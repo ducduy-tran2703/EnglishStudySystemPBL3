@@ -14,6 +14,7 @@ namespace EnglishStudySystem.Controllers
         public HomeController()
         {
             _context = new ApplicationDbContext();
+            
         }
         public HomeController(ApplicationDbContext context)
         {
@@ -21,6 +22,7 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult HomePage()
         {
+            Session["Layout"] = "~/Views/Shared/_Layout.cshtml";
             // Lấy danh sách categories
             var categories = _context.Categories
                 .Where(c => !c.IsDeleted)
@@ -38,7 +40,8 @@ namespace EnglishStudySystem.Controllers
 
             // Truyền dữ liệu qua ViewBag
             ViewBag.UserNames = users;
-
+            ViewBag.Layout = Session["Layout"];
+            ViewBag.ListCategories = categories;
             return View(categories);
         }
 
