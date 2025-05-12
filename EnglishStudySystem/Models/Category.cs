@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema; // For [DatabaseGenerated] if needed, or other specific EF attributes
 
@@ -68,5 +69,13 @@ namespace EnglishStudySystem.Models
         [DataType(DataType.DateTime)]
         [Display(Name = "Ngày xóa")]
         public DateTime? DeletedAt { get; set; } // Lưu thời gian xóa mềm
+        // --- THUỘC TÍNH ĐIỀU HƯỚNG ---
+        public virtual ICollection<Lesson> Lessons { get; set; }
+
+        // Constructor để khởi tạo collection, tránh lỗi null reference
+        public Category()
+        {
+            Lessons = new HashSet<Lesson>();
+        }
     }
 }

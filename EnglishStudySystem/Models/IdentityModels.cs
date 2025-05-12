@@ -23,7 +23,8 @@ namespace EnglishStudySystem.Models
         // Thuộc tính điều hướng (Navigation properties)
         public virtual ICollection<SavedLesson> SavedLessons { get; set; }
         public virtual ICollection<LessonHistory> LessonHistories { get; set; }
-        public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<Notification> SentNotifications { get; set; }
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
 
         public virtual ICollection<UserPermission> UserPermissions { get; set; }
@@ -31,6 +32,16 @@ namespace EnglishStudySystem.Models
         // Ví dụ: Public bool CanManageUsers { get; set; }
         // Public bool CanManageLessons { get; set; }
 
+        public ApplicationUser()
+        {
+            // Khởi tạo các collections để tránh lỗi null reference
+            SavedLessons = new HashSet<SavedLesson>();
+            LessonHistories = new HashSet<LessonHistory>();
+            // Notifications = new HashSet<Notification>(); // <-- Xóa hoặc Comment dòng này
+            SentNotifications = new HashSet<Notification>();
+            UserNotifications = new HashSet<UserNotification>();
+            UserPermissions = new HashSet<UserPermission>();
+        }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Lưu ý rằng authenticationType phải khớp với loại được xác định trong CookieAuthenticationOptions.AuthenticationType
@@ -77,6 +88,7 @@ namespace EnglishStudySystem.Models
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         // --- Override SaveChanges cho Soft Delete ---
         public override int SaveChanges()
