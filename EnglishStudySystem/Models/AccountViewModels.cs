@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace EnglishStudySystem.Models
@@ -64,21 +65,44 @@ namespace EnglishStudySystem.Models
 
     public class RegisterViewModel
     {
+        [Required(ErrorMessage = "Tên đăng nhập là bắt buộc.")]
+        [StringLength(50, ErrorMessage = "{0} phải dài ít nhất {2} ký tự.", MinimumLength = 3)]
+        [Display(Name = "Tên đăng nhập")]
+        public string UserName { get; set; } // Changed from Username to UserName to match IdentityUser property
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "{0} phải dài ít nhất {2} ký tự.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Mật khẩu")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Xác nhận mật khẩu")]
+        [Compare("Password", ErrorMessage = "Mật khẩu và mật khẩu xác nhận không khớp.")]
         public string ConfirmPassword { get; set; }
+
+        // --- NEW PROPERTIES FOR REGISTRATION ---
+
+        [Required(ErrorMessage = "Họ tên là bắt buộc.")]
+        [StringLength(255, ErrorMessage = "Họ tên không được vượt quá 255 ký tự.")]
+        [Display(Name = "Họ tên")]
+        public string FullName { get; set; }
+
+        [Required(ErrorMessage = "Ngày sinh là bắt buộc.")]
+        [DataType(DataType.Date)] // Quan trọng để hiển thị lịch chọn ngày
+        [Display(Name = "Ngày sinh")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)] // Định dạng hiển thị
+        public DateTime? DateOfBirth { get; set; } // Dùng DateTime? để có thể là null nếu không bắt buộc hoặc để kiểm tra input
+
+        [Phone] // Đảm bảo định dạng số điện thoại hợp lệ (không bắt buộc kiểm tra theo regex nếu không yêu cầu)
+        [Display(Name = "Số điện thoại")]
+        [StringLength(20, ErrorMessage = "Số điện thoại không được vượt quá 20 ký tự.")]
+        public string PhoneNumber { get; set; }
     }
 
     public class ResetPasswordViewModel
