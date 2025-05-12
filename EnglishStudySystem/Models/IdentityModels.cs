@@ -1,7 +1,9 @@
 ﻿using System; // Thêm dòng này cho DateTime
 using System.Collections.Generic; // Thêm dòng này cho ICollection
 using System.Data.Entity;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -76,6 +78,39 @@ namespace EnglishStudySystem.Models
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
 
+        // --- Override SaveChanges cho Soft Delete ---
+        public override int SaveChanges()
+        {
+            // Lấy tất cả các entry đang được đánh dấu là 'Deleted'
+            var softDeletableEntries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted && e.Entity is ISoftDeletable);
+
+            foreach (var entry in softDeletableEntries)
+            {
+                var entity = (ISoftDeletable)entry.Entity;
+                entity.IsDeleted = true; // Đánh dấu là đã xóa mềm
+                entity.DeletedAt = DateTime.Now; // Lưu thời gian xóa
+                entry.State = EntityState.Modified; // Thay đổi trạng thái từ Deleted thành Modified
+                                                    // Để Entity Framework thực hiện update thay vì delete
+            }
+            return base.SaveChanges();
+        }
+
+        // --- Async version của SaveChanges (quan trọng nếu bạn dùng async/await) ---
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            var softDeletableEntries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted && e.Entity is ISoftDeletable);
+
+            foreach (var entry in softDeletableEntries)
+            {
+                var entity = (ISoftDeletable)entry.Entity;
+                entity.IsDeleted = true;
+                entity.DeletedAt = DateTime.Now;
+                entry.State = EntityState.Modified;
+            }
+            return base.SaveChangesAsync(cancellationToken);
+        }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -125,6 +160,8 @@ namespace EnglishStudySystem.Models
                 .WithMany(l => l.Tests)
                 .HasForeignKey(t => t.LessonId)
                 .WillCascadeOnDelete(true);
+
+
 
             // Cấu hình quan hệ cho Question (Test - Question)
             modelBuilder.Entity<Question>()

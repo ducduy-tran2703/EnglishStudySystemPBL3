@@ -1,32 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic; // Thêm dòng này nếu bạn định có Questions trong Test
 
-namespace EnglishStudySystem.Models
+namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với dự án của bạn
 {
-    public class Test
+    public class Test : ISoftDeletable // Kế thừa ISoftDeletable
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(255)]
-        [Display(Name = "Tiêu đề bài kiểm tra")]
+        [Required(ErrorMessage = "ID bài học là bắt buộc.")]
+        [Display(Name = "ID Bài học")]
+        public int LessonId { get; set; } // Khóa ngoại tới Lesson
+
+        [ForeignKey("LessonId")]
+        public virtual Lesson Lesson { get; set; } // Thuộc tính điều hướng tới Lesson
+
+        [Required(ErrorMessage = "Tiêu đề bài kiểm tra là bắt buộc.")]
+        [StringLength(255, ErrorMessage = "Tiêu đề không được vượt quá 255 ký tự.")]
+        [Display(Name = "Tiêu đề")]
         public string Title { get; set; }
 
         [Display(Name = "Mô tả")]
         public string Description { get; set; }
 
-        [Display(Name = "Thời lượng (phút)")]
-        public int DurationMinutes { get; set; }
+        [Required]
+        [Display(Name = "Số lượng câu hỏi")]
+        public int QuestionCount { get; set; } // Ví dụ: tổng số câu hỏi trong bài kiểm tra
 
-        // Foreign Key
-        [Display(Name = "Bài học liên quan")]
-        public int LessonId { get; set; }
+        [Required]
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Ngày tạo")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        // Navigation properties
-        [ForeignKey("LessonId")]
-        public virtual Lesson Lesson { get; set; }
-        public virtual ICollection<Question> Questions { get; set; }
+        // --- CHỨC NĂNG XÓA MỀM (SOFT DELETE) ---
+        [Required]
+        [Display(Name = "Đã xóa")]
+        public bool IsDeleted { get; set; } = false;
+
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Ngày xóa")]
+        public DateTime? DeletedAt { get; set; }
+
+        // Bạn có thể thêm các thuộc tính điều hướng khác tại đây, ví dụ: một bài kiểm tra có nhiều câu hỏi
+         public virtual ICollection<Question> Questions { get; set; }
     }
 }

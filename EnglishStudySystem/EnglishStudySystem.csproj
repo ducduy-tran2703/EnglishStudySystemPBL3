@@ -177,6 +177,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\QueryExtensions.cs" />
     <Compile Include="Migrations\202505112159014_FixUserTestAttemptCascade.cs" />
     <Compile Include="Migrations\202505112159014_FixUserTestAttemptCascade.Designer.cs">
       <DependentUpon>202505112159014_FixUserTestAttemptCascade.cs</DependentUpon>
@@ -184,6 +185,14 @@
     <Compile Include="Migrations\202505121310050_UpdateDB.cs" />
     <Compile Include="Migrations\202505121310050_UpdateDB.Designer.cs">
       <DependentUpon>202505121310050_UpdateDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505121413043_AddCategoryAndSoftDelete.cs" />
+    <Compile Include="Migrations\202505121413043_AddCategoryAndSoftDelete.Designer.cs">
+      <DependentUpon>202505121413043_AddCategoryAndSoftDelete.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505121432498_AddLessonModel.cs" />
+    <Compile Include="Migrations\202505121432498_AddLessonModel.Designer.cs">
+      <DependentUpon>202505121432498_AddLessonModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -321,6 +330,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505121310050_UpdateDB.resx">
       <DependentUpon>202505121310050_UpdateDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505121413043_AddCategoryAndSoftDelete.resx">
+      <DependentUpon>202505121413043_AddCategoryAndSoftDelete.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505121432498_AddLessonModel.resx">
+      <DependentUpon>202505121432498_AddLessonModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
