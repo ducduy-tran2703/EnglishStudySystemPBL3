@@ -9,17 +9,34 @@ namespace EnglishStudySystem.Controllers
 {
     public class CategoryController : Controller
     {
-        // GET: Category
-        private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        public ActionResult Index()
+        private readonly ApplicationDbContext _context;
+        public CategoryController()
         {
-            
-            return View();
+            _context = new ApplicationDbContext();
         }
-        public ActionResult ShowAllCategories()
+        public CategoryController(ApplicationDbContext context)
         {
-            var categories = _context.Categories.ToList();
-            return View(categories);
+            _context = context;
+        }
+
+        // In CategoryController.cs (no changes needed, your existing code is fine)
+        public ActionResult Details(int id)
+        {
+            var category = _context.Categories
+                .FirstOrDefault(c => c.Id == id && !c.IsDeleted);
+
+            if (category == null)
+            {
+                return HttpNotFound();
+            }
+
+            var lessons = _context.Lessons
+                .Where(l => l.CategoryId == id && !l.IsDeleted)
+                .OrderBy(l => l.CreatedDate)
+                .ToList();
+
+            ViewBag.Lessons = lessons;
+            return View(category);
         }
     }
 }
