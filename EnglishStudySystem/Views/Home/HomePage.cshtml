@@ -4,11 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <main class="container py-4">
-    <!-- Header Section -->
+    <!-- Header Section - Đổi tiêu đề thành "Bạn Muốn Gì Hôm Nay" -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">Tất cả danh mục học tập</h2>
+        <h2 class="fw-bold mb-0">Bạn Muốn Gì Hôm Nay</h2> <!-- Đã bỏ text-success để mặc định màu đen -->
         <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+            <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                 <i class="fas fa-sort me-1"></i> Sắp xếp
             </button>
             <ul class="dropdown-menu">
@@ -28,16 +28,18 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <h3 class="h5 fw-bold mb-1">@category.Name</h3>
+                                <!-- Đổi màu tiêu đề danh mục thành đen -->
+                                <h3 class="h5 fw-bold mb-1">@category.Name</h3> <!-- Đã bỏ text-success -->
                                 @if (!string.IsNullOrEmpty(category.Description))
                                 {
                                     <p class="text-muted small mb-2">@category.Description</p>
                                 }
                             </div>
-                            <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3">
+                            <!-- Đổi màu giá tiền thành vàng -->
+                            <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
                                 @if (category.Price.HasValue && category.Price > 0)
                                 {
-                                    string.Format("{0:C}", category.Price);
+                                    <text>@string.Format("{0:C0}", category.Price.Value)</text>
                                 }
                                 else
                                 {
@@ -47,7 +49,7 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            <span class="badge bg-secondary bg-opacity-10 text-secondary py-1 px-2">
+                            <span class="badge bg-success bg-opacity-10 text-success py-1 px-2">
                                 <i class="fas @GetCategoryIcon(category.Name) me-1"></i>
                                 @GetCategoryTag(category.Name)
                             </span>
@@ -55,22 +57,27 @@
 
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-user text-muted"></i>
+                                <div class="avatar-sm bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user text-success"></i>
                                 </div>
-                                <div class="ms-2">
-                                    <small class="text-muted">Tạo bởi</small>
-                                    <div class="fw-semibold">@(string.IsNullOrEmpty(category.CreatedByUserRole) ? "Admin" : category.CreatedByUserRole)</div>
+                                <div class="fw-semibold">
+                                    @{
+                                        var userNames = ViewBag.UserNames as Dictionary<string, string>;
+                                        var userName = userNames != null && userNames.ContainsKey(category.CreatedByUserId)
+                                            ? userNames[category.CreatedByUserId]
+                                            : "System";
+                                    }
+                                    @userName - @(category.CreatedByUserRole ?? "Admin")
                                 </div>
                             </div>
                             <a href="@Url.Action("Details", "Category", new { id = category.Id })"
-                               class="btn btn-sm btn-outline-primary px-3">
+                               class="btn btn-sm btn-success px-3">
                                 Xem chi tiết
                             </a>
                         </div>
                     </div>
                     <div class="card-footer bg-transparent border-top py-2">
-                        <small class="text-muted">
+                        <small class="text-success">
                             <i class="far fa-clock me-1"></i>
                             @category.CreatedDate.ToString("dd/MM/yyyy")
                         </small>
@@ -80,6 +87,25 @@
         }
     </div>
 </main>
+
+<style>
+    /* Hiệu ứng hover cho card */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.1) !important;
+        }
+
+    /* Custom màu vàng cho badge giá tiền */
+    .badge.bg-warning {
+        color: #ffc107 !important;
+        background-color: rgba(255, 193, 7, 0.1) !important;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+</style>
 
 @functions {
     public string GetCategoryIcon(string categoryName)
