@@ -194,6 +194,10 @@
     <Compile Include="Migrations\202505121432498_AddLessonModel.Designer.cs">
       <DependentUpon>202505121432498_AddLessonModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505121545290_updatedatabase.cs" />
+    <Compile Include="Migrations\202505121545290_updatedatabase.Designer.cs">
+      <DependentUpon>202505121545290_updatedatabase.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -336,6 +340,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505121432498_AddLessonModel.resx">
       <DependentUpon>202505121432498_AddLessonModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505121545290_updatedatabase.resx">
+      <DependentUpon>202505121545290_updatedatabase.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
