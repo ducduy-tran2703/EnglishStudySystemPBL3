@@ -1,0 +1,94 @@
+﻿/* Content/CustomStyles.css */
+
+/* Căn giữa toàn bộ khung form trên trang */
+.register-form-wrapper {
+    max-width: 600px; /* Đặt chiều rộng tối đa cho form */
+    margin: 50px auto; /* Căn giữa theo chiều ngang và tạo khoảng cách trên/dưới */
+    padding: 30px; /* Khoảng cách bên trong khung */
+    /* Thay đổi màu viền thành xanh */
+    border: 1px solid #007bff; /* Viền xanh dương của Bootstrap primary */
+    border-radius: 8px; /* Bo góc khung */
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Đổ bóng nhẹ màu xanh */
+    background-color: #fff; /* Màu nền của khung */
+}
+
+    /* Tùy chỉnh tiêu đề và đường kẻ ngang bên trong form */
+    .register-form-wrapper h2,
+    .register-form-wrapper h4 {
+        text-align: center; /* Căn giữa tiêu đề */
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .register-form-wrapper hr {
+        border-top: 1px solid #eee;
+        margin-bottom: 25px;
+    }
+
+
+    /* Căn giữa các nút trong form (ví dụ nút "Đăng ký") */
+    /* Áp dụng cho div chứa nút submit trong Bootstrap's form-horizontal */
+    .register-form-wrapper .form-group > div:last-child { /* Targeting the column containing the button */
+        text-align: center; /* Căn giữa nội dung của cột, bao gồm nút */
+    }
+
+    /* Style cho nút Đăng ký */
+    .register-form-wrapper .btn.btn-default {
+        background-color: #007bff; /* Màu nền xanh dương của Bootstrap primary */
+        color: #fff; /* Màu chữ trắng */
+        border: 1px solid #007bff; /* Viền cùng màu nền */
+        padding: 10px 30px; /* Kích thước nút */
+        font-size: 18px; /* Cỡ chữ */
+        border-radius: 5px; /* Bo góc nút */
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển động */
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2); /* Đổ bóng nhẹ */
+    }
+
+        .register-form-wrapper .btn.btn-default:hover {
+            background-color: #0056b3; /* Màu nền khi hover */
+            border-color: #004085; /* Màu viền khi hover */
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); /* Đổ bóng đậm hơn khi hover */
+        }
+
+        .register-form-wrapper .btn.btn-default:active {
+            background-color: #00357a;
+            border-color: #002752;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Hiệu ứng nhấn xuống */
+        }
+
+    /* Điều chỉnh cho các ô nhập liệu (TextBox) */
+    .register-form-wrapper .form-control {
+        /* ... (giữ nguyên) ... */
+    }
+
+    /* Bạn có thể thêm các style cho lỗi validation nếu muốn */
+    .register-form-wrapper .text-danger {
+        font-size: 0.9em;
+    }
+
+    /* Điều chỉnh khoảng cách cho các label (nếu cần) */
+    .register-form-wrapper .control-label {
+        font-weight: 600;
+        margin-bottom: 5px; /* Khoảng cách dưới label */
+    }
+
+/* Style cho icon trong input */
+.input-group-addon {
+    background-color: #e9ecef; /* Màu nền nhẹ cho icon */
+    border: 1px solid #ced4da; /* Viền khớp với input */
+    padding: .375rem .75rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: .25rem;
+}
+
+/* Fix for input-group-addon width with form-horizontal */
+/* This can be tricky with form-horizontal grid system */
+/* If using Bootstrap 3, input-group inside form-group will work fine.
+   If using Bootstrap 4+, need to make sure the grid system (col-md-10) allows it. */
+/* For simple input-group-addon, Bootstrap 3's default styling is usually sufficient. */
