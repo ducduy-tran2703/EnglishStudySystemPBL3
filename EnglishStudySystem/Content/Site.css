@@ -1,0 +1,145 @@
+﻿/* Set padding to keep content from hitting the edges */
+.body-content {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Định nghĩa màu sắc chính của bạn */
+:root {
+    --primary-color: #6a1b9a; /* Màu tím đậm */
+    --secondary-color: #e0b4fc; /* Màu tím nhạt hơn */
+    --text-color: #333; /* Màu chữ chính */
+    --light-text-color: #fff; /* Màu chữ trên nền tối */
+    --background-color: #f8f8f8; /* Màu nền trắng nhạt */
+    --border-color: #ddd; /* Màu viền */
+    --hover-color: #8e24aa; /* Màu tím khi di chuột */
+}
+
+body {
+    padding-top: 50px; /* Đảm bảo nội dung không bị che bởi navbar cố định */
+    padding-bottom: 20px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar adjustments */
+.navbar-inverse {
+    background-color: var(--primary-color); /* Nền navbar màu tím đậm */
+    border-color: var(--primary-color); /* Viền navbar cùng màu nền */
+}
+
+    .navbar-inverse .navbar-nav > li > a {
+        color: var(--light-text-color); /* Màu chữ menu trắng */
+    }
+
+        .navbar-inverse .navbar-nav > li > a:hover,
+        .navbar-inverse .navbar-nav > li > a:focus {
+            color: var(--secondary-color); /* Màu chữ menu tím nhạt khi di chuột */
+            background-color: transparent;
+        }
+
+    .navbar-inverse .navbar-brand {
+        color: var(--light-text-color); /* Màu chữ brand trắng */
+        font-weight: bold;
+    }
+
+        .navbar-inverse .navbar-brand:hover,
+        .navbar-inverse .navbar-brand:focus {
+            color: var(--secondary-color); /* Màu chữ brand tím nhạt khi di chuột */
+        }
+
+    .navbar-inverse .navbar-toggle {
+        border-color: var(--light-text-color);
+    }
+
+        .navbar-inverse .navbar-toggle .icon-bar {
+            background-color: var(--light-text-color);
+        }
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--light-text-color);
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active,
+    .btn-primary.active {
+        background-color: var(--hover-color);
+        border-color: var(--hover-color);
+        color: var(--light-text-color);
+    }
+
+/* Links */
+a {
+    color: var(--primary-color);
+}
+
+    a:hover {
+        color: var(--hover-color);
+    }
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+}
+
+/* Forms */
+.form-horizontal .control-label {
+    color: var(--text-color);
+}
+
+/* Main content area */
+.container.body-content {
+    background-color: #fff; /* Nền trắng cho khu vực nội dung chính */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+/* Footer */
+footer {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    color: var(--text-color);
+}
+
+/* Các phần tử đặc biệt khác nếu cần, ví dụ:
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.card-header {
+    background-color: var(--secondary-color);
+    color: var(--light-text-color);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+*/

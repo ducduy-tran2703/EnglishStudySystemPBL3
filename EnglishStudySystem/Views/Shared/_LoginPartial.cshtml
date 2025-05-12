@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    @* Form này sẽ được căn chỉnh bởi parent div trong _Layout *@
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "d-flex" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="navbar-nav">
+            @* Loại bỏ "nav" và "navbar-right" - chỉ cần "navbar-nav" hoặc không cần gì nếu chỉ có 1 item *@
+            <li class="nav-item">
+                @* nav-item cho mỗi item *@
+                @* Nút cho "Hello User!" - sử dụng btn-secondary (thay thế btn-default) và me-2 (margin-end) cho khoảng cách *@
+                @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage", @class = "btn btn-secondary me-2" })
+            </li>
+            <li class="nav-item">
+                @* Nút "Log off" - sử dụng btn-primary và không cần navbar-btn *@
+                <a href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-primary">Log off</a>
+            </li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="navbar-nav">
+        @* Loại bỏ "nav" và "navbar-right" *@
+        <li class="nav-item">
+            @* Nút "Register" - sử dụng btn-primary và me-2 *@
+            @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "btn btn-primary me-2" })
+        </li>
+        <li class="nav-item">
+            @* Nút "Log in" - sử dụng btn-secondary *@
+            @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "btn btn-secondary" })
+        </li>
+    </ul>
+}
