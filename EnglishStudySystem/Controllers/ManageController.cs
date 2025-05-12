@@ -55,25 +55,32 @@ namespace EnglishStudySystem.Controllers
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
-                : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
+                message == ManageMessageId.ChangePasswordSuccess ? "Mật khẩu của bạn đã được thay đổi."
+                : message == ManageMessageId.SetPasswordSuccess ? "Mật khẩu của bạn đã được đặt."
+                : message == ManageMessageId.SetTwoFactorSuccess ? "Xác thực hai yếu tố của bạn đã được đặt."
+                : message == ManageMessageId.AddPhoneNumberSuccess ? "Số điện thoại của bạn đã được thêm."
+                : message == ManageMessageId.RemovePhoneNumberSuccess ? "Số điện thoại của bạn đã bị xóa."
                 : "";
 
             var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
+            var user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                return View("Error"); // Hoặc xử lý lỗi khác nếu người dùng không tìm thấy
+            }
+
+            var model = new ProfileViewModel
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber // Thuộc tính PhoneNumber có thể là null
+                // Thêm các thuộc tính khác từ user nếu bạn đã mở rộng ApplicationUser của mình
+                // FullName = user.FullName
             };
+
             return View(model);
         }
+
 
         //
         // POST: /Manage/RemoveLogin

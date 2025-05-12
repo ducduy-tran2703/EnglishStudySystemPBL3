@@ -1,89 +1,60 @@
-﻿@model EnglishStudySystem.Models.IndexViewModel
+﻿@model EnglishStudySystem.Models.ProfileViewModel 
+
 @{
-    ViewBag.Title = "Manage";
+    ViewBag.Title = "Hồ sơ người dùng";
 }
 
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
+<div class="container mt-4">
+    <h2>@ViewBag.Title</h2>
+    <hr />
 
-    <p class="text-success">@ViewBag.StatusMessage</p>
-    <div>
-        <h4>Change your account settings</h4>
-        <hr />
-        <dl class="dl-horizontal">
-            <dt>Password:</dt>
-            <dd>
-                [
-                @if (Model.HasPassword)
-                {
-                    @Html.ActionLink("Change your password", "ChangePassword")
-                }
-                else
-                {
-                    @Html.ActionLink("Create", "SetPassword")
-                }
-                ]
-            </dd>
-            <dt>External Logins:</dt>
-            <dd>
-                @Model.Logins.Count [
-                @Html.ActionLink("Manage", "ManageLogins") ]
-            </dd>
-            @*
-                Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-                
-                See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                    for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-                
-                Uncomment the following block after you have set up two-factor authentication
-            *@
-            @*  
-                <dt>Phone Number:</dt>
-                <dd>
-                    @(Model.PhoneNumber ?? "None")
-                    @if (Model.PhoneNumber != null)
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thông tin cá nhân</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(ViewBag.StatusMessage))
                     {
-                        <br />
-                        <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
-                        using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>[<input type="submit" value="Remove" class="btn-link" />]</text>
-                        }
+                        <div class="alert alert-success" role="alert">@ViewBag.StatusMessage</div>
                     }
-                    else
-                    {
-                        <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
-                    }
-                </dd>
-            *@
-            <dt>Two-Factor Authentication:</dt>
-            <dd>
-                <p>
-                    There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                    for details on setting up this ASP.NET application to support two-factor authentication.
-                </p>
-                @*@if (Model.TwoFactor)
-                    {
-                        using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { role = "form" }))
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(m => m.UserName):</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(m => m.UserName)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(m => m.Email):</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(m => m.Email)</dd>
+                        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
                         {
-                            @Html.AntiForgeryToken()
-                            <text>Enabled
-                            <input type="submit" value="Disable" class="btn btn-link" />
-                            </text>
+                            <dt class="col-sm-4">@Html.DisplayNameFor(m => m.PhoneNumber):</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(m => m.PhoneNumber)</dd>
                         }
-                    }
-                    else
-                    {
-                        using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { role = "form" }))
+                        else
                         {
-                            @Html.AntiForgeryToken()
-                            <text>Disabled
-                            <input type="submit" value="Enable" class="btn btn-link" />
-                            </text>
+                            <dt class="col-sm-4">Số điện thoại:</dt>
+                            <dd class="col-sm-8"><span class="text-muted">Chưa có số điện thoại.</span></dd>
                         }
-                    }*@
-            </dd>
-        </dl>
+
+                        @* Thêm các trường khác nếu bạn có trong ProfileViewModel *@
+                        @* <dt class="col-sm-4">@Html.DisplayNameFor(m => m.FullName):</dt> *@
+                        @* <dd class="col-sm-8">@Html.DisplayFor(m => m.FullName)</dd> *@
+                    </dl>
+                </div>
+                <div class="card-footer text-end">
+                    @Html.ActionLink("Thay đổi mật khẩu", "ChangePassword", "Manage", routeValues: null, htmlAttributes: new { @class = "btn btn-outline-primary me-2" })
+                    @Html.ActionLink("Quản lý thông tin khác", "Index", "Manage", routeValues: null, htmlAttributes: new { @class = "btn btn-outline-secondary" }) @* Liên kết này có thể dẫn đến các cài đặt quản lý khác nếu bạn muốn *@
+                </div>
+            </div>
+        </div>
     </div>
-</main>
+
+    <p class="mt-3 text-center">
+        @Html.ActionLink("Quay lại trang chủ", "Index", "Home", null, new { @class = "btn btn-link" })
+    </p>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -180,6 +180,10 @@
     <Compile Include="Migrations\202505112159014_FixUserTestAttemptCascade.Designer.cs">
       <DependentUpon>202505112159014_FixUserTestAttemptCascade.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505121310050_UpdateDB.cs" />
+    <Compile Include="Migrations\202505121310050_UpdateDB.Designer.cs">
+      <DependentUpon>202505121310050_UpdateDB.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -192,6 +196,7 @@
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Payment.cs" />
     <Compile Include="Models\Permisson.cs" />
+    <Compile Include="Models\ProfileViewModel.cs" />
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\SavedLesson.cs" />
     <Compile Include="Models\Test.cs" />
@@ -311,6 +316,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202505112159014_FixUserTestAttemptCascade.resx">
       <DependentUpon>202505112159014_FixUserTestAttemptCascade.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505121310050_UpdateDB.resx">
+      <DependentUpon>202505121310050_UpdateDB.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
