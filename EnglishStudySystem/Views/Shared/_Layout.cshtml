@@ -8,42 +8,6 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-        <div class="container">
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            @Html.ActionLink("English Study System", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        @Html.ActionLink("Trang chủ", "Index", "Home", null, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Về chúng tôi", "About", "Home", null, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Liên hệ", "Contact", "Home", null, new { @class = "nav-link" })
-                    </li>
-                    @if(Request.IsAuthenticated && User.IsInRole("Administrator") )
-                    {
-                        <li class="nav-item">
-                            @Html.ActionLink("Quản lý Người dùng", "Index", "Users", new { area = "Admin" }, new { @class = "nav-link" })
-                        </li>
-
-                    }
-
-                </ul>
-
-                @Html.Partial("_LoginPartial")
-
-            </div>
-        </div>
-    </nav>
-
     <div class="container body-content">
         @RenderBody()
         <hr />
