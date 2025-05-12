@@ -126,3 +126,177 @@ hr {
         max-width: 100%;
     }
 }
+.remember-me-container {
+    margin: 15px 0;
+}
+
+.remember-me-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+    .remember-me-label:hover {
+        color: #333;
+    }
+
+.remember-me-checkbox {
+    /* Ẩn checkbox mặc định */
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .remember-me-checkbox:checked {
+        background-color: #4a90e2;
+        border-color: #4a90e2;
+    }
+
+        .remember-me-checkbox:checked::after {
+            content: '\2713'; /* Dấu tích */
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    .remember-me-checkbox:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    }
+
+.remember-me-text {
+    margin-left: 5px;
+}
+.forgot-password-wrapper {
+    text-align: right;
+    margin: 10px 0 20px;
+}
+
+.forgot-password-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 5px 0;
+}
+
+    .forgot-password-link:hover {
+        color: #4a90e2;
+        text-decoration: none;
+    }
+
+    /* Hiệu ứng gạch chân động */
+    .forgot-password-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: #4a90e2;
+        transition: width 0.3s ease;
+    }
+
+    .forgot-password-link:hover::after {
+        width: 100%;
+    }
+
+    /* Hoặc hiệu ứng khác - mũi tên xuất hiện */
+    .forgot-password-link:hover {
+        padding-right: 15px;
+    }
+
+        .forgot-password-link:hover::before {
+            content: '→';
+            position: absolute;
+            right: 0;
+            opacity: 0;
+            animation: fadeInArrow 0.3s ease forwards;
+        }
+
+@keyframes fadeInArrow {
+    from {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.register-prompt {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.register-text {
+    margin-right: 8px;
+}
+
+.register-link {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    padding: 0 2px;
+    transition: all 0.3s ease;
+}
+
+    /* Hiệu ứng gạch chân động */
+    .register-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: #4a90e2;
+        transition: width 0.3s ease;
+    }
+
+    .register-link:hover {
+        color: #3a7bc8;
+    }
+
+        .register-link:hover::after {
+            width: 100%;
+        }
+
+    /* Hoặc phiên bản với icon */
+    .register-link.with-icon {
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .register-link.with-icon::before {
+            content: '\f054'; /* FontAwesome arrow-right */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 10px;
+            margin-left: 6px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .register-link.with-icon:hover::before {
+            opacity: 1;
+            transform: translateX(3px);
+        }
