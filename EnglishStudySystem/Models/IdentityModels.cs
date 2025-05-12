@@ -1,5 +1,5 @@
-﻿using System; // Thêm dòng này cho DateTime
-using System.Collections.Generic; // Thêm dòng này cho ICollection
+﻿using System; // Cần cho DateTime
+using System.Collections.Generic; // Cần cho ICollection
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using static System.Net.Mime.MediaTypeNames;
+// using static System.Net.Mime.MediaTypeNames.Application; // <-- Dòng này không cần thiết, đã được xóa
 
 namespace EnglishStudySystem.Models
 {
@@ -23,9 +23,9 @@ namespace EnglishStudySystem.Models
         // Thuộc tính điều hướng (Navigation properties)
         public virtual ICollection<SavedLesson> SavedLessons { get; set; }
         public virtual ICollection<LessonHistory> LessonHistories { get; set; }
-        public virtual ICollection<Notification> SentNotifications { get; set; }
-        public virtual ICollection<UserNotification> UserNotifications { get; set; }
-        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Notification> SentNotifications { get; set; } // Thông báo được gửi bởi người dùng này
+        public virtual ICollection<UserNotification> UserNotifications { get; set; } // Thông báo mà người dùng này nhận được (qua bảng trung gian)
+        public virtual ICollection<Comment> Comments { get; set; } // <-- Thuộc tính này đã có sẵn và được giữ nguyên
 
         public virtual ICollection<UserPermission> UserPermissions { get; set; }
         // Nếu cần thêm các thuộc tính cho Admin/Editor, có thể thêm ở đây
@@ -37,11 +37,12 @@ namespace EnglishStudySystem.Models
             // Khởi tạo các collections để tránh lỗi null reference
             SavedLessons = new HashSet<SavedLesson>();
             LessonHistories = new HashSet<LessonHistory>();
-            // Notifications = new HashSet<Notification>(); // <-- Xóa hoặc Comment dòng này
             SentNotifications = new HashSet<Notification>();
             UserNotifications = new HashSet<UserNotification>();
+            Comments = new HashSet<Comment>(); // <-- Đảm bảo được khởi tạo tại đây
             UserPermissions = new HashSet<UserPermission>();
         }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Lưu ý rằng authenticationType phải khớp với loại được xác định trong CookieAuthenticationOptions.AuthenticationType
@@ -88,7 +89,7 @@ namespace EnglishStudySystem.Models
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
-        public DbSet<UserNotification> UserNotifications { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; } // DbSet cho bảng trung gian UserNotification
 
         // --- Override SaveChanges cho Soft Delete ---
         public override int SaveChanges()
@@ -123,6 +124,14 @@ namespace EnglishStudySystem.Models
             }
             return base.SaveChangesAsync(cancellationToken);
         }
+
+        // MỚI: Thêm override này để hỗ trợ SaveChangesAsync() không tham số CancellationToken
+        public override Task<int> SaveChangesAsync()
+        {
+            return SaveChangesAsync(CancellationToken.None);
+        }
+
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -173,8 +182,6 @@ namespace EnglishStudySystem.Models
                 .HasForeignKey(t => t.LessonId)
                 .WillCascadeOnDelete(true);
 
-
-
             // Cấu hình quan hệ cho Question (Test - Question)
             modelBuilder.Entity<Question>()
                 .HasRequired(q => q.Test)
@@ -188,7 +195,6 @@ namespace EnglishStudySystem.Models
                 .WithMany(q => q.Answers)
                 .HasForeignKey(a => a.QuestionId)
                 .WillCascadeOnDelete(true);
-
 
             // Cấu hình quan hệ cho Payment (Người dùng - Payment)
             modelBuilder.Entity<Payment>()
@@ -241,8 +247,34 @@ namespace EnglishStudySystem.Models
                 .WithMany(p => p.UserPermissions)
                 .HasForeignKey(up => up.PermissionId)
                 .WillCascadeOnDelete(true);
-        }
 
-        public System.Data.Entity.DbSet<EnglishStudySystem.Models.UserViewModel> UserViewModels { get; set; }
+            // MỚI: Cấu hình quan hệ cho Notification (NGƯỜI GỬI - Sender)
+            // Một Notification có một Sender (Editor/Admin)
+            modelBuilder.Entity<Notification>()
+                .HasRequired(n => n.Sender) // Mỗi Notification phải có một người gửi
+                .WithMany(u => u.SentNotifications) // Một người dùng có thể gửi nhiều Notification
+                .HasForeignKey(n => n.SenderId) // Khóa ngoại là SenderId trong bảng Notification
+                .WillCascadeOnDelete(false); // Không xóa thông báo nếu người gửi bị xóa (thường muốn giữ lại lịch sử)
+
+            // MỚI: Cấu hình quan hệ nhiều-nhiều cho Notification và ApplicationUser (NGƯỜI NHẬN - Recipients) thông qua bảng UserNotification
+            // 1. Notification <-> UserNotification (Một Notification có nhiều UserNotification)
+            modelBuilder.Entity<UserNotification>()
+                .HasRequired(un => un.Notification) // Mỗi UserNotification phải thuộc về một Notification
+                .WithMany(n => n.UserNotifications) // Một Notification có nhiều UserNotification
+                .HasForeignKey(un => un.NotificationId) // Khóa ngoại là NotificationId
+                .WillCascadeOnDelete(true); // Nếu Notification bị xóa cứng, các liên kết UserNotification của nó cũng bị xóa
+
+            // 2. ApplicationUser <-> UserNotification (Một ApplicationUser nhận nhiều UserNotification)
+            modelBuilder.Entity<UserNotification>()
+                .HasRequired(un => un.User) // Mỗi UserNotification phải thuộc về một User (người nhận)
+                .WithMany(u => u.UserNotifications) // Một User có nhiều UserNotification
+                .HasForeignKey(un => un.UserId) // Khóa ngoại là UserId
+                .WillCascadeOnDelete(false); // Quan trọng: Không xóa UserNotification nếu User bị xóa (để tránh xóa User)
+
+            // Lưu ý: Dòng này có vẻ không đúng nếu UserViewModel chỉ là một ViewModel để hiển thị.
+            // Dbset chỉ nên dùng cho các Entity Model ánh xạ tới bảng trong database.
+            // Nếu UserViewModel không phải là một Entity Model, hãy xóa dòng này.
+            // public System.Data.Entity.DbSet<EnglishStudySystem.Models.UserViewModel> UserViewModels { get; set; }
+        }
     }
 }
