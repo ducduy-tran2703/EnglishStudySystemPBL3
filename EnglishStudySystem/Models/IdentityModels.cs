@@ -161,6 +161,8 @@ namespace EnglishStudySystem.Models
                 .HasForeignKey(t => t.LessonId)
                 .WillCascadeOnDelete(true);
 
+
+
             // Cấu hình quan hệ cho Question (Test - Question)
             modelBuilder.Entity<Question>()
                 .HasRequired(q => q.Test)

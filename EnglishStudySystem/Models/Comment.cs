@@ -1,33 +1,45 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; // Để sử dụng [ForeignKey]
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EnglishStudySystem.Models
+namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với dự án của bạn
 {
-    public class Comment
+    public class Comment : ISoftDeletable // Kế thừa ISoftDeletable
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(1000)]
-        [Display(Name = "Nội dung bình luận")]
+        [Required(ErrorMessage = "ID bài học là bắt buộc.")]
+        [Display(Name = "ID Bài học")]
+        public int LessonId { get; set; } // Khóa ngoại tới Lesson
+
+        [ForeignKey("LessonId")]
+        public virtual Lesson Lesson { get; set; } // Thuộc tính điều hướng tới Lesson
+
+        [Required(ErrorMessage = "Nội dung bình luận là bắt buộc.")]
+        [Display(Name = "Nội dung")]
         public string Content { get; set; }
 
-        [Display(Name = "Ngày bình luận")]
-        public DateTime CommentDate { get; set; } = DateTime.Now;
-
-        // Foreign Keys
-        [Display(Name = "Bài học")]
-        public int LessonId { get; set; }
-
+        [Required]
         [Display(Name = "Người bình luận")]
-        public string UserId { get; set; } // UserId từ AspNetUsers
-
-        // Navigation properties
-        [ForeignKey("LessonId")]
-        public virtual Lesson Lesson { get; set; }
+        public string UserId { get; set; } // ID của người dùng bình luận (ApplicationUser.Id)
 
         [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser User { get; set; } // Thuộc tính điều hướng tới ApplicationUser
+
+        [Required]
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Ngày bình luận")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now; // Mặc định là thời gian hiện tại
+
+        // --- CHỨC NĂNG XÓA MỀM (SOFT DELETE) ---
+        [Required]
+        [Display(Name = "Đã xóa")]
+        public bool IsDeleted { get; set; } = false;
+
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Ngày xóa")]
+        public DateTime? DeletedAt { get; set; }
     }
 }
