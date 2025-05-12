@@ -177,12 +177,6 @@ namespace EnglishStudySystem.Models
                 .HasForeignKey(a => a.QuestionId)
                 .WillCascadeOnDelete(true);
 
-            // Cấu hình quan hệ cho Notification (Người dùng - Notification)
-            modelBuilder.Entity<Notification>()
-                .HasRequired(n => n.User)
-                .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.UserId)
-                .WillCascadeOnDelete(true);
 
             // Cấu hình quan hệ cho Payment (Người dùng - Payment)
             modelBuilder.Entity<Payment>()
