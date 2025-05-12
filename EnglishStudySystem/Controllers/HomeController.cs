@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Data.Entity;
 using System.Web.Mvc;
 
 namespace EnglishStudySystem.Controllers
@@ -13,11 +14,11 @@ namespace EnglishStudySystem.Controllers
 
         public HomeController()
         {
-            _context = new ApplicationDbContext();
+             _context = new ApplicationDbContext();
         }
         public HomeController(ApplicationDbContext context)
         {
-            _context = context;
+             _context = context;
         }
         public ActionResult HomePage()
         {
@@ -26,7 +27,6 @@ namespace EnglishStudySystem.Controllers
             .OrderByDescending(c => c.CreatedDate)
             .Take(6)
             .ToList();
-
             return View(categories);
         }
 
