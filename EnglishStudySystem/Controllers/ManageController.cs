@@ -58,8 +58,8 @@ namespace EnglishStudySystem.Controllers
                 message == ManageMessageId.ChangePasswordSuccess ? "Mật khẩu của bạn đã được thay đổi."
                 : message == ManageMessageId.SetPasswordSuccess ? "Mật khẩu của bạn đã được đặt."
                 : message == ManageMessageId.SetTwoFactorSuccess ? "Xác thực hai yếu tố của bạn đã được đặt."
-                : message == ManageMessageId.AddPhoneNumberSuccess ? "Số điện thoại của bạn đã được thêm."
-                : message == ManageMessageId.RemovePhoneNumberSuccess ? "Số điện thoại của bạn đã bị xóa."
+                : message == ManageMessageId.AddPhoneSuccess ? "Số điện thoại của bạn đã được thêm."
+                : message == ManageMessageId.RemovePhoneSuccess ? "Số điện thoại của bạn đã bị xóa."
                 : "";
 
             var userId = User.Identity.GetUserId();
