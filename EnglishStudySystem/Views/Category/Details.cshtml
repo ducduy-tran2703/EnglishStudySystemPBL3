@@ -1,0 +1,78 @@
+﻿@model EnglishStudySystem.Models.Category
+@{
+    ViewBag.Title = Model.Name + " - Chi tiết danh mục";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lessons = ViewBag.Lessons as List<EnglishStudySystem.Models.Lesson>;
+}
+
+<main class="container py-4">
+    <!-- Category Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">@Model.Name</h2>
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p class="text-muted">@Model.Description</p>
+            }
+        </div>
+        <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
+            @if (Model.Price.HasValue && Model.Price > 0)
+            {
+                <text>@string.Format("{0:C0}", Model.Price.Value)</text>
+            }
+            else
+            {
+                @:Miễn phí
+            }
+        </span>
+    </div>
+
+    <!-- Lessons List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+            <h3 class="h5 mb-0">Danh sách bài học</h3>
+        </div>
+        <div class="card-body p-0">
+            @if (lessons != null && lessons.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var lesson in lessons)
+                    {
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="h6 fw-bold mb-1" style="color: #000000;">@lesson.Title</h4>
+                                    @if (!string.IsNullOrEmpty(lesson.Description))
+                                    {
+                                        <p class="text-muted small mb-0">@lesson.Description</p>
+                                    }
+                                </div>
+                                <a href="#" class="btn btn-sm btn-success px-3">
+                                    Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">Không có bài học nào trong danh mục này.</p>
+                </div>
+            }
+        </div>
+    </div>
+</main>
+
+<style>
+    .list-group-item:hover {
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+
+    .badge.bg-warning {
+        color: #ffc107 !important;
+        background-color: rgba(255, 193, 7, 0.1) !important;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+</style>
