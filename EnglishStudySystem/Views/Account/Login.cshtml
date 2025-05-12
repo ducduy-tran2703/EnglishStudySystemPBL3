@@ -1,15 +1,13 @@
 ﻿@model EnglishStudySystem.Models.LoginViewModel
 @{
     ViewBag.Title = "Đăng nhập";
-    
 }
-
-@section Styles {
-    <link href="~/Content/CSS/LoginStyle.css" rel="stylesheet" type="text/css" />
+<head>
+    <link href="~/Content/CSS/RegisterStyle.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-}
+</head>
 
-<div class="login-form-wrapper">
+<div class="register-form-wrapper">
     <h2>@ViewBag.Title</h2>
 
     @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
@@ -35,12 +33,14 @@
         </div>
 
         <div class="form-options">
-            <div class="remember-me">
-                @Html.CheckBoxFor(m => m.RememberMe)
-                @Html.LabelFor(m => m.RememberMe)
+            <div class="remember-me-container">
+                <label class="remember-me-label">
+                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "remember-me-checkbox" })
+                    <span class="remember-me-text">Ghi nhớ đăng nhập</span>
+                </label>
             </div>
-            <div class="forgot-password">
-                @Html.ActionLink("Quên mật khẩu?", "ForgotPassword")
+            <div class="forgot-password-wrapper">
+                @Html.ActionLink("Quên mật khẩu?", "ForgotPassword", null, new { @class = "forgot-password-link" })
             </div>
         </div>
 
@@ -48,8 +48,9 @@
             <input type="submit" value="Đăng nhập" class="btn btn-submit" />
         </div>
 
-        <div class="register-link">
-            Chưa có tài khoản? @Html.ActionLink("Đăng ký ngay", "Register")
+        <div class="register-prompt">
+            <span class="register-text">Chưa có tài khoản?</span>
+            @Html.ActionLink("Đăng ký ngay", "Register", null, new { @class = "register-link" })
         </div>
     }
 </div>
