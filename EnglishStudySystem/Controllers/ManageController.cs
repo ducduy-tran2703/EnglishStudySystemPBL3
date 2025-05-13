@@ -12,18 +12,22 @@ namespace EnglishStudySystem.Controllers
 {
     [Authorize]
     public class ManageController : Controller
+
     {
+        
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-
+        private ApplicationDbContext _context ;
         public ManageController()
         {
         }
 
-        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ApplicationDbContext context)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            
+            Context = context;
         }
 
         public ApplicationSignInManager SignInManager
@@ -37,6 +41,19 @@ namespace EnglishStudySystem.Controllers
                 _signInManager = value; 
             }
         }
+        public ApplicationDbContext  Context
+        {
+            get
+            {
+                return _context ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _context = value;
+            }
+        }
+
+
 
         public ApplicationUserManager UserManager
         {
@@ -224,6 +241,12 @@ namespace EnglishStudySystem.Controllers
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
+             var categories = _context.Categories
+            .Where(c => !c.IsDeleted)
+            .OrderByDescending(c => c.CreatedDate)
+            .Take(6)
+            .ToList();
+            ViewBag.ListCategories = categories;
             return View();
         }
 
