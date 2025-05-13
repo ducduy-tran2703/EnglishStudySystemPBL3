@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace EnglishStudySystem.MomoPayment
 {
-	public class MomoSecurity
+	public class MoMoSecurity
 	{
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
-        public MomoSecurity()
+        public MoMoSecurity()
         {
         }
         public string getHash(string partnerCode, string merchantRefId,

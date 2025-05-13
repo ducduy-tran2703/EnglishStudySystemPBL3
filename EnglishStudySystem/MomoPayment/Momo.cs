@@ -10,8 +10,7 @@ namespace EnglishStudySystem.MomoPayment
 {
 	public class Momo
 	{
-        string OrderId;
-        public void PayMOMO()
+        public void PayMOMO(decimal amountCourse, string orderID)
         {
             string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
             string partnerCode = "MOMO";
@@ -21,9 +20,8 @@ namespace EnglishStudySystem.MomoPayment
             string redirectUrl = "";
             string ipnUrl = "\"https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b\"";
             string requestType = "captureWallet";
-            string amount = "1000";
-            string orderId = Guid.NewGuid().ToString();
-            OrderId = orderId;
+            string amount = (amountCourse*100).ToString();
+            string orderId = orderID;
             string requestId = Guid.NewGuid().ToString();
             string extraData = "";
             string rawHash = "accessKey=" + accessKey +
@@ -37,7 +35,7 @@ namespace EnglishStudySystem.MomoPayment
                 "&requestId=" + requestId +
                 "&requestType=" + requestType
                 ;
-            MomoSecurity crypto = new MomoSecurity();
+            MoMoSecurity crypto = new MoMoSecurity();
             //sign signature SHA256
             string signature = crypto.signSHA256(rawHash, serectkey);
 
@@ -62,12 +60,12 @@ namespace EnglishStudySystem.MomoPayment
             JObject jmessage = JObject.Parse(responseFromMomo);
             System.Diagnostics.Process.Start(jmessage.GetValue("payUrl").ToString());
         }
-        public string CheckPaymentMOMO()
+        public string CheckPaymentMOMO(string orderID)
         {
             string partnerCode = "MOMO"; // Mã đối tác
             string requestId = Guid.NewGuid().ToString();
             string accesskey = "F8BBA842ECF85"; // Access key
-            string orderIdToCheck = this.OrderId; // Mã đơn hàng cần kiểm tra
+            string orderIdToCheck = orderID; // Mã đơn hàng cần kiểm tra
             string secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz"; // Secret key
 
             // Tạo chuỗi signature
