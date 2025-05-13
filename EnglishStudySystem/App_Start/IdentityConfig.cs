@@ -11,6 +11,8 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using EnglishStudySystem.Models;
+using System.Configuration;
+using System.Net.Mail;
 
 namespace EnglishStudySystem
 {
@@ -18,8 +20,32 @@ namespace EnglishStudySystem
     {
         public Task SendAsync(IdentityMessage message)
         {
-            // Plug in your email service here to send an email.
-            return Task.FromResult(0);
+            // Cắm dịch vụ gửi email của bạn tại đây.
+            // Ví dụ sử dụng SmtpClient (chỉ nên dùng cho mục đích phát triển/thử nghiệm):
+
+            var fromEmail = ConfigurationManager.AppSettings["SendGridFrom"]; // Lấy từ Web.config
+            var smtpHost = ConfigurationManager.AppSettings["SmtpHost"];       // Lấy từ Web.config
+            var smtpPort = int.Parse(ConfigurationManager.AppSettings["SmtpPort"]); // Lấy từ Web.config
+            var smtpUser = ConfigurationManager.AppSettings["SmtpUser"];       // Lấy từ Web.config
+            var smtpPass = ConfigurationManager.AppSettings["SmtpPass"];       // Lấy từ Web.config
+
+            var client = new SmtpClient(smtpHost, smtpPort)
+            {
+                Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass),
+                EnableSsl = true // Sử dụng SSL
+            };
+
+            var mailMessage = new MailMessage(fromEmail, message.Destination)
+            {
+                Subject = message.Subject,
+                Body = message.Body,
+                IsBodyHtml = true // Giả định nội dung email là HTML
+            };
+
+            // Gửi email bất đồng bộ
+            return client.SendMailAsync(mailMessage);
+
+            // Đối với môi trường Production, hãy sử dụng các dịch vụ gửi email chuyên nghiệp.
         }
     }
 
