@@ -305,12 +305,13 @@
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Category\Details.cshtml" />
     <Content Include="Views\Home\FindHomePage.cshtml" />
+    <Content Include="Views\Customer\CustomerDashBoard.cshtml" />
+    <Content Include="Views\Shared\LayoutCustomer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Views\Shared\" />
-    <Folder Include="Views\Customer\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
