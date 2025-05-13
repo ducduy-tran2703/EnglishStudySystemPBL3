@@ -1,0 +1,48 @@
+﻿.edit-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    background-color: #f9f9f9;
+}
+
+    .edit-input:focus {
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        outline: none;
+        background-color: white;
+    }
+
+/* Form validation styles */
+.text-danger {
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+    color: #dc3545;
+}
+
+/* Alert message */
+.alert-success {
+    padding: 15px;
+    margin-bottom: 20px;    
+    border-radius: 8px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.edit-form-control {
+    background:transparent;
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    font-size: 1rem;
+    border-radius: 0 4px 4px 0;
+    width: 100%; /* Đảm bảo chiếm hết không gian */
+    max-width: 600px; /* Giới hạn chiều rộng tối đa */
+}
+
+.form-control:focus {
+    outline: none;
+}
