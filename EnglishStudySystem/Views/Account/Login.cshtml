@@ -19,9 +19,9 @@
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email đăng nhập" })
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Tài khoản" })
             </div>
-            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
         </div>
 
         <div class="form-group">
