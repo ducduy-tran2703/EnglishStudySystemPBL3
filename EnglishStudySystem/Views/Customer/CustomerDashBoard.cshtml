@@ -1,7 +1,125 @@
-﻿
+﻿@model IEnumerable<EnglishStudySystem.Models.Category>
 @{
     ViewBag.Title = "CustomerDashBoard";
-    Layout = "~/Views/Shared/LayoutCustomer.cshtml";
+    Layout = ViewBag.Layout;
 }
 
-<!-- Add Bootstrap JS and Tooltip Activation -->
+<main class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Danh mục bài học</h2>
+        <div class="dropdown">
+            <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                <i class="fas fa-sort me-1"></i> Sắp xếp
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Mới nhất</a></li>
+                <li><a class="dropdown-item" href="#">Cũ nhất</a></li>
+                <li><a class="dropdown-item" href="#">A-Z</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="row g-4">
+        @foreach (var category in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="h5 fw-bold mb-1">@category.Name</h3>
+                                @if (!string.IsNullOrEmpty(category.Description))
+                                {
+                                    <p class="text-muted small mb-2">@category.Description</p>
+                                }
+                            </div>
+                            <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
+                                @if (category.Price.HasValue && category.Price > 0)
+                                {
+                                    <text>@string.Format("{0:C0}", category.Price.Value)</text>
+                                }
+                                else
+                                {
+                                    @:Miễn phí
+                                }
+                            </span>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge bg-success bg-opacity-10 text-success py-1 px-2">
+                                <i class="fas @GetCategoryIcon(category.Name) me-1"></i>
+                                @GetCategoryTag(category.Name)
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user text-success"></i>
+                                </div>
+                                <div class="fw-semibold">
+                                    @{
+                                        var userNames = ViewBag.UserNames as Dictionary<string, string>;
+                                        var userName = userNames != null && userNames.ContainsKey(category.CreatedByUserId)
+                                            ? userNames[category.CreatedByUserId]
+                                            : "System";
+                                    }
+                                    @userName - @(category.CreatedByUserRole ?? "Admin")
+                                </div>
+                            </div>
+                            <a href="@Url.Action("Details", "Category", new { id = category.Id })"
+                               class="btn btn-sm btn-success px-3">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top py-2">
+                        <small class="text-success">
+                            <i class="far fa-clock me-1"></i>
+                            @category.CreatedDate.ToString("dd/MM/yyyy")
+                        </small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.1) !important;
+        }
+
+    .badge.bg-warning {
+        color: #ffc107 !important;
+        background-color: rgba(255, 193, 7, 0.1) !important;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+</style>
+
+@functions {
+    public string GetCategoryIcon(string categoryName)
+    {
+        if (categoryName.Contains("Giao tiếp")) return "fa-comments";
+        if (categoryName.Contains("Ngữ pháp")) return "fa-pen-fancy";
+        if (categoryName.Contains("Từ vựng")) return "fa-spell-check";
+        if (categoryName.Contains("Luyện nghe")) return "fa-headphones";
+        return "fa-book";
+    }
+
+    public string GetCategoryTag(string categoryName)
+    {
+        if (categoryName.Contains("Giao tiếp")) return "Giao tiếp";
+        if (categoryName.Contains("Ngữ pháp")) return "Ngữ pháp";
+        if (categoryName.Contains("Từ vựng")) return "Từ vựng";
+        if (categoryName.Contains("Luyện nghe")) return "Luyện nghe";
+        return "Tổng hợp";
+    }
+}
