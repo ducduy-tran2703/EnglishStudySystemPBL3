@@ -9,7 +9,7 @@ namespace EnglishStudySystem.Controllers
     public class CustomerController : Controller
     {
         // GET: Customer
-        public ActionResult CusstomerDashBoard()
+        public ActionResult CustomerDashBoard()
         {
             return View();
         }
