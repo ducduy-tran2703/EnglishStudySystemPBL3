@@ -1,0 +1,111 @@
+﻿/* Navbar styling */
+.navbar {
+    padding: 0.5rem 1rem;
+}
+
+.navbar-brand {
+    font-size: 1.2rem;
+    color: #28a745 !important;
+}
+
+/* Navigation links */
+.nav-link {
+    color: #495057 !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+}
+
+    .nav-link:hover,
+    .nav-link:focus {
+        color: #28a745 !important;
+    }
+
+.dropdown-toggle::after {
+    vertical-align: middle;
+}
+
+/* Search bar */
+.search-bar .form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    margin-top: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+    padding: 0.5rem 1.5rem;
+}
+
+    .dropdown-item:hover {
+        background-color: #e9f7ef;
+        color: #28a745;
+    }
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .search-bar {
+        width: 100% !important;
+        margin: 1rem 0;
+        order: 3;
+    }
+
+    .navbar-collapse {
+        padding: 1rem 0;
+    }
+
+    .d-flex {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+body {
+    padding-top: 0 !important;
+}
+
+.container.body-content {
+    padding-top: 0 !important;
+}
+
+/* css cho menu danh muc*/
+/* Dropdown danh mục tùy chỉnh */
+.dropdown-menu {
+    background-color: #ffffff;
+    border: 1px solid #28a745;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+    min-width: 200px;
+    z-index: 1000;
+}
+
+    /* Mỗi mục danh mục */
+    .dropdown-menu li a {
+        display: block;
+        padding: 10px 20px;
+        font-weight: 500;
+        color: #212529;
+        text-decoration: none;
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    }
+
+        /* Hover hiệu ứng */
+        .dropdown-menu li a:hover {
+            background-color: #e9f7ef;
+            color: #28a745;
+            padding-left: 25px;
+        }
+
+/* Thêm dấu mũi tên chuyển động nhẹ */
+.dropdown-toggle::after {
+    transition: transform 0.2s;
+}
+
+.dropdown.show .dropdown-toggle::after {
+    transform: rotate(180deg);
+}

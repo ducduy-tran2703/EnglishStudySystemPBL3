@@ -17,15 +17,17 @@ namespace EnglishStudySystem.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _context = new ApplicationDbContext();
 
         public AccountController()
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, ApplicationDbContext context )
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            Context = context;
         }
 
         public ApplicationSignInManager SignInManager
@@ -52,14 +54,31 @@ namespace EnglishStudySystem.Controllers
             }
         }
 
+        public ApplicationDbContext Context
+        {
+            get
+            {
+                return _context ?? HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            }
+            private set
+            {
+                _context = value;
+            }
+        }
+
         //
         // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
 
         {
-      
-            ViewBag.ReturnUrl = returnUrl;
+            var categories = _context.Categories
+            .Where(c => !c.IsDeleted)
+            .OrderByDescending(c => c.CreatedDate)
+            .Take(6)
+            .ToList();
+            ViewBag.ListCategories = categories;
+            ViewBag.ReturnUrl = Request.UrlReferrer?.ToString();
             return View();
         }
 
@@ -81,7 +100,13 @@ namespace EnglishStudySystem.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+
+                    Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
+                    ApplicationUser user = await UserManager.FindByNameAsync(model.UserName);
+                    Session["ID"] = User.Identity.GetUserId();
+                    Session["FullName"] = user.FullName;
+
+                    return RedirectToAction("HomePage", "Home");
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -141,6 +166,12 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            var categories = _context.Categories
+     .Where(c => !c.IsDeleted)
+     .OrderByDescending(c => c.CreatedDate)
+     .Take(6)
+     .ToList();
+            ViewBag.ListCategories = categories;
             return View();
         }
 
@@ -153,33 +184,64 @@ namespace EnglishStudySystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser {
+                var user = new ApplicationUser
+                {
                     UserName = model.UserName,
                     Email = model.Email,
                     FullName = model.FullName,
                     DateOfBirth = model.DateOfBirth,
                     PhoneNumber = model.PhoneNumber,
                     IsActive = true,
-                    AccountStatus = UserAccountStatus.Normal
+                    AccountStatus = UserAccountStatus.Normal,
+                    EmailConfirmed = false
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    await UserManager.AddToRoleAsync(user.Id, "Customer");
+                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    //await UserManager.AddToRoleAsync(user.Id, "Customer");
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // Send the email with the confirmation link
+                    if (UserManager.EmailService != null)
+                    {
+                        await UserManager.EmailService.SendAsync(new IdentityMessage
+                        {
+                            Destination = user.Email,
+                            Subject = "Xác nhận Email của bạn",
+                            Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                        });
+                    }
+                    else
+                    {
+                        // Handle case where EmailService is not configured
+                        ViewBag.ErrorMessage = "Dịch vụ gửi Email chưa được cấu hình. Không thể gửi Email xác nhận.";
+                        // Optionally log the error
+                        // Redirect to an error page or back to registration with an error message
+                        return View("Error"); // Cần có View Error.cshtml
+                    }
 
-                    return RedirectToAction("HomePage", "Home");
+                    // Redirect to a page informing the user to check their email
+                    return RedirectToAction("RegisterConfirmation", new { email = user.Email });
+
                 }
                 AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        // GET: /Account/RegisterConfirmation
+        [AllowAnonymous]
+        public ActionResult RegisterConfirmation(string email)
+        {
+            // Simple view to tell the user to check their email
+            // Pass the email to the view if you want to display it
+            ViewBag.Email = email;
+            return View();
         }
 
         //
@@ -189,12 +251,43 @@ namespace EnglishStudySystem.Controllers
         {
             if (userId == null || code == null)
             {
+                ViewBag.ErrorMessage = "Liên kết xác nhận không hợp lệ.";
                 return View("Error");
             }
+            // Find the user by ID
+            var user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"Người dùng với ID '{userId}' không tồn tại.";
+                return View("Error"); // Display an error view
+            }
+            // Confirm the email
             var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            if (result.Succeeded)
+            {
+                // Email confirmed successfully!
+                // You can redirect to a success page or the login page.
+                 ViewBag.StatusMessage = "Cảm ơn bạn đã xác nhận Email của mình!"; // Message for a confirmation view
+               // return RedirectToAction("ConfirmEmailConfirmation"); // Redirect to a success view
+                 return RedirectToAction("Login"); // Alternatively, redirect to login page
+            }
+            else
+            {
+                // Handle confirmation failure (e.g., invalid token, user not found, token expired)
+                AddErrors(result); // Display specific errors from IdentityResult
+                ViewBag.ErrorMessage = "Lỗi xác nhận Email.";
+                return View("Error"); // Display an error view
+            }
         }
 
+        //
+        // GET: /Account/ConfirmEmailConfirmation
+        [AllowAnonymous]
+        public ActionResult ConfirmEmailConfirmation()
+        {
+            // Simple view to display a success message after email is confirmed
+            return View();
+        }
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
@@ -459,7 +552,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Register", "Account");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

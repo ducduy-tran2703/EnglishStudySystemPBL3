@@ -1,22 +1,22 @@
 ﻿@model IEnumerable<EnglishStudySystem.Models.Category>
 @{
-    ViewBag.Title = "Trang chủ - English Study";
+    ViewBag.Title = "CustomerDashBoard";
     Layout = ViewBag.Layout;
 }
+
 <main class="container py-4">
-    <!-- Header Section - Đổi tiêu đề thành "Bạn Muốn Gì Hôm Nay" -->
+    <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">Bạn Muốn Gì Hôm Nay</h2> <!-- Đã bỏ text-success để mặc định màu đen -->
+        <h2 class="fw-bold mb-0">Danh mục bài học</h2>
         <div class="dropdown">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                 <i class="fas fa-sort me-1"></i> Sắp xếp
             </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "newest" })">Mới nhất</a></li>
-                <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "oldest" })">Cũ nhất</a></li>
-                <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "name" })">A-Z</a></li>
+                <li><a class="dropdown-item" href="#">Mới nhất</a></li>
+                <li><a class="dropdown-item" href="#">Cũ nhất</a></li>
+                <li><a class="dropdown-item" href="#">A-Z</a></li>
             </ul>
-
         </div>
     </div>
 
@@ -29,14 +29,12 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <!-- Đổi màu tiêu đề danh mục thành đen -->
-                                <h3 class="h5 fw-bold mb-1">@category.Name</h3> <!-- Đã bỏ text-success -->
+                                <h3 class="h5 fw-bold mb-1">@category.Name</h3>
                                 @if (!string.IsNullOrEmpty(category.Description))
                                 {
                                     <p class="text-muted small mb-2">@category.Description</p>
                                 }
                             </div>
-                            <!-- Đổi màu giá tiền thành vàng -->
                             <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
                                 @if (category.Price.HasValue && category.Price > 0)
                                 {
@@ -90,7 +88,6 @@
 </main>
 
 <style>
-    /* Hiệu ứng hover cho card */
     .card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -100,7 +97,6 @@
             box-shadow: 0 10px 20px rgba(40, 167, 69, 0.1) !important;
         }
 
-    /* Custom màu vàng cho badge giá tiền */
     .badge.bg-warning {
         color: #ffc107 !important;
         background-color: rgba(255, 193, 7, 0.1) !important;

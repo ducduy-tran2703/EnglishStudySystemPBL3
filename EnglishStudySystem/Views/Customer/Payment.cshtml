@@ -1,0 +1,153 @@
+﻿@model EnglishStudySystem.Models.Category
+@{
+    ViewBag.Title = "Thanh toán - " + Model.Name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lessons = ViewBag.Lessons as List<EnglishStudySystem.Models.Lesson>;
+}
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0"><i class="fas fa-shopping-cart me-2 text-success"></i>Thanh toán khóa học</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Thông tin đơn hàng -->
+                    <div class="mb-4 p-4 bg-light rounded">
+                        <h4 class="h5 fw-bold mb-3 text-success">
+                            <i class="fas fa-receipt me-2"></i>Đơn hàng của bạn
+                        </h4>
+
+                        <div class="table-responsive">
+                            <table class="table table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td width="40%"><i class="fas fa-book me-2 text-muted"></i>Khóa Học:</td>
+                                        <td class="fw-semibold">@Model.Name</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fas fa-tag me-2 text-muted"></i>Giá:</td>
+                                        <td class="fw-semibold text-warning">@string.Format("{0:C0}", Model.Price)</td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <td><i class="fas fa-calculator me-2 text-muted"></i>Tổng cộng:</td>
+                                        <td class="fw-bold text-success">@string.Format("{0:C0}", Model.Price)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách bài học -->
+                    @if (lessons != null && lessons.Any())
+                    {
+                        <div class="mb-4 p-4 bg-light rounded">
+                            <h5 class="h6 fw-bold mb-3 text-success">
+                                <i class="fas fa-list-ul me-2"></i>Danh sách bài học (@lessons.Count bài)
+                            </h5>
+                            <ul class="list-unstyled">
+                                @foreach (var lesson in lessons.Take(10))
+                                {
+                                    <li class="mb-2">
+                                        <i class="fas fa-check-circle text-success me-2"></i>@lesson.Title
+                                    </li>
+                                }
+                                @if (lessons.Count > 10)
+                                {
+                                    <li class="text-muted">
+                                        <i class="fas fa-ellipsis-h me-2"></i>+ @(lessons.Count - 10) bài học khác...
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <!-- Thông báo bảo mật -->
+                    <div class="alert alert-success d-flex align-items-center mb-4">
+                        <i class="fas fa-lock me-3 fs-4"></i>
+                        <div>
+                            <input type="checkbox" id="securityCheck" checked disabled>
+                            <label for="securityCheck" class="ms-2 mb-0">Thông tin thanh toán được bảo mật</label>
+                        </div>
+                    </div>
+
+                    <!-- Nút thanh toán -->
+                    <div class="d-grid gap-3">
+                        <button id="btnPayment" class="btn btn-success py-3 fw-bold">
+                            <i class="fas fa-money-bill-wave me-2"></i>THANH TOÁN QUA MOMO
+                        </button>
+
+                        <button id="btnCheckPayment" class="btn btn-outline-success py-3">
+                            <i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Gọi API thanh toán Momo
+            $('#btnPayment').click(function () {
+                $(this).html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
+                initiateMomoPayment(@Model.Id, @Model.Price);
+
+                setTimeout(() => {
+                    $('#btnPayment').html('<i class="fas fa-money-bill-wave me-2"></i>THANH TOÁN QUA MOMO');
+                }, 3000);
+            });
+
+            // Kiểm tra thanh toán
+            $('#btnCheckPayment').click(function () {
+                $(this).html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
+                checkMomoPayment(@Model.Id);
+
+                setTimeout(() => {
+                    $('#btnCheckPayment').html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
+                }, 3000);
+            });
+
+            function initiateMomoPayment(categoryId, amount) {
+                // Thay bằng API thực tế của bạn
+                console.log('Initiating Momo payment...');
+                alert('Chuyển hướng đến cổng thanh toán Momo...');
+            }
+
+            function checkMomoPayment(categoryId) {
+                // Thay bằng API thực tế của bạn
+                console.log('Checking Momo payment...');
+                alert('Đang kiểm tra trạng thái thanh toán...');
+            }
+        });
+    </script>
+}
+
+<style>
+    .table td {
+        padding: 0.75rem 0.5rem;
+        vertical-align: middle;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        border-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+    }
+
+    #btnPayment {
+        transition: all 0.3s ease;
+    }
+
+        #btnPayment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+</style>
