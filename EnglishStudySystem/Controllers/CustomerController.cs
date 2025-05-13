@@ -95,7 +95,7 @@ namespace EnglishStudySystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Author,Admin")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(ProfileViewModel model)
+        public ActionResult EditProfile(ProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
