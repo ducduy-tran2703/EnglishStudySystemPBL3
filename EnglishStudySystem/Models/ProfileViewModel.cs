@@ -5,8 +5,10 @@ namespace EnglishStudySystem.Models // Make sure to use the correct namespace fo
 {
     public class ProfileViewModel
     {
+        [Display(Name = "Tên đăng nhập")]
+        public string UserName { get; set; }
         [Display(Name = "Tên người dùng")]
-        public string Fullname { get; set; }
+        public string FullName { get; set; }
 
         [Display(Name = "Địa chỉ Email")]
         public string Email { get; set; }

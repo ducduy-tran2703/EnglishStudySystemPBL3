@@ -84,7 +84,7 @@ namespace EnglishStudySystem.Controllers
             if (user == null) return HttpNotFound("User not found");
             var model = new ProfileViewModel
             {
-                Fullname = user.FullName,
+                FullName = user.FullName,
                 DateOfBirth = user.DateOfBirth,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
@@ -102,7 +102,7 @@ namespace EnglishStudySystem.Controllers
                 var userId = User.Identity.GetUserId();
                 var user = _context.Users.Find(userId);
                 if (user == null) return HttpNotFound("User not found");
-                user.FullName = model.Fullname;
+                user.FullName = model.FullName;
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
                 user.DateOfBirth = model.DateOfBirth;
