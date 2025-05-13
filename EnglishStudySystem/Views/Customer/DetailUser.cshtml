@@ -1,0 +1,76 @@
+﻿@model EnglishStudySystem.Models.ApplicationUser
+@{
+    ViewBag.Title = "Thông tin cá nhân";
+    Layout = "~/Views/Shared/LayoutCustomer.cshtml";
+}
+
+<head>
+    <link href="~/Content/CSS2/DetailUserStyle.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+</head>
+
+<div class="detail-user-wrapper">
+    <h2 class="detail-user-header">@ViewBag.Title</h2>
+
+
+
+    <div class="detail-user-info-group">
+        <div class="detail-user-info-item">
+            <div class="detail-user-info-label"><i class="fas fa-user"></i> Tên đăng nhập</div>
+            <div class="detail-user-info-value">@Model.UserName</div>
+        </div>
+
+        <div class="detail-user-info-item">
+            <div class="detail-user-info-label"><i class="fas fa-signature"></i> Họ và tên</div>
+            <div class="detail-user-info-value">@Model.FullName</div>
+        </div>
+
+        <div class="detail-user-info-item">
+            <div class="detail-user-info-label"><i class="fas fa-envelope"></i> Email</div>
+            <div class="detail-user-info-value">@Model.Email</div>
+        </div>
+
+        <div class="detail-user-info-item">
+            <div class="detail-user-info-label"><i class="c"></i> Số điện thoại</div>
+            <div class="detail-user-info-value">@(Model.PhoneNumber ?? "Chưa cập nhật")</div>
+        </div>
+        <div class="detail-user-info-item">
+            <div class="detail-user-info-label"><i class="fas fa-signature"></i>Ngày sinh</div>
+            <div class="detail-user-info-value">
+                @(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="detail-user-action-buttons">
+        @Html.ActionLink("Chỉnh sửa thông tin", "EditProfile", null, new { @class = "detail-user-btn detail-user-btn-edit" })
+        @Html.ActionLink("Đổi mật khẩu", "ChangePassword", null, new { @class = "detail-user-btn detail-user-btn-change-password" })
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Hiệu ứng khi di chuột vào avatar
+        document.getElementById('userAvatar').addEventListener('mouseenter', function () {
+            this.style.transform = 'scale(1.1) rotate(5deg)';
+        });
+
+        document.getElementById('userAvatar').addEventListener('mouseleave', function () {
+            this.style.transform = 'scale(1) rotate(0)';
+        });
+
+        // Hiệu ứng khi click vào các nút
+        document.querySelectorAll('.detail-user-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                this.style.transform = 'translateY(2px)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-3px)';
+                }, 100);
+            });
+        });
+    </script>
+}
