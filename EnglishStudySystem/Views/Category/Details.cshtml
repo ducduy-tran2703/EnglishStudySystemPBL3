@@ -15,18 +15,24 @@
                 <p class="text-muted">@Model.Description</p>
             }
         </div>
-        <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
-            @if (Model.Price.HasValue && Model.Price > 0)
-            {
-                <text>@string.Format("{0:C0}", Model.Price.Value)</text>
-            }
-            else
-            {
-                @:Miễn phí
-            }
-        </span>
+        <div class="d-flex align-items-center">
+            <!-- Adjust the price to match the size of the button -->
+            <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3 d-flex align-items-center" style="font-size: 1rem; height: 40px;">
+                @if (Model.Price.HasValue && Model.Price > 0)
+                {
+                    <text>@string.Format("{0:C0}", Model.Price.Value)</text>
+                }
+                else
+                {
+                    @:Miễn phí
+                }
+            </span>
+            <!-- Shopping Icon Button -->
+            <button class="btn btn-success ms-2 d-flex align-items-center">
+                <i class="fa fa-shopping-cart me-2"></i> Mua ngay
+            </button>
+        </div>
     </div>
-
     <!-- Lessons List -->
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom py-3">
@@ -48,7 +54,7 @@
                                     }
                                 </div>
                                 <a href="#" class="btn btn-sm btn-success px-3">
-                                    Xem chi tiết
+                                    Xem bài học
                                 </a>
                             </div>
                         </div>
