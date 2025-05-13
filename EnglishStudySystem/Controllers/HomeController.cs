@@ -21,12 +21,70 @@ namespace EnglishStudySystem.Controllers
         {
              _context = context;
         }
-        public ActionResult HomePage()
+        public ActionResult HomePage(string sortOrder)
         {
             Session["Layout"] = "~/Views/Shared/_Layout.cshtml";
+
+            // Truy vấn ban đầu (lọc deleted)
+            var categoriesQuery = _context.Categories
+                .Where(c => !c.IsDeleted);
+
+            // Áp dụng thứ tự sắp xếp
+            switch (sortOrder)
+            {
+                case "oldest":
+                    categoriesQuery = categoriesQuery.OrderBy(c => c.CreatedDate);
+                    break;
+                case "name":
+                    categoriesQuery = categoriesQuery.OrderBy(c => c.Name);
+                    break;
+                default:
+                    categoriesQuery = categoriesQuery.OrderByDescending(c => c.CreatedDate); // Mặc định: Mới nhất
+                    break;
+            }
+
+            var categories = categoriesQuery
+                .Take(6) // giữ nếu bạn chỉ muốn 6 kết quả, có thể bỏ nếu muốn toàn bộ
+                .ToList();
+
+            // Lấy danh sách userIds từ các categories
+            var userIds = categories
+                .Select(c => c.CreatedByUserId)
+                .Distinct()
+                .ToList();
+
+            // Truy vấn bảng Users
+            var users = _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToDictionary(u => u.Id, u => u.FullName);
+
+            // Truyền dữ liệu qua ViewBag
+            ViewBag.UserNames = users;
+            ViewBag.Layout = Session["Layout"];
+            ViewBag.ListCategories = categories;
+            ViewBag.CurrentSort = sortOrder;
+
+            return View(categories);
+        }
+
+        public ActionResult FindHomePage(string keyword)
+        {
             // Lấy danh sách categories
-            var categories = _context.Categories
+            var ViewBagcategories = _context.Categories
                 .Where(c => !c.IsDeleted)
+                .OrderByDescending(c => c.CreatedDate)
+                .Take(6)
+                .ToList();
+            var categoriesQuery = _context.Categories
+            .Where(c => !c.IsDeleted);
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                categoriesQuery = categoriesQuery
+                    .Where(c => c.Name.ToLower().Contains(keyword.ToLower()));
+            }
+
+            var categories = categoriesQuery
                 .OrderByDescending(c => c.CreatedDate)
                 .Take(6)
                 .ToList();
@@ -42,9 +100,11 @@ namespace EnglishStudySystem.Controllers
             // Truyền dữ liệu qua ViewBag
             ViewBag.UserNames = users;
             ViewBag.Layout = Session["Layout"];
-            ViewBag.ListCategories = categories;
+            ViewBag.ListCategories = ViewBagcategories;
+            ViewBag.Keyword = keyword;
             return View(categories);
         }
+
 
     }
 }

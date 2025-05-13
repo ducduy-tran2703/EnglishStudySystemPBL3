@@ -70,6 +70,7 @@ namespace EnglishStudySystem.Controllers
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
+
         {
             var categories = _context.Categories
             .Where(c => !c.IsDeleted)

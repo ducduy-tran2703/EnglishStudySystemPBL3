@@ -19,7 +19,7 @@
                 </a>
 
                 <div class="d-flex">
-                    <a href="@Url.Action("Index", "Home")" class="nav-link me-3">
+                    <a href="@Url.Action("HomePage", "Home")" class="nav-link me-3">
                         <i class="fas fa-home me-1"></i> Trang chủ
                     </a>
                     <!-- Danh mục Dropdown -->
@@ -47,24 +47,34 @@
             </div>
 
             <!-- Search Bar (Center) -->
-            <div class="search-bar mx-auto" style="width: 40%;">
-                <div class="input-group">
-                    <input type="text" class="form-control border-success" placeholder="Tìm kiếm..." style="border-radius: 20px 0 0 20px;">
-                    <button class="btn btn-success" type="button" style="border-radius: 0 20px 20px 0;">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
+<div class="search-bar mx-auto" style="width: 40%;">
+    <form action="/Home/FindHomePage" method="get" class="search-form">
+        <div class="input-group">
+            <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control border-success" placeholder="Tìm kiếm..." style="border-radius: 20px 0 0 20px;">
+            <button class="btn btn-success" type="submit" style="border-radius: 0 20px 20px 0;">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+
 
             <!-- User Actions -->
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-success me-2">
-                    <i class="fas fa-sign-in-alt me-1"></i> Đăng nhập
-                </button>
-                <button class="btn btn-success">
-                    <i class="fas fa-user-plus me-1"></i> Đăng ký
-                </button>
-            </div>
+<div class="d-flex align-items-center">
+    <form action="@Url.Action("Login", "Account")" method="get" class="me-2">
+        <button type="submit" class="btn btn-outline-success">
+            <i class="fas fa-sign-in-alt me-1"></i> Đăng nhập
+        </button>
+    </form>
+
+    <form action="@Url.Action("Register", "Account")" method="get">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-user-plus me-1"></i> Đăng ký
+        </button>
+    </form>
+</div>
+
         </div>
     </nav>
 </header>
