@@ -34,7 +34,7 @@
                 <div class="detail-user-info-item">
                     <div class="detail-user-info-label"><i class="fas fa-envelope"></i> Email</div>
                     <div class="detail-user-info-value">
-                        <input placeholder="@Model.Email" asp-for="Email" class="edit-form-control edit-input" style="border:none; width: 100%;" />
+                        <input placeholder="@Model.Email asp-for="Email" class="edit-form-control edit-input" style="border:none; width: 100%;" />
                     </div>
 
                     <span asp-validation-for="Email" class="text-danger"></span>
@@ -43,14 +43,14 @@
                 <div class="detail-user-info-item">
                     <div class="detail-user-info-label"><i class="fas fa-phone"></i> Phone Number</div>
                     <div class="detail-user-info-value">
-                        <input placeholder="@Model.PhoneNumber" asp-for="PhoneNumber" class="edit-form-control edit-input" style="border:none; width: 100%;" />
+                        <input placeholder="@Model.PhoneNumber asp-for="PhoneNumber" class="edit-form-control edit-input" style="border:none; width: 100%;" />
                     </div>
                     <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
                 <div class="detail-user-info-item">
                     <div class="detail-user-info-label"><i class="fas fa-user"></i> Date of birth</div>
                     <div class="detail-user-info-value">
-                        <input placeholder="@Model.DateOfBirth" asp-for="Dateofbirth" class="edit-form-control edit-input"  style="border:none; width: 100%;" />
+                        <input placeholder="@Model.DateOfBirth asp-for="Dateofbirth" class="edit-form-control edit-input"  style="border:none; width: 100%;" />
                     </div>
                     <span asp-validation-for="Dateofbirth" class="text-danger"></span>
                 </div>
