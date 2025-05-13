@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using EnglishStudySystem.Models;
+using EnglishStudySystem.ViewModel;
+using Microsoft.AspNet.Identity;
 
 namespace EnglishStudySystem.Controllers
 {
@@ -57,6 +59,57 @@ namespace EnglishStudySystem.Controllers
                 .ToList();
             ViewBag.Lessons = lessons;
             return View(category);
+        }
+        public ActionResult DetailUser()
+        {
+            var userId = User.Identity.GetUserId(); // This method is part of Microsoft.AspNet.Identity namespace
+            var user = _context.Users.Find(userId);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            // Lấy thông tin bài học nếu cần
+            var categories = _context.Categories
+            .Where(c => !c.IsDeleted)
+            .OrderByDescending(c => c.CreatedDate)
+            .Take(6)
+            .ToList();
+            ViewBag.ListCategories = categories;
+            return View(user);
+        }
+        public ActionResult EditProfile()
+        {
+            var userId = User.Identity.GetUserId();
+            var user = _context.Users.Find(userId);
+            if (user == null) return HttpNotFound("User not found");
+            var model = new ProfileViewModel
+            {
+                FullName = user.FullName,
+                DateOfBirth = user.DateOfBirth,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
+            };
+            
+            return View();
+        }
+        [HttpPost]
+        [Authorize(Roles = "Author,Admin")]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(ProfileViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = User.Identity.GetUserId();
+                var user = _context.Users.Find(userId);
+                if (user == null) return HttpNotFound("User not found");
+                user.FullName = model.FullName;
+                user.Email = model.Email;
+                user.PhoneNumber = model.PhoneNumber;
+                user.DateOfBirth = model.DateOfBirth;
+                _context.SaveChanges(); // Corrected the variable name to '_context'  
+                return RedirectToAction("Infor");
+            }
+            return View(model);
         }
     }
 }

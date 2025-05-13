@@ -70,11 +70,15 @@
                     <a class="nav-link" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
                         <i class="fas fa-bell fs-4"></i>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="notificationsDropdown">
-                        <li><a class="dropdown-item" href="#">Thông báo 1</a></li>
-                        <li><a class="dropdown-item" href="#">Thông báo 2</a></li>
-                        <li><a class="dropdown-item" href="#">Thông báo 3</a></li>
-                    </ul>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            🔔 Thông báo
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="notificationsDropdown">
+                            @Html.Action("DanhSach", "ThongBao")  <!-- Gọi action trả về partial chứa danh sách thông báo -->
+                        </ul>
+                    </li>
+
                 </div>
 
                 <!-- User Profile Dropdown -->
@@ -94,6 +98,7 @@
 </header>
 <body>
     @RenderBody()
+    @RenderSection("Scripts", required: false)
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
