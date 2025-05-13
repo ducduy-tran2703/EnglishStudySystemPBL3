@@ -1,0 +1,126 @@
+﻿/* --- CSS cho cửa sổ dropdown thông báo (thẻ ul.dropdown-menu) --- */
+/* Đảm bảo selector nhắm đúng vào dropdown của thông báo nếu có nhiều dropdown khác */
+.dropdown-menu[aria-labelledby="notificationsDropdown"] {
+    /* Cố định độ rộng */
+    width: 350px; /* Điều chỉnh giá trị này theo ý muốn */
+    /* Cố định chiều cao tối đa */
+    max-height: 400px; /* Điều chỉnh giá trị này theo ý muốn */
+    /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao tối đa */
+    overflow-y: auto;
+    /* Đảm bảo không bị tràn ngang nếu có nội dung siêu dài không có khoảng trắng (ít phổ biến) */
+    overflow-x: hidden;
+    /* Tùy chọn: Điều chỉnh khoảng cách bên trong nếu các mục sát viền quá */
+    /* padding-left: 0; */
+    /* padding-right: 0; */
+}
+
+
+/* --- CSS cho toàn bộ phần header (Tiêu đề + Nút bật tắt) --- */
+/* Nhắm vào thẻ li có lớp dropdown-header */
+.dropdown-menu > li.dropdown-header {
+    /* Thêm khoảng đệm xung quanh nội dung header để làm cho nó "dày" hơn */
+    padding-top: 0.75rem; /* Điều chỉnh khoảng đệm trên */
+    padding-bottom: 0.75rem; /* Điều chỉnh khoảng đệm dưới */
+    /* Bootstrap đã có padding trái/phải mặc định cho dropdown-header, có thể không cần điều chỉnh */
+    /* padding-left: 1rem; */
+    /* padding-right: 1rem; */
+    /* Tùy chọn: Thêm màu nền khác để làm nổi bật */
+    background-color: #f8f9fa; /* Ví dụ: màu xám nhạt */
+    /* Đảm bảo chữ bên trong không bị quá nhỏ nếu có style chung nào đó ảnh hưởng */
+    font-size: 1rem; /* Đặt font size cơ bản cho header li (để các phần tử text kế thừa) */
+}
+
+    /* --- CSS cho chỉ riêng chữ "Thông báo" trong header --- */
+    /* Nhắm vào thẻ span chứa chữ "Thông báo" bên trong header li */
+    .dropdown-menu > li.dropdown-header > span.notification-header-title {
+        /* Các style này sẽ làm cho CHỮ "Thông báo" nổi bật hơn */
+        font-size: 1.5rem; /* Tăng cỡ chữ riêng cho text, điều chỉnh giá trị này */
+        font-weight: bold; /* Làm cho chữ đậm */
+        color: #333; /* Chọn màu chữ sẫm hơn */
+        /* Thêm các style khác cho chữ nếu muốn */
+    }
+
+    /* --- CSS cho nút bật tắt trong header --- */
+    /* Nhắm vào div chứa nút bật tắt bên trong header li */
+    /* Bootstrap đã cung cấp các lớp form-check và form-switch để tạo kiểu cho nút */
+    /* Đảm bảo không có các style khác ghi đè lên */
+    .dropdown-menu > li.dropdown-header > .form-check.form-switch {
+        /* Điều chỉnh margin hoặc padding nếu vị trí nút chưa đúng ý */
+        margin: 0; /* Loại bỏ margin mặc định nếu có */
+        padding: 0; /* Loại bỏ padding mặc định nếu có */
+        /* display: flex; */ /* Đã được áp dụng cho li.dropdown-header cha */
+        /* align-items: center; */ /* Đã được áp dụng cho li.dropdown-header cha */
+    }
+
+
+/* --- CSS cho các mục thông báo riêng lẻ (thẻ li) --- */
+/* Sử dụng các lớp 'unread-notification' và 'read-notification' đã thêm vào thẻ li */
+.dropdown-menu > li.unread-notification {
+    background-color: #e9ecef; /* Ví dụ: nền màu xám nhạt cho chưa đọc */
+    /* Các style khác cho chưa đọc nếu muốn */
+}
+
+.dropdown-menu > li.read-notification {
+    /* Ví dụ: giảm độ mờ hoặc chữ nhạt hơn cho đã đọc */
+    opacity: 0.8;
+}
+
+/* --- CSS cho thẻ <a> bên trong mỗi mục thông báo (dropdown-item) --- */
+/* Đây là vùng có thể click trong mỗi mục thông báo */
+.dropdown-menu .dropdown-item {
+    /* Bootstrap đã có padding mặc định, nhưng có thể kiểm tra/điều chỉnh nếu cần */
+    /* padding: 0.5rem 1rem; */
+    /* Quan trọng: Thiết lập vị trí tương đối cho phần tử này để định vị dấu chấm tuyệt đối */
+    position: relative;
+    /* Thêm khoảng đệm bên phải để có chỗ cho dấu chấm chưa đọc */
+    /* Điều chỉnh giá trị này dựa trên kích thước dấu chấm và khoảng cách mong muốn */
+    padding-right: 25px;
+}
+
+/* --- CSS thêm dấu chấm màu xanh nước biển cho thông báo CHƯA ĐỌC --- */
+/* Áp dụng cho thẻ <a> bên trong li có lớp unread-notification */
+.dropdown-menu > li.unread-notification > .dropdown-item::after {
+    content: ""; /* Nội dung rỗng để tạo hình */
+    display: block; /* Hiển thị như block để dễ kiểm soát kích thước */
+    width: 10px; /* Kích thước chiều rộng của dấu chấm */
+    height: 10px; /* Kích thước chiều cao của dấu chấm */
+    background-color: #007bff; /* Màu xanh nước biển của Bootstrap */
+    border-radius: 50%; /* Tạo hình tròn */
+    position: absolute; /* Vị trí tuyệt đối so với .dropdown-item */
+    top: 50%; /* Căn giữa theo chiều dọc */
+    right: 10px; /* Khoảng cách từ lề phải của .dropdown-item */
+    transform: translateY(-50%); /* Điều chỉnh vị trí để căn giữa chính xác */
+}
+
+/* Tùy chọn: Đảm bảo thông báo đã đọc không có dấu chấm (mặc dù theo logic chỉ thêm vào unread thì không cần) */
+/* Nếu cần thiết lập lại, bỏ comment dòng dưới */
+/*
+.dropdown-menu > li.read-notification > .dropdown-item::after {
+    display: none;
+}
+*/
+
+
+/* --- CSS cho các phần tử văn bản bên trong mục thông báo (Tiêu đề, Nội dung, Ngày tạo) --- */
+/* Đảm bảo font size và style của chúng phù hợp và nhỏ hơn tiêu đề header */
+
+.dropdown-menu .dropdown-item strong { /* Tiêu đề trong mục */
+    display: block; /* Đảm bảo tiêu đề trên một dòng */
+    font-size: 1rem; /* Đặt font size, điều chỉnh so với tiêu đề header */
+    font-weight: bold; /* Giữ đậm cho tiêu đề mục */
+    color: #333; /* Màu chữ cho tiêu đề mục */
+}
+
+.dropdown-menu .dropdown-item p { /* Nội dung trong mục */
+    /* Khoảng cách trên dưới nếu cần */
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    white-space: normal; /* Cho phép nội dung xuống dòng */
+    font-size: 0.9rem; /* Đặt font size cho nội dung, nhỏ hơn tiêu đề */
+    color: #555; /* Màu chữ cho nội dung */
+}
+
+.dropdown-menu .dropdown-item small { /* Ngày tạo trong mục */
+    font-size: 0.8rem; /* Đặt font size nhỏ hơn cho ngày tạo */
+    color: #888; /* Màu chữ xám nhạt hơn cho ngày tạo */
+}

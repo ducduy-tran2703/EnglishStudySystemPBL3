@@ -223,7 +223,7 @@
     <Compile Include="Models\UserTestAttempt.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="MomoPayment\Momo.cs" />
-    <Compile Include="MomoPayment\MomoSecurity.cs" />
+    <Compile Include="MomoPayment\MoMoSecurity.cs" />
     <Compile Include="MomoPayment\PaymentRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -253,6 +253,7 @@
     <Content Include="Content\CSS2\ForgetPasswordStyle.css" />
     <Content Include="Content\CSS\RegisterStyle.css" />
     <Content Include="Content\CSS\StyleLayout.css" />
+    <Content Include="Content\CSS\_NotificationDropdownPartial.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -317,6 +318,7 @@
     <Content Include="Views\Customer\CustomerDashBoard.cshtml" />
     <Content Include="Views\Shared\LayoutCustomer.cshtml" />
     <Content Include="Views\Customer\Payment.cshtml" />
+    <Content Include="Views\Notification\_NotificationDropdownPartial.cshtml" />
     <Content Include="Views\Customer\DetailUser.cshtml" />
     <Content Include="Views\Customer\EditProfile.cshtml" />
   </ItemGroup>

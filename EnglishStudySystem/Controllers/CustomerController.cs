@@ -81,7 +81,11 @@ namespace EnglishStudySystem.Controllers
         {
             var userId = User.Identity.GetUserId();
             var user = _context.Users.Find(userId);
-            if (user == null) return HttpNotFound("User not found");
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("HomePage", "Home");
+            }
             var model = new ProfileViewModel
             {
                 FullName = user.FullName,
@@ -89,27 +93,37 @@ namespace EnglishStudySystem.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
-            
-            return View();
+
+            return View(model);
         }
+
         [HttpPost]
         [Authorize(Roles = "Author,Admin")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(ProfileViewModel model)
+        public ActionResult EditProfile(ProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var userId = User.Identity.GetUserId();
                 var user = _context.Users.Find(userId);
-                if (user == null) return HttpNotFound("User not found");
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return RedirectToAction("HomePage", "Home");
+                }
+
                 user.FullName = model.FullName;
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
                 user.DateOfBirth = model.DateOfBirth;
-                _context.SaveChanges(); // Corrected the variable name to '_context'  
+
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Profile updated successfully!";
                 return RedirectToAction("Infor");
             }
             return View(model);
         }
+
     }
 }

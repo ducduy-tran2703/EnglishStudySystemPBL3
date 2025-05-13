@@ -87,67 +87,80 @@
         </div>
     </div>
 </main>
-
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
     <script>
         $(document).ready(function () {
-            // Gọi API thanh toán Momo
-            $('#btnPayment').click(function () {
-                $(this).html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
-                initiateMomoPayment(@Model.Id, @Model.Price);
+            // 1. Nút Thanh toán
+            $('#btnPayment').click(function() {
+                var $btn = $(this);
+                $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
+                $btn.prop('disabled', true);
 
-                setTimeout(() => {
-                    $('#btnPayment').html('<i class="fas fa-money-bill-wave me-2"></i>THANH TOÁN QUA MOMO');
-                }, 3000);
+                $.post('@Url.Action("PaymentMomo", "Payment")', {
+                    amount: @Model.Price,
+                }, function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        // Tự động kiểm tra thanh toán sau 5 giây
+                        setTimeout(checkPaymentStatus, 5000);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                }).fail(function() {
+                    toastr.error('Không thể kết nối đến server');
+                }).always(function() {
+                    $btn.html('<i class="fas fa-money-bill-wave me-2"></i>THANH TOÁN QUA MOMO');
+                    $btn.prop('disabled', false);
+                });
             });
 
-            // Kiểm tra thanh toán
-            $('#btnCheckPayment').click(function () {
-                $(this).html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
-                checkMomoPayment(@Model.Id);
+            // 2. Nút Kiểm tra
+            $('#btnCheckPayment').click(checkPaymentStatus);
 
-                setTimeout(() => {
-                    $('#btnCheckPayment').html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
-                }, 3000);
-            });
+            // Hàm kiểm tra trạng thái thanh toán
+            function checkPaymentStatus() {
+                var $btn = $('#btnCheckPayment');
+                $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
+                $btn.prop('disabled', true);
 
-            function initiateMomoPayment(categoryId, amount) {
-                // Thay bằng API thực tế của bạn
-                console.log('Initiating Momo payment...');
-                alert('Chuyển hướng đến cổng thanh toán Momo...');
-            }
-
-            function checkMomoPayment(categoryId) {
-                // Thay bằng API thực tế của bạn
-                console.log('Checking Momo payment...');
-                alert('Đang kiểm tra trạng thái thanh toán...');
+                $.get('@Url.Action("CheckPaymentMomo", "Payment")', function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        // Nếu thanh toán thành công, có thể chuyển hướng hoặc làm gì đó
+                    } else {
+                        toastr.warning(response.message);
+                    }
+                }).fail(function() {
+                    toastr.error('Không thể kiểm tra trạng thái thanh toán');
+                }).always(function() {
+                    $btn.html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
+                    $btn.prop('disabled', false);
+                });
             }
         });
     </script>
-}
 
-<style>
-    .table td {
-        padding: 0.75rem 0.5rem;
-        vertical-align: middle;
-    }
-
-    .alert-success {
-        background-color: rgba(40, 167, 69, 0.1);
-        border-color: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-    }
-
-    #btnPayment {
-        transition: all 0.3s ease;
-    }
-
-        #btnPayment:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    <style>
+        /* Thêm style cho toast message */
+        .toast {
+            font-size: 14px;
+            padding: 15px;
         }
 
-    .text-warning {
-        color: #ffc107 !important;
-    }
-</style>
+        .toast-success {
+            background-color: #28a745;
+        }
+
+        .toast-error {
+            background-color: #dc3545;
+        }
+
+        .toast-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+    </style>
+}
