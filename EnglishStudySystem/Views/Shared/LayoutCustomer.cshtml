@@ -65,20 +65,15 @@
                     <i class="fas fa-book fs-4"></i>
                 </a>
 
-                <!-- Notifications Dropdown -->
+            
                 <div class="dropdown me-3" data-bs-toggle="tooltip" title="Thông báo">
                     <a class="nav-link" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
                         <i class="fas fa-bell fs-4"></i>
                     </a>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            🔔 Thông báo
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="notificationsDropdown">
-                            @Html.Action("DanhSach", "ThongBao")  <!-- Gọi action trả về partial chứa danh sách thông báo -->
-                        </ul>
-                    </li>
-
+                    @* Thêm lớp dropdown-menu-end vào thẻ <ul> để menu mở sang trái *@
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                        @Html.Action("List", "Notification")
+                    </ul>
                 </div>
 
                 <!-- User Profile Dropdown -->

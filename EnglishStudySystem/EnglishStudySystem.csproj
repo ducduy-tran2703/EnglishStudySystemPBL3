@@ -250,6 +250,7 @@
     <Content Include="Content\CSS2\ForgetPasswordStyle.css" />
     <Content Include="Content\CSS\RegisterStyle.css" />
     <Content Include="Content\CSS\StyleLayout.css" />
+    <Content Include="Content\CSS\_NotificationDropdownPartial.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -314,12 +315,12 @@
     <Content Include="Views\Customer\CustomerDashBoard.cshtml" />
     <Content Include="Views\Shared\LayoutCustomer.cshtml" />
     <Content Include="Views\Customer\Payment.cshtml" />
+    <Content Include="Views\Notification\_NotificationDropdownPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Views\Shared\" />
-    <Folder Include="Views\Notification\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
