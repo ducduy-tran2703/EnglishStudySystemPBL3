@@ -74,7 +74,9 @@
                         <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             🔔 Thông báo
                         </a>
-                        
+                        <ul class="dropdown-menu" aria-labelledby="notificationsDropdown">
+                            @Html.Action("DanhSach", "ThongBao")  <!-- Gọi action trả về partial chứa danh sách thông báo -->
+                        </ul>
                     </li>
 
                 </div>
