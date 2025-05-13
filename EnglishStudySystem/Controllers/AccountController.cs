@@ -109,15 +109,18 @@ namespace EnglishStudySystem.Controllers
             // Lấy URL chuẩn của Action Login và Register (chỉ lấy PathAndQuery)
             string loginUrlPath = Url.Action("Login", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
             string registerUrlPath = Url.Action("Register", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
-
+            string forgotUrlPath = Url.Action("FogotPassword", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
+            string RegisConfirmUrlPath = Url.Action("RegisterConfirmation", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
 
             // So sánh finalReturnUrl với loginUrlPath và registerUrlPath (không phân biệt chữ hoa chữ thường)
             if (!string.IsNullOrEmpty(finalReturnUrl) && // Đảm bảo finalReturnUrl không null/empty
                 (finalReturnUrl.Equals(loginUrlPath, StringComparison.OrdinalIgnoreCase) ||
-                 finalReturnUrl.Equals(registerUrlPath, StringComparison.OrdinalIgnoreCase)))
+                 finalReturnUrl.Equals(registerUrlPath, StringComparison.OrdinalIgnoreCase) || 
+                 finalReturnUrl.Equals(forgotUrlPath, StringComparison.OrdinalIgnoreCase) || 
+                 finalReturnUrl.Equals(RegisConfirmUrlPath, StringComparison.OrdinalIgnoreCase)))
             {
                 // Nếu URL đích là trang Login hoặc Register, FORCE chuyển hướng về trang chủ
-                finalReturnUrl = Url.Action("Index", "Home");
+                finalReturnUrl = Url.Action("HomePage", "Home");
             }
             // --- KẾT THÚC LOGIC KIỂM TRA ---
 
