@@ -93,8 +93,8 @@ namespace EnglishStudySystem.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
-            
-            return View();
+
+            return View(model);
         }
 
         [HttpPost]
