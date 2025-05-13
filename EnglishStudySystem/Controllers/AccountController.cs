@@ -100,9 +100,11 @@ namespace EnglishStudySystem.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+
                     Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
+                    ApplicationUser user = await UserManager.FindByNameAsync(model.UserName);
                     Session["ID"] = User.Identity.GetUserId();
-                    Session["FullName"] = User.Identity.GetUserName();
+                    Session["FullName"] = user.FullName;
 
                     return RedirectToAction("HomePage", "Home");
                 case SignInStatus.LockedOut:
