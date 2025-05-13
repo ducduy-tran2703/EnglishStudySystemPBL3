@@ -108,7 +108,5 @@ namespace EnglishStudySystem.Controllers
             ViewBag.Keyword = keyword;
             return View(categories);
         }
-
-
     }
 }
