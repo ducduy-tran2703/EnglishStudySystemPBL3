@@ -10,7 +10,9 @@ namespace EnglishStudySystem.MomoPayment
 	public class MomoSecurity
 	{
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
-        
+        public MomoSecurity()
+        {
+        }
         public string getHash(string partnerCode, string merchantRefId,
             string amount, string paymentCode, string storeId, string storeName, string publicKeyXML)
         {

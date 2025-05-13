@@ -37,7 +37,7 @@ namespace EnglishStudySystem.MomoPayment
                 "&requestId=" + requestId +
                 "&requestType=" + requestType
                 ;
-            MoMoSecurity crypto = new MoMoSecurity();
+            MomoSecurity crypto = new MomoSecurity();
             //sign signature SHA256
             string signature = crypto.signSHA256(rawHash, serectkey);
 
