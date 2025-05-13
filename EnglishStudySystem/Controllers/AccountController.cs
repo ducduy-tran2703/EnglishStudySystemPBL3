@@ -69,7 +69,7 @@ namespace EnglishStudySystem.Controllers
         //
         // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
 
         {
             var categories = _context.Categories
@@ -78,8 +78,7 @@ namespace EnglishStudySystem.Controllers
             .Take(6)
             .ToList();
             ViewBag.ListCategories = categories;
-            ViewBag.ReturnUrl = returnUrl;
-
+            ViewBag.ReturnUrl = Request.UrlReferrer?.ToString();
             return View();
         }
 
@@ -101,7 +100,11 @@ namespace EnglishStudySystem.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
+                    Session["ID"] = User.Identity.GetUserId();
+                    Session["FullName"] = User.Identity.GetUserName();
+
+                    return RedirectToAction("HomePage", "Home");
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -547,7 +550,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Register", "Account");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

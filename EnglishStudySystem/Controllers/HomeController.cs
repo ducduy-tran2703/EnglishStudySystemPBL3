@@ -21,10 +21,14 @@ namespace EnglishStudySystem.Controllers
         {
              _context = context;
         }
-        public ActionResult HomePage(string sortOrder)
+        public ActionResult Load()
         {
             Session["Layout"] = "~/Views/Shared/_Layout.cshtml";
+            return RedirectToAction("HomePage", "Home");
 
+        }
+        public ActionResult HomePage(string sortOrder)
+        {
             // Truy vấn ban đầu (lọc deleted)
             var categoriesQuery = _context.Categories
                 .Where(c => !c.IsDeleted);
