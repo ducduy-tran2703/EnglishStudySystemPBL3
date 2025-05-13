@@ -13,6 +13,9 @@
     @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
     {
         @Html.AntiForgeryToken()
+        @* --- Thêm Trường ẩn cho ReturnUrl --- *@
+        @Html.HiddenFor(m => m.ReturnUrl)
+        @* --- Kết thúc Trường ẩn --- *@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 

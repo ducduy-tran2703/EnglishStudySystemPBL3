@@ -69,17 +69,65 @@ namespace EnglishStudySystem.Controllers
         //
         // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Login()
-
+        public ActionResult Login(string ReturnUrl)
         {
+ 
             var categories = _context.Categories
-            .Where(c => !c.IsDeleted)
-            .OrderByDescending(c => c.CreatedDate)
-            .Take(6)
-            .ToList();
+                .Where(c => !c.IsDeleted)
+                .OrderByDescending(c => c.CreatedDate)
+                .Take(6)
+                .ToList();
             ViewBag.ListCategories = categories;
-            ViewBag.ReturnUrl = Request.UrlReferrer?.ToString();
-            return View();
+
+            // --- LOGIC XÁC ĐỊNH FINAL RETURNURL ---
+            string finalReturnUrl;
+
+            // 1. Ưu tiên tham số returnUrl từ query string nếu nó tồn tại và là URL nội bộ an toàn
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                finalReturnUrl = ReturnUrl;
+            }
+            else
+            {
+                // 2. Nếu không có returnUrl hợp lệ, thử sử dụng Request.UrlReferrer làm dự phòng
+                // Sử dụng PathAndQuery để chỉ lấy đường dẫn và chuỗi truy vấn (thường tốt hơn full URL)
+                string referrerUrl = Request.UrlReferrer?.PathAndQuery;
+
+                if (!string.IsNullOrEmpty(referrerUrl) && Url.IsLocalUrl(referrerUrl))
+                {
+                    // Sử dụng referrerUrl làm ReturnUrl
+                    finalReturnUrl = referrerUrl;
+                }
+                else
+                {
+                    // 3. Nếu cả hai đều không có hoặc không hợp lệ, thiết lập URL mặc định là trang chủ
+                    finalReturnUrl = Url.Action("HomePage", "Home"); // URL đến trang chủ
+                }
+            }
+
+            // --- THỰC HIỆN KIỂM TRA: Nếu URL đã xác định là trang Login hoặc Register, chuyển hướng về trang chủ ---
+            // Lấy URL chuẩn của Action Login và Register (chỉ lấy PathAndQuery)
+            string loginUrlPath = Url.Action("Login", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
+            string registerUrlPath = Url.Action("Register", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
+
+
+            // So sánh finalReturnUrl với loginUrlPath và registerUrlPath (không phân biệt chữ hoa chữ thường)
+            if (!string.IsNullOrEmpty(finalReturnUrl) && // Đảm bảo finalReturnUrl không null/empty
+                (finalReturnUrl.Equals(loginUrlPath, StringComparison.OrdinalIgnoreCase) ||
+                 finalReturnUrl.Equals(registerUrlPath, StringComparison.OrdinalIgnoreCase)))
+            {
+                // Nếu URL đích là trang Login hoặc Register, FORCE chuyển hướng về trang chủ
+                finalReturnUrl = Url.Action("Index", "Home");
+            }
+            // --- KẾT THÚC LOGIC KIỂM TRA ---
+
+            // Chuẩn bị ViewModel cho View Login
+            // Truyền finalReturnUrl đã xử lý vào ViewModel để View có thể đưa vào hidden field
+            var model = new LoginViewModel(); // Khởi tạo ViewModel
+            model.ReturnUrl = finalReturnUrl; // Gán finalReturnUrl vào thuộc tính ReturnUrl của ViewModel
+
+            // Return the View with the ViewModel
+            return View(model); // Trả về View Login và truyền model
         }
 
         //
@@ -87,35 +135,72 @@ namespace EnglishStudySystem.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(LoginViewModel model)
         {
+
+            // Giữ lại việc lấy categories nếu View cần hiển thị chúng khi validation thất bại
+            var categories = _context.Categories
+            .Where(c => !c.IsDeleted)
+            .OrderByDescending(c => c.CreatedDate)
+            .Take(6)
+            .ToList();
+            ViewBag.ListCategories = categories;
+
+
             if (!ModelState.IsValid)
             {
+                // Nếu model state không hợp lệ, hiển thị lại View
+                // ViewModel model đã chứa ReturnUrl từ hidden field trong form POST
                 return View(model);
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
+            // Thực hiện đăng nhập bằng UserName (theo LoginViewModel)
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+
             switch (result)
             {
                 case SignInStatus.Success:
                     Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
-                    Session["ID"] = User.Identity.GetUserId();
-                    Session["FullName"] = User.Identity.GetUserName();
+                    // Lấy thông tin User và lưu vào Session (giữ nguyên logic của bạn)
+                    ApplicationUser user = await UserManager.FindByNameAsync(model.UserName);
+                    // Lưu ý: User.Identity.GetUserId() chỉ có giá trị sau khi đăng nhập hoàn tất trong Request tiếp theo.
+                    // Để lấy ID ngay đây, bạn có thể lấy từ user object: user.Id
+                    if (user != null)
+                    {
+                        Session["ID"] = user.Id; // Lấy ID từ user object
+                        Session["FullName"] = user.FullName;
+                    }
+                    else
+                    {
+                        // Xử lý trường hợp không tìm thấy user (dù đăng nhập thành công?) - rất hiếm
+                        Session["ID"] = null;
+                        Session["FullName"] = "Người dùng";
+                    }
 
-                    return RedirectToAction("HomePage", "Home");
+
+                    // CHUYỂN HƯỚNG sau khi đăng nhập thành công.
+                    // Sử dụng model.ReturnUrl (giá trị đã được xác định ở GET action và truyền qua form)
+                    // Phương thức RedirectToLocal sẽ kiểm tra an toàn lần cuối và chuyển hướng.
+                    return RedirectToLocal(model.ReturnUrl);
+
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
+
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    // Nếu cần xác thực 2 bước, chuyển hướng đến SendCode
+                    // Truyền model.ReturnUrl để sau khi xác thực 2 bước xong sẽ quay lại đúng trang đích
+                    return RedirectToAction("SendCode", new { Provider = "Email", ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+
                 case SignInStatus.Failure:
                 default:
+                    // Đăng nhập thất bại
                     ModelState.AddModelError("", "Invalid login attempt.");
+                    // Hiển thị lại View Login
+                    // ViewModel model đã chứa ReturnUrl từ form POST
                     return View(model);
             }
         }
-
         //
         // GET: /Account/VerifyCode
         [AllowAnonymous]
@@ -291,6 +376,12 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
+            var categories = _context.Categories
+    .Where(c => !c.IsDeleted)
+    .OrderByDescending(c => c.CreatedDate)
+    .Take(6)
+    .ToList();
+            ViewBag.ListCategories = categories;
             return View();
         }
 
@@ -303,19 +394,34 @@ namespace EnglishStudySystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                var user = await UserManager.FindByEmailAsync(model.Email);
+                if (user == null )
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
                 }
 
+                if (!(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                {
+                    ModelState.AddModelError("", "Email chưa được xác nhận. Vui lòng kiểm tra hộp thư của bạn.");
+                    return View(model);
+                }
+
                 // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                if (UserManager.EmailService == null)
+                {
+                    // Xử lý khi EmailService chưa được cấu hình
+                    ViewBag.ErrorMessage = "Dịch vụ gửi Email chưa được cấu hình.";
+                    return View(model);
+                }
+                else
+                {
+                    string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                }
             }
 
             // If we got this far, something failed, redisplay form
@@ -349,7 +455,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByNameAsync(model.Email);
+            var user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist

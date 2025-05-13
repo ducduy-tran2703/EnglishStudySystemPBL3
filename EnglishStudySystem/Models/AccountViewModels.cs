@@ -61,6 +61,8 @@ namespace EnglishStudySystem.Models
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
+
+        public string ReturnUrl { get; set; }
     }
 
     public class RegisterViewModel
@@ -103,6 +105,8 @@ namespace EnglishStudySystem.Models
         [Display(Name = "Số điện thoại")]
         [StringLength(20, ErrorMessage = "Số điện thoại không được vượt quá 20 ký tự.")]
         public string PhoneNumber { get; set; }
+
+        public string ReturnUrl { get; set; }
     }
 
     public class ResetPasswordViewModel
@@ -133,4 +137,5 @@ namespace EnglishStudySystem.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
+
 }
