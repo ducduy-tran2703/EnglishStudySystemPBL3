@@ -350,7 +350,6 @@
     <Content Include="Views\Customer\EditProfile.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
-    <Content Include="Views\Test\Test.cshtml" />
     <Content Include="Views\Customer\_BoughtCoursesStats.cshtml" />
     <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
     <Content Include="Views\Customer\LearningActivities.cshtml" />
