@@ -26,8 +26,11 @@ namespace EnglishStudySystem.Controllers
         {
             UserManager = userManager;
             SignInManager = signInManager;
-            
+
             Context = context;
+            //_userManager = userManager;
+            //_signInManager = signInManager;
+            //_context = context;
         }
 
         public ApplicationSignInManager SignInManager

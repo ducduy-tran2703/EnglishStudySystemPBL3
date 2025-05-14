@@ -46,9 +46,11 @@
     </div>
 
     <div class="detail-user-action-buttons">
-        @Html.ActionLink("Chỉnh sửa thông tin", "EditProfile", null, new { @class = "detail-user-btn detail-user-btn-edit" })
-        @Html.ActionLink("Đổi mật khẩu", "ChangePassword", null, new { @class = "detail-user-btn detail-user-btn-change-password" })
+        <a href="@Url.Action("EditProfile", "Customer")" class="detail-user-btn detail-user-btn-edit">Chỉnh sửa thông tin</a>
+        <a href="@Url.Action("ChangePassword", "Manage")" class="detail-user-btn detail-user-btn-change-password">Đổi mật khẩu</a>
     </div>
+
+
 </div>
 
 @section Scripts {
