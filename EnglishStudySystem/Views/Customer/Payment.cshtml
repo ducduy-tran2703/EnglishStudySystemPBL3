@@ -1,7 +1,7 @@
 ﻿@model EnglishStudySystem.Models.Category
 @{
     ViewBag.Title = "Thanh toán - " + Model.Name;
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/LayoutCustomer.cshtml";
     var lessons = ViewBag.Lessons as List<EnglishStudySystem.Models.Lesson>;
 }
 
@@ -148,18 +148,28 @@
             });
 
             // Nút Kiểm tra thanh toán
-            $('#btnCheckPayment').click(function() {
-                var $btn = $(this);
-                $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
-                $btn.prop('disabled', true);
+            // Nút Kiểm tra thanh toán
+$('#btnCheckPayment').click(function() {
+    var $btn = $(this);
+    $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
+    $btn.prop('disabled', true);
 
-                $.get('@Url.Action("CheckPaymentMomo", "Payment")', function(response) {
-                    showSimpleResult(response.success);
-                }).always(function() {
-                    $btn.html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
-                    $btn.prop('disabled', false);
-                });
-            });
+    // Thêm tham số amount vào request
+    $.get('@Url.Action("CheckPaymentMomo", "Payment")', {
+        amount: @Model.Price // Truyền amount từ model
+    }, function(response) {
+        if (response && typeof response.success !== 'undefined') {
+            showSimpleResult(response.success);
+        } else {
+            showSimpleResult(false);
+        }
+    }).fail(function() {
+        showSimpleResult(false);
+    }).always(function() {
+        $btn.html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
+        $btn.prop('disabled', false);
+    });
+});
         });
     </script>
 }

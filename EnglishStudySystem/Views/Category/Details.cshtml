@@ -1,7 +1,7 @@
 ﻿@model EnglishStudySystem.Models.Category
 @{
     ViewBag.Title = Model.Name + " - Chi tiết danh mục";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.Layout;
     var lessons = ViewBag.Lessons as List<EnglishStudySystem.Models.Lesson>;
 }
 

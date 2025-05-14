@@ -71,7 +71,7 @@
                                     @userName - @(category.CreatedByUserRole ?? "Admin")
                                 </div>
                             </div>
-                            <a href="@Url.Action("Details", "Category", new { id = category.Id })"
+                            <a href="@Url.Action("Load", "Category", new { id = category.Id })"
                                class="btn btn-sm btn-success px-3">
                                 Xem chi tiết
                             </a>
