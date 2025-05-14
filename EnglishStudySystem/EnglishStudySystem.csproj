@@ -304,7 +304,6 @@
     <Content Include="Views\Account\SendCode.cshtml" />
     <Content Include="Views\Account\VerifyCode.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\ManageLogins.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
@@ -322,6 +321,7 @@
     <Content Include="Views\Notification\_NotificationDropdownPartial.cshtml" />
     <Content Include="Views\Customer\DetailUser.cshtml" />
     <Content Include="Views\Customer\EditProfile.cshtml" />
+    <Content Include="Views\Manage\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
