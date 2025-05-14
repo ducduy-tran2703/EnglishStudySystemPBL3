@@ -1,0 +1,326 @@
+﻿@model IEnumerable<EnglishStudySystem.Models.UserViewModel>
+
+@{
+    ViewBag.Title = "Quản lý Người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml";
+}
+
+<div class="container-fluid px-4 py-3">
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-gradient-success text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 font-weight-bold">
+                    <i class="fas fa-users-cog mr-2"></i>Quản lý Người dùng
+                </h4>
+                @Html.ActionLink("Tạo mới", "Create", null, new { @class = "btn btn-light btn-sm text-success font-weight-bold" })
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Search and Filter Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white border-right-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                        </div>
+                        <input type="text" id="userSearch" class="form-control border-left-0" placeholder="Tìm kiếm theo tên, email...">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                Lọc
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item filter-option" href="#" data-filter="all">Tất cả</a>
+                                <a class="dropdown-item filter-option" href="#" data-filter="active">Đang hoạt động</a>
+                                <a class="dropdown-item filter-option" href="#" data-filter="inactive">Không hoạt động</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Tabs -->
+            <ul class="nav nav-tabs nav-fill mb-4" id="userTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active d-flex align-items-center justify-content-center" id="admin-tab" data-toggle="tab" href="#admin" role="tab">
+                        <i class="fas fa-user-shield mr-2"></i>Admin
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center justify-content-center" id="editor-tab" data-toggle="tab" href="#editor" role="tab">
+                        <i class="fas fa-user-edit mr-2"></i>Editor
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center justify-content-center" id="customer-tab" data-toggle="tab" href="#customer" role="tab">
+                        <i class="fas fa-user mr-2"></i>Customer
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="userTabsContent">
+                <!-- Admin Tab -->
+                <div class="tab-pane fade show active" id="admin" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 20%">Tên đăng nhập</th>
+                                    <th style="width: 25%">Email</th>
+                                    <th style="width: 25%">Họ tên</th>
+                                    <th style="width: 15%">Trạng thái</th>
+                                    <th style="width: 15%" class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(u => u.Roles.Contains("Admin")))
+                                {
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
+                                        <td class="font-weight-bold">@item.UserName</td>
+                                        <td>@item.Email</td>
+                                        <td>@item.FullName</td>
+                                        <td>
+                                            <span class="badge @(item.IsActive ? "badge-success" : "badge-secondary") p-2">
+                                                @(item.IsActive ? "Hoạt động" : "Không hoạt động")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-outline-primary" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-outline-info" title="Chi tiết">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Editor Tab -->
+                <div class="tab-pane fade" id="editor" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 20%">Tên đăng nhập</th>
+                                    <th style="width: 25%">Email</th>
+                                    <th style="width: 25%">Họ tên</th>
+                                    <th style="width: 15%">Trạng thái</th>
+                                    <th style="width: 15%" class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(u => u.Roles.Contains("Editor")))
+                                {
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
+                                        <td class="font-weight-bold">@item.UserName</td>
+                                        <td>@item.Email</td>
+                                        <td>@item.FullName</td>
+                                        <td>
+                                            <span class="badge @(item.IsActive ? "badge-success" : "badge-secondary") p-2">
+                                                @(item.IsActive ? "Hoạt động" : "Không hoạt động")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-outline-primary" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-outline-info" title="Chi tiết">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                                <a href="@Url.Action("ManagePermissions", new { id = item.Id })" class="btn btn-outline-success" title="Cấp quyền">
+                                                    <i class="fas fa-user-tag"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Customer Tab -->
+                <div class="tab-pane fade" id="customer" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 20%">Tên đăng nhập</th>
+                                    <th style="width: 25%">Email</th>
+                                    <th style="width: 25%">Họ tên</th>
+                                    <th style="width: 15%">Trạng thái</th>
+                                    <th style="width: 15%" class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Where(u => u.Roles.Contains("Customer")))
+                                {
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
+                                        <td class="font-weight-bold">@item.UserName</td>
+                                        <td>@item.Email</td>
+                                        <td>@item.FullName</td>
+                                        <td>
+                                            <span class="badge @(item.IsActive ? "badge-success" : "badge-secondary") p-2">
+                                                @(item.IsActive ? "Hoạt động" : "Không hoạt động")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-outline-primary" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-outline-info" title="Chi tiết">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-outline-danger" title="Xóa">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="text-center py-5 empty-state d-none">
+                <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Không tìm thấy người dùng phù hợp</h5>
+                <p class="text-muted">Thử thay đổi tiêu chí tìm kiếm hoặc bộ lọc</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Tab functionality
+            $('#userTabs a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+                updateEmptyState();
+            });
+
+            // Search functionality
+            $('#userSearch').on('keyup', function () {
+                filterUsers();
+            });
+
+            // Filter functionality
+            $('.filter-option').on('click', function (e) {
+                e.preventDefault();
+                const filter = $(this).data('filter');
+                $('.filter-option').removeClass('active');
+                $(this).addClass('active');
+                filterUsers(filter);
+            });
+
+            function filterUsers(statusFilter = 'all') {
+                const searchTerm = $('#userSearch').val().toLowerCase();
+                const activeTab = $('.tab-pane.active');
+                let visibleRows = 0;
+
+                activeTab.find('.user-row').each(function () {
+                    const rowText = $(this).text().toLowerCase();
+                    const rowStatus = $(this).data('status');
+
+                    const matchesSearch = searchTerm === '' || rowText.indexOf(searchTerm) > -1;
+                    const matchesFilter = statusFilter === 'all' || rowStatus === statusFilter;
+
+                    if (matchesSearch && matchesFilter) {
+                        $(this).show();
+                        visibleRows++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                updateEmptyState(visibleRows);
+            }
+
+            function updateEmptyState(visibleRows) {
+                const activeTab = $('.tab-pane.active');
+                const totalRows = activeTab.find('.user-row').length;
+                const emptyState = $('.empty-state');
+
+                if (typeof visibleRows === 'undefined') {
+                    visibleRows = activeTab.find('.user-row:visible').length;
+                }
+
+                if (visibleRows === 0 && totalRows > 0) {
+                    emptyState.removeClass('d-none');
+                } else {
+                    emptyState.addClass('d-none');
+                }
+            }
+
+            // Initialize
+            updateEmptyState();
+        });
+    </script>
+}
+
+<style>
+    .card-header {
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #28a745;
+            background-color: transparent;
+            border-bottom: 3px solid #28a745;
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        min-width: 100px;
+    }
+
+    .empty-state {
+        background-color: #f8f9fa;
+        border-radius: 0.35rem;
+    }
+
+    .btn-outline-primary,
+    .btn-outline-info,
+    .btn-outline-success,
+    .btn-outline-danger {
+        border-width: 1px;
+    }
+</style>
