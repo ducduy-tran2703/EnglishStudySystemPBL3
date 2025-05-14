@@ -26,8 +26,6 @@ namespace EnglishStudySystem.Controllers
         // GET: Customer
         public ActionResult CustomerDashBoard()
         {
-            Session["Layout"] = null;
-            Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
             // Lấy danh sách categories giống như HomePage
             var categories = _context.Categories
                 .Where(c => !c.IsDeleted)
@@ -43,7 +41,6 @@ namespace EnglishStudySystem.Controllers
 
             ViewBag.UserNames = userNames;
             ViewBag.ListCategory = categories;
-            ViewBag.Layout = Session["Layout"];
             return View(categories);
         }
         public ActionResult Payment(int categoryId)
