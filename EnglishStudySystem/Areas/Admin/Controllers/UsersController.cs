@@ -12,7 +12,7 @@ using EnglishStudySystem.Areas.Admin.ViewModel;
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
-    //[Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator, Editor" )]
     public class UsersController : Controller
     {
         private ApplicationDbContext _context;

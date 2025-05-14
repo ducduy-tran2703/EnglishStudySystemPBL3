@@ -21,9 +21,13 @@ namespace EnglishStudySystem.Controllers
         {
              _context = context;
         }
-
+        
         public ActionResult HomePage(string sortOrder)
         {
+            if(User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
             // Truy vấn ban đầu (lọc deleted)
             var categoriesQuery = _context.Categories
                 .Where(c => !c.IsDeleted);
