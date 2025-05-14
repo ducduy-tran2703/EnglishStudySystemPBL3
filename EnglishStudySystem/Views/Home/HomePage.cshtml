@@ -5,20 +5,19 @@
 }
 <main class="container py-4">
     <!-- Header Section - Đổi tiêu đề thành "Bạn Muốn Gì Hôm Nay" -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">Bạn Muốn Gì Hôm Nay</h2> <!-- Đã bỏ text-success để mặc định màu đen -->
-        <div class="dropdown">
-            <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                <i class="fas fa-sort me-1"></i> Sắp xếp
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "newest" })">Mới nhất</a></li>
-                <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "oldest" })">Cũ nhất</a></li>
-                <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "name" })">A-Z</a></li>
-            </ul>
+<div class="d-flex flex-column align-items-center mb-4">
+     <h2 class="fw-bold mb-3 text-center">Bạn muốn học gì hôm nay</h2> <div class="dropdown">
+         <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+             <i class="fas fa-sort me-1"></i> Sắp xếp
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "newest" })">Mới nhất</a></li>
+             <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "oldest" })">Cũ nhất</a></li>
+             <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "name" })">A-Z</a></li>
+         </ul>
 
-        </div>
-    </div>
+     </div>
+ </div>
 
     <!-- Categories Grid -->
     <div class="row g-4">
