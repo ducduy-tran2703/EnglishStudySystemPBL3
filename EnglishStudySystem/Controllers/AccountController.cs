@@ -177,7 +177,7 @@ namespace EnglishStudySystem.Controllers
 
 
                         // KIỂM TRA VAI TRÒ để quyết định chuyển hướng
-                        if (roles.Contains("Admin") || roles.Contains("Editor"))
+                        if (roles.Contains("Administrator") || roles.Contains("Editor"))
                         {
                             // Nếu là Admin hoặc Editor, chuyển hướng đến Trang chủ Admin Dashboard
                             // Sử dụng RedirectToAction với area = "Admin"
@@ -617,7 +617,7 @@ namespace EnglishStudySystem.Controllers
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
            Session.Clear();
-            return RedirectToAction("HomePage", "Home");
+            return RedirectToAction("HomePage", "Home", new {area = ""});
         }
 
         //
