@@ -35,7 +35,6 @@ namespace EnglishStudySystem.Controllers
                 .Where(l => l.CategoryId == id && !l.IsDeleted)
                 .OrderBy(l => l.CreatedDate)
                 .ToList();
-            string ID = id.ToString();
             // Kiểm tra người dùng đã mua CHÍNH XÁC category này chưa
             bool daMua = false;
             if (User.Identity.IsAuthenticated)
@@ -44,9 +43,14 @@ namespace EnglishStudySystem.Controllers
                 daMua = _context.Payments
                     .Any(p => p.UserId == userId &&
                              p.Status == "Completed" &&
-                             p.TransactionId == ID); // So sánh với ID category hiện tại
+                             p.CategoryId == id); // So sánh với ID category hiện tại
             }
-
+            var categoriesQuery = _context.Categories
+                .Where(c => !c.IsDeleted);
+            var categories = categoriesQuery
+                .Take(6) // giữ nếu bạn chỉ muốn 6 kết quả, có thể bỏ nếu muốn toàn bộ
+                .ToList();
+            ViewBag.ListCategories = categories;
             ViewBag.DaMua = daMua;
             ViewBag.Lessons = lessons;
             return View(category);
