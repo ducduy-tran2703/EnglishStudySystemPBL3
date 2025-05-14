@@ -36,16 +36,6 @@
                                 }
                             </div>
                             <!-- Đổi màu giá tiền thành vàng -->
-                            <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
-                                @if (category.Price.HasValue && category.Price > 0)
-                                {
-                                    <text>@string.Format("{0:C0}", category.Price.Value)</text>
-                                }
-                                else
-                                {
-                                    @:Miễn phí
-                                }
-                            </span>
                         </div>
 
                         <div class="d-flex flex-wrap gap-2 mb-3">

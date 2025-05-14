@@ -1,0 +1,272 @@
+﻿/* LearningActivities.css */
+
+/* Xóa các quy tắc body không cần thiết khi dùng Layout */
+/* body { ... } */
+
+/* Điều chỉnh quy tắc cho container mới của View */
+.container-view-content {
+    /* Giữ lại các kiểu dáng hiển thị */
+    background-color: #fff; /* Màu nền trắng cho container */
+    padding: 20px; /* Khoảng đệm bên trong container */
+    border-radius: 8px; /* Bo tròn góc container */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ cho container */
+    /* Xóa hoặc điều chỉnh các quy tắc bố cục có thể xung đột với Layout */
+    /* Bỏ width, max-width nếu muốn nó rộng theo container cha của Layout */
+    /* width: 95%; */
+    /* max-width: 800px; */
+    /* Bỏ các quy tắc căn giữa bằng flex/margin auto nếu Layout đã lo việc này */
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: flex-start; */
+    /* padding-top: 20px; */ /* Nếu Layout đã có padding trên cho @RenderBody() */
+    /* Thêm margin-top nếu cần khoảng cách với phần tử phía trên trong Layout */
+    margin-top: 20px; /* Ví dụ: thêm khoảng cách 20px phía trên */
+
+    text-align: center; /* Vẫn căn giữa nội dung bên trong container-view-content */
+    /* Có thể cần điều chỉnh thêm width/max-width tùy vào cấu trúc Layout của bạn */
+    /* Nếu container của Layout đã có max-width, bạn có thể không cần ở đây */
+    /* Nếu cần kiểm soát chiều rộng, hãy dùng lại width/max-width */
+    width: 95%; /* Ví dụ: giữ lại chiều rộng tương đối */
+    max-width: 800px; /* Ví dụ: giữ lại chiều rộng tối đa */
+    margin-left: auto; /* Căn giữa trong container cha */
+    margin-right: auto;
+}
+
+
+h1 {
+    color: #333; /* Màu chữ cho tiêu đề */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+}
+
+hr {
+    border: none; /* Bỏ đường viền mặc định của hr */
+    height: 1px; /* Chiều cao của đường kẻ ngang */
+    background-color: #ccc; /* Màu sắc của đường kẻ ngang */
+    margin: 20px 0; /* Khoảng cách trên và dưới đường kẻ ngang */
+}
+
+.card-container {
+    display: flex; /* Sử dụng flexbox để bố trí các ô */
+    justify-content: space-around; /* Phân bố khoảng trống đều giữa các ô */
+    gap: 15px; /* Khoảng cách giữa các ô */
+    flex-wrap: wrap; /* Cho phép các ô xuống dòng nếu không đủ chỗ trên màn hình nhỏ */
+}
+
+.card {
+    flex: 1; /* Các ô sẽ mở rộng để lấp đầy không gian */
+    min-width: 120px; /* Chiều rộng tối thiểu của mỗi ô */
+    max-width: 180px; /* Chiều rộng tối đa để không quá lớn trên màn hình rộng */
+    background-color: #f9f9f9; /* Màu nền nhẹ cho mỗi ô */
+    padding: 15px 10px; /* Khoảng đệm bên trong mỗi ô (trên/dưới, trái/phải) */
+    border-radius: 8px; /* Bo tròn góc mỗi ô */
+    text-align: center; /* Căn giữa nội dung bên trong mỗi ô */
+    cursor: pointer; /* Hiển thị con trỏ dạng bàn tay khi rê chuột vào */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Hiệu ứng chuyển đổi */
+    border: 1px solid transparent; /* Đường viền trong suốt mặc định */
+    box-shadow: none; /* Đảm bảo không có đổ bóng mặc định */
+}
+
+    .card:hover {
+        /* Màu nền hover sẽ được tùy chỉnh cho từng loại card bên dưới */
+        border-color: #ccc; /* Thay đổi màu viền khi hover */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Thêm đổ bóng khi hover */
+    }
+
+    .card .icon {
+        margin-bottom: 10px; /* Khoảng cách dưới biểu tượng */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .card .icon i {
+            font-size: 40px; /* Kích thước icon */
+            color: #007bff; /* Màu icon mặc định */
+        }
+
+
+    .card .text {
+        font-size: 13px; /* Kích thước chữ cho nhãn */
+        color: #555; /* Màu chữ cho nhãn */
+        margin-bottom: 8px; /* Khoảng cách dưới nhãn */
+        font-weight: 600; /* In đậm nhẹ nhãn */
+    }
+
+    .card .number {
+        font-size: 28px; /* Kích thước chữ cho số đếm */
+        font-weight: bold; /* In đậm số đếm */
+        color: #333; /* Màu chữ cho số đếm */
+    }
+
+    /* Tùy chỉnh màu icon và màu nền khi hover cho từng loại ô */
+
+    .card.all .icon i {
+        color: #007bff;
+    }
+
+    .card.all:hover {
+        background-color: #e0e7ff;
+        border-color: #a0c3ff;
+    }
+
+    .card.completed .icon i {
+        color: #28a745;
+    }
+
+    .card.completed:hover {
+        background-color: #e9f5e9;
+        border-color: #b8ecc4;
+    }
+
+    .card.in-progress .icon i {
+        color: #ffc107;
+    }
+
+    .card.in-progress:hover {
+        background-color: #cce0ff;
+        border-color: #4a8aff;
+    }
+
+    .card.failed .icon i {
+        color: #dc3545;
+    }
+
+    .card.failed:hover {
+        background-color: #ffebeb;
+        border-color: #ffc2c2;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-container {
+        flex-direction: column; /* Xếp chồng các ô trên màn hình nhỏ */
+        align-items: center; /* Căn giữa các ô khi xếp chồng */
+    }
+
+    .card {
+        min-width: 200px; /* Chiều rộng tối thiểu lớn hơn khi xếp chồng */
+        width: 80%; /* Chiều rộng chiếm 80% của container */
+        max-width: 300px; /* Chiều rộng tối đa khi xếp chồng */
+    }
+}
+
+
+/* Kiểu dáng cho khu vực hiển thị thống kê chính */
+
+/* Kiểu dáng cho loading indicator (nếu bạn có) */
+#loading-indicator {
+    position: absolute; /* Đặt chồng lên nội dung */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8); /* Nền mờ */
+    display: flex; /* Căn giữa nội dung loading */
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Đảm bảo nằm trên nội dung khác */
+    font-size: 1.2em;
+    color: #333;
+}
+
+
+/* Kiểu dáng cho các khối nội dung thống kê riêng lẻ */
+.stats-content {
+    display: none; /* Mặc định ẩn các khối nội dung này */
+    /* Các kiểu dáng chung cho nội dung thống kê bên trong */
+    padding: 10px; /* Khoảng đệm bên trong mỗi khối nội dung */
+    border-bottom: 1px dashed #eee; /* Ví dụ: đường kẻ phân cách nhẹ nếu cần */
+    margin-bottom: 15px; /* Khoảng cách dưới mỗi khối nếu nhiều khối hiển thị */
+}
+
+    /* Bỏ border-bottom cho khối cuối cùng nếu chỉ hiển thị 1 khối mỗi lần */
+    .stats-content:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+
+    /* Kiểu dáng cho tiêu đề bên trong các khối nội dung thống kê */
+    .stats-content h2 {
+        margin-top: 0; /* Bỏ margin trên mặc định */
+        color: #333; /* Màu chữ */
+        font-size: 20px; /* Kích thước chữ */
+        margin-bottom: 15px; /* Khoảng cách dưới tiêu đề */
+        border-bottom: 2px solid #007bff; /* Ví dụ: gạch chân tiêu đề */
+        padding-bottom: 5px;
+        display: inline-block; /* Giúp border-bottom chỉ dài bằng chữ */
+    }
+
+    /* Kiểu dáng cho đoạn văn bản bên trong các khối nội dung thống kê */
+    .stats-content p {
+        color: #555; /* Màu chữ */
+        font-size: 16px; /* Kích thước chữ */
+        line-height: 1.6; /* Chiều cao dòng cho dễ đọc */
+        margin-bottom: 10px; /* Khoảng cách dưới đoạn văn */
+    }
+
+/* Thêm các kiểu dáng cho bảng, danh sách, v.v. nếu nội dung thống kê của bạn phức tạp hơn */
+/* .stats-content table { ... } */
+/* .stats-content ul { ... } */
+/* CSS cho phần hiển thị thống kê */
+
+/* LearningActivities.css */
+
+/* Style cho container chính của View */
+.container-content {
+    /* Style cho khung */
+    background-color: #fff; /* Màu nền trắng */
+    padding: 20px; /* Khoảng đệm bên trong */
+    border-radius: 8px; /* Bo tròn góc */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ tạo hiệu ứng khung */
+    border: 1px solid #ddd; /* Thêm viền nhẹ để tạo khung rõ ràng */
+    /* Style cho độ rộng và căn giữa */
+    width: 95%; /* Chiều rộng tương đối, chiếm 95% của container cha */
+    max-width: 1000px; /* <-- Đã tăng chiều rộng tối đa ở đây (bạn có thể chỉnh số này) */
+    margin-top: 20px; /* Khoảng cách với phần tử phía trên trong Layout */
+    margin-left: auto; /* Tự động căn giữa theo chiều ngang */
+    margin-right: auto;
+    /* Các kiểu dáng khác nếu cần */
+    text-align: center; /* Căn giữa nội dung bên trong (tiêu đề, HR) */
+}
+
+/* Style cho khu vực hiển thị thống kê chính */
+.statistics-section {
+    margin-top: 30px; /* Khoảng cách với khối card hoạt động phía trên */
+    padding: 20px; /* Khoảng đệm bên trong khu vực thống kê */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Bóng nhẹ hơn một chút so với container chính */
+    min-height: 100px;
+    position: relative;
+    text-align: left; /* Đảm bảo nội dung bên trong thống kê căn trái */
+}
+
+/* Kiểu dáng cho loading indicator */
+#loading-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    font-size: 1.2em;
+    color: #333;
+}
+
+
+/* --- Điều chỉnh CSS cho nội dung tải từ Partial View (bên trong statistics-section) --- */
+
+.card.active {
+    border-color: #007bff;
+    background-color: #e0e7ff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+}
+.statistics-section {
+    position: relative;
+}

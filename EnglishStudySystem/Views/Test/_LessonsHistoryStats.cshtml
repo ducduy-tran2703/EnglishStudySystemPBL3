@@ -1,0 +1,44 @@
+﻿@model IEnumerable<EnglishStudySystem.Models.Lesson>
+
+@* Đây là Partial View - KHÔNG có @Layout = "..."; *@
+@* Chỉ chứa nội dung HTML sẽ được chèn vào trang chính *@
+
+<h2>Lịch sử bài học</h2>
+<hr /> @* Đường phân cách sau tiêu đề *@
+
+@if (Model != null && Model.Any())
+{
+    @* Container cho danh sách bài học *@
+    <div class="lesson-history-list">
+        @foreach (var lesson in Model)
+        {
+            @* Mỗi mục bài học trong danh sách *@
+            <div class="lesson-item">
+                @* Phần chi tiết bài học (tiêu đề, ngày) *@
+                <div class="lesson-details">
+                    <h4 class="lesson-title">@lesson.Title</h4>
+                    <p class="lesson-date">
+                        @* Giả định Lesson có thuộc tính CompletionDate (kiểu DateTime?) *@
+                        <i class="far fa-clock me-1"></i> @* Icon đồng hồ (yêu cầu Font Awesome)*@
+                        Ngày hoàn thành: @(lesson.CompletionDate.HasValue ? lesson.CompletionDate.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa hoàn thành")
+                    </p>
+                    @* Thêm các chi tiết khác từ Model Lesson nếu cần *@
+                </div>
+                @* Phần hành động (ví dụ: nút xem lại) *@
+                <div class="lesson-actions">
+                    @* Giả định có Action "Details" trong Controller "Lesson" để xem chi tiết *@
+                    @* Thay thế "Lesson" và "Details" nếu Action/Controller của bạn khác *@
+                    <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })" class="btn btn-sm btn-outline-primary">Xem lại</a>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    @* Hiển thị thông báo nếu không có bài học nào *@
+    <p>Chưa có bài học nào trong lịch sử.</p>
+}
+
+@* Ghi chú: Các class CSS như .lesson-history-list, .lesson-item, v.v. cần được định nghĩa
+    trong tệp CSS của bạn (ví dụ: LearningActivities.css) để hiển thị đúng bố cục và kiểu dáng. *@
