@@ -135,6 +135,13 @@ namespace EnglishStudySystem.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // Quan hệ giữa payment-category
+            modelBuilder.Entity<Payment>()
+    .HasRequired(p => p.Category) // Mỗi Payment yêu cầu có một Category
+    .WithMany() // Category có thể có nhiều Payments (Nếu không cần điều hướng ngược lại từ Category đến Payment)
+                // .WithMany(c => c.Payments) // Nếu bạn thêm ICollection<Payment> Payments { get; set; } vào Category Model
+    .HasForeignKey(p => p.CategoryId) // Khóa ngoại là CategoryId trong bảng Payment
+    .WillCascadeOnDelete(false);
 
             // Cấu hình quan hệ cho SavedLesson (Người dùng - Bài học)
             modelBuilder.Entity<SavedLesson>()

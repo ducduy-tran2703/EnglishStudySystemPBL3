@@ -205,6 +205,10 @@
     <Compile Include="Migrations\202505121537059_AddLessonModel1.Designer.cs">
       <DependentUpon>202505121537059_AddLessonModel1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.cs" />
+    <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
+      <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -388,6 +392,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505121537059_AddLessonModel1.resx">
       <DependentUpon>202505121537059_AddLessonModel1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.resx">
+      <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
