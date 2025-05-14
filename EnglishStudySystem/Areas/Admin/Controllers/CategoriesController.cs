@@ -16,7 +16,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 
 // Đặt Authorize cho Controller để chỉ Admin hoặc Editor mới có thể truy cập
-[Authorize(Roles = "Admin, Editor")]
+[Authorize(Roles = "Administrator, Editor")]
 public class CategoriesController : Controller
 {
     // Khai báo DbContext để truy vấn dữ liệu

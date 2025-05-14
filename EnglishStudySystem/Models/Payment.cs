@@ -41,7 +41,16 @@ namespace EnglishStudySystem.Models
         // Navigation property
         [ForeignKey("UserId")]
         public virtual ApplicationUser User { get; set; }
+
+        // Foreign Key to Category
+        [Display(Name = "Danh mục Khóa học")]
+        public int CategoryId { get; set; } // Giả định Category là đơn vị có thể thanh toán
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; }
+
     }
+
+
 
     public enum PaymentStatus
     {
