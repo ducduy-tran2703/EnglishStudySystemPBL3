@@ -289,6 +289,11 @@
     <Content Include="Areas\Admin\Views\Users\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Users\CreateEditor.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\ListDeletedAccount.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Review.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Revive.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\DeletePermanent.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Delete.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -345,7 +350,6 @@
     <Content Include="Views\Customer\EditProfile.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
-    <Content Include="Views\Test\Test.cshtml" />
     <Content Include="Views\Customer\_BoughtCoursesStats.cshtml" />
     <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
     <Content Include="Views\Customer\LearningActivities.cshtml" />
