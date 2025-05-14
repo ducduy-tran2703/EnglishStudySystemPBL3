@@ -26,7 +26,6 @@ namespace EnglishStudySystem.Controllers
         // GET: Customer
         public ActionResult CustomerDashBoard()
         {
-            Session["Layout"] = null;
             // Lấy danh sách categories giống như HomePage
             var categories = _context.Categories
                 .Where(c => !c.IsDeleted)

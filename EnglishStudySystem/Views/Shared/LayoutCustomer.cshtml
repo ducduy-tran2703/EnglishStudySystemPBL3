@@ -1,48 +1,51 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html>
 <head>
     @{
-        ViewBag.Title = "Admin Panel";
+        ViewBag.Title = "LayoutCustomer";
     }
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Hệ thống Quản trị</title>
+    <title>@ViewBag.Title - Hệ thống Tự học Tiếng Anh</title>
     @Styles.Render("~/Content/css")
-    <link rel="stylesheet" href="~/Content/CSS/AdminLayout.css" />
+    <link rel="stylesheet" href="~/Content/CSS/StyleLayout.css" />
     @Scripts.Render("~/bundles/modernizr")
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
-<body>
-    <!-- Top Navigation Bar -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="border: 3px solid #28a745; border-radius: 5px;">
-            <div class="container-fluid">
-                <!-- Brand & Toggle -->
-                <div class="d-flex align-items-center">
-                    <button class="sidebar-toggle btn btn-link me-3 d-lg-none">
-                        <i class="fas fa-bars fs-4"></i>
-                    </button>
-                    <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="@Url.Action("Index", "Dashboard", new { area = "Admin" })">
-                        <i class="fas fa-cog fs-4 me-2 text-success"></i>
-                        <span>Admin Panel</span>
-                    </a>
-                </div>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="border: 3px solid #28a745; border-radius: 5px;">
+        <div class="container-fluid">
+            <!-- Brand & Navigation Items -->
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="#">
+                    <i class="fas fa-globe fs-4 me-2 text-success"></i>
+                    <span>ESystem</span>
+                </a>
 
-                <!-- Admin Navigation -->
-                <div class="d-none d-lg-flex">
-                    <a href="@Url.Action("Index", "Dashboard", new { area = "Admin" })" class="nav-link me-3">
-                        <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                <div class="d-flex">
+                    <a href="@Url.Action("HomePage", "Home")" class="nav-link me-3">
+                        <i class="fas fa-home me-1"></i> Trang chủ
                     </a>
+                    <!-- Danh mục Dropdown -->
                     <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-cogs me-1"></i> Quản lý
+                        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-list me-1"></i> Danh mục
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="@Url.Action("Index", "Users", new { area = "Admin" })"><i class="fas fa-users me-2"></i>Người dùng</a></li>
-                            <li><a class="dropdown-item" href="@Url.Action("Index", "Courses", new { area = "Admin" })"><i class="fas fa-book me-2"></i>Khóa học</a></li>
-                            <li><a class="dropdown-item" href="@Url.Action("Index", "Categories", new { area = "Admin" })"><i class="fas fa-list me-2"></i>Danh mục</a></li>
+                        <ul class="dropdown-menu" id="CategoryList">
+                            @if (ViewBag.ListCategories != null)
+                            {
+                                foreach (var category in (List<EnglishStudySystem.Models.Category>)ViewBag.ListCategories)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Details", "Category", new { id = category.Id })">
+                                            @category.Name
+                                        </a>
+                                    </li>
+                                }
+                            }
                         </ul>
                     </div>
                 </div>
+            </div>
 
             <!-- Search Bar (Center) -->
             <div class="search-bar mx-auto" style="width: 40%;">
@@ -63,7 +66,7 @@
                     <i class="fas fa-book fs-4"></i>
                 </a>
 
-            
+
                 <div class="dropdown me-3" data-bs-toggle="tooltip" title="Thông báo">
                     <a class="nav-link" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
                         <i class="fas fa-bell fs-4"></i>
@@ -76,79 +79,30 @@
 
                 </div>
 
-                    <!-- User Profile Dropdown -->
-                    <div class="dropdown" data-bs-toggle="tooltip" title="Tài khoản">
-                        <a class="nav-link" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle fs-4"></i>
-                            <span class="d-none d-lg-inline ms-1">@User.Identity.Name</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
-                            <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="@Url.Action("LogOff", "Account")"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                        </ul>
-                    </div>
+                <!-- User Profile Dropdown -->
+                <div class="dropdown" data-bs-toggle="tooltip" title="Người dùng">
+                    <a class="nav-link" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle fs-4"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")">Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")">Đổi mật khẩu</a></li>
+                        <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+                    </ul>
                 </div>
             </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-menu">
-                <div class="sidebar-header">
-                    <h5><i class="fas fa-cog me-2"></i> Quản trị</h5>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Dashboard", new { area = "Admin" })">
-                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Users", new { area = "Admin" })">
-                            <i class="fas fa-users me-2"></i> Quản lý người dùng
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Courses", new { area = "Admin" })">
-                            <i class="fas fa-book me-2"></i> Quản lý khóa học
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Categories", new { area = "Admin" })">
-                            <i class="fas fa-list me-2"></i> Quản lý danh mục
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Notifications", new { area = "Admin" })">
-                            <i class="fas fa-bell me-2"></i> Quản lý thông báo
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Settings", new { area = "Admin" })">
-                            <i class="fas fa-cog me-2"></i> Cài đặt hệ thống
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="admin-main">
-            <div class="admin-content">
-                @RenderBody()
-            </div>
-        </main>
-    </div>
-
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/Scripts/admin.js"></script>
-    @RenderSection("scripts", required: false)
+        </div>
+    </nav>
+</header>
+<body>
+    @RenderBody()
+    @RenderSection("Scripts", required: false)
 </body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Activate tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
