@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace EnglishStudySystem.Models
@@ -24,5 +25,9 @@ namespace EnglishStudySystem.Models
 
         [Display(Name = "Vai trò")]
         public string Roles { get; set; }
+        [Display(Name = "Các bài viết đã tạo")]
+        public List<Category> Categories { get; set; } = new List<Category>();
+        [Display(Name = "Các bài viết đã mua")]
+        public List<Category> PurchasedCategories { get; set; } = new List<Category>();
     }
 }
