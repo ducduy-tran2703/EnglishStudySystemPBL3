@@ -14,7 +14,7 @@
                     <h4 class="mb-0 font-weight-bold" style="color:White">
                         <i class="fas fa-users-cog mr-2" style="color:whitesmoke"></i>@ViewBag.Title
                     </h4>
-                    <small  class="font-weight-light" >Quản lý tất cả người dùng hệ thống</small>
+                    <small class="font-weight-light">Quản lý tất cả người dùng hệ thống</small>
                 </div>
                 <div>
                     @Html.ActionLink("Tạo Editor", "CreateEditor", "Users", null,
@@ -37,26 +37,7 @@
                                 </span>
                             </div>
                             <input type="text" id="userSearch" class="form-control border-0 py-2"
-                                   placeholder="Tìm kiếm theo tên, email...">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-light dropdown-toggle rounded-pill" type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-filter mr-1"></i> Lọc
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right shadow">
-                                    <h6 class="dropdown-header">Trạng thái</h6>
-                                    <a class="dropdown-item filter-option active" href="#" data-filter="all">
-                                        <i class="fas fa-circle mr-2 text-primary"></i>Tất cả
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item filter-option" href="#" data-filter="active">
-                                        <i class="fas fa-circle mr-2 text-success"></i>Đang hoạt động
-                                    </a>
-                                    <a class="dropdown-item filter-option" href="#" data-filter="inactive">
-                                        <i class="fas fa-circle mr-2 text-secondary"></i>Không hoạt động
-                                    </a>
-                                </div>
-                            </div>
+                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">               
                         </div>
                     </div>
                 </div>
@@ -105,7 +86,7 @@
                             <tbody>
                                 @foreach (var item in Model.Where(u => u.Roles.Contains("Admin")))
                                 {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")" data-username="@item.UserName.ToLower()" data-email="@item.Email.ToLower()" data-fullname="@item.FullName.ToLower()">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
@@ -154,7 +135,7 @@
                             <tbody>
                                 @foreach (var item in Model.Where(u => u.Roles.Contains("Editor")))
                                 {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")" data-username="@item.UserName.ToLower()" data-email="@item.Email.ToLower()" data-fullname="@item.FullName.ToLower()">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm bg-gradient-warning text-white rounded-circle d-flex align-items-center justify-content-center me-2">
@@ -203,7 +184,7 @@
                             <tbody>
                                 @foreach (var item in Model.Where(u => u.Roles.Contains("Customer")))
                                 {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")" data-username="@item.UserName.ToLower()" data-email="@item.Email.ToLower()" data-fullname="@item.FullName.ToLower()">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm bg-gradient-info text-white rounded-circle d-flex align-items-center justify-content-center me-2">
@@ -272,7 +253,9 @@
             let searchTimeout;
             $('#userSearch').on('keyup', function () {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(filterUsers, 300);
+                searchTimeout = setTimeout(function () {
+                    filterUsers($('.filter-option.active').data('filter'));
+                }, 300);
             });
 
             // Filter functionality
@@ -284,39 +267,14 @@
             });
 
             // Delete confirmation
-            //$('.btn-delete').on('click', function (e) {
-            //    e.preventDefault();
-            //    const deleteUrl = $(this).attr('href');  // Lấy URL xóa tài khoản
+            $('.btn-delete').on('click', function (e) {
+                e.preventDefault();
+                const deleteUrl = $(this).attr('href');
 
-            //    // Gửi yêu cầu AJAX để xóa tài khoản
-            //    $.ajax({
-            //        url: deleteUrl,
-            //        type: 'POST',  // Sử dụng POST để xóa tài khoản
-            //        data: { 
-            //            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() // Đảm bảo bảo mật CSRF
-            //        },
-            //        success: function (response) {
-            //            // Nếu xóa thành công, ẩn dòng dữ liệu trong bảng
-            //            Swal.fire({
-            //                title: 'Xóa thành công!',
-            //                text: 'Tài khoản đã được xóa.',
-            //                icon: 'success',
-            //                confirmButtonText: 'OK'
-            //            }).then(() => {
-            //                // Ẩn dòng người dùng đã xóa
-            //                window.location.reload(); // Tải lại trang để hiển thị thay đổi
-            //            });
-            //        },
-            //        error: function () {
-            //            Swal.fire({
-            //                title: 'Lỗi!',
-            //                text: 'Không thể xóa tài khoản.',
-            //                icon: 'error',
-            //                confirmButtonText: 'OK'
-            //            });
-            //        }
-            //    });
-            //});
+                if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
+                    window.location.href = deleteUrl;
+                }
+            });
 
             function filterUsers(statusFilter = 'all') {
                 const searchTerm = $('#userSearch').val().toLowerCase();
@@ -324,17 +282,26 @@
                 let visibleRows = 0;
 
                 activeTab.find('.user-row').each(function () {
-                    const rowText = $(this).text().toLowerCase();
-                    const rowStatus = $(this).data('status');
+                    const $row = $(this);
+                    const username = $row.data('username');
+                    const email = $row.data('email');
+                    const fullname = $row.data('fullname');
+                    const rowStatus = $row.data('status');
 
-                    const matchesSearch = searchTerm === '' || rowText.indexOf(searchTerm) > -1;
+                    // Kiểm tra tìm kiếm
+                    const matchesSearch = searchTerm === '' ||
+                        username.includes(searchTerm) ||
+                        email.includes(searchTerm) ||
+                        fullname.includes(searchTerm);
+
+                    // Kiểm tra bộ lọc trạng thái
                     const matchesFilter = statusFilter === 'all' || rowStatus === statusFilter;
 
                     if (matchesSearch && matchesFilter) {
-                        $(this).show();
+                        $row.show();
                         visibleRows++;
                     } else {
-                        $(this).hide();
+                        $row.hide();
                     }
                 });
 
@@ -374,6 +341,12 @@
 
 <style>
     /* Custom CSS for enhanced appearance */
+    .form-control {
+        flex: 1;
+        width: 100%;
+        max-width: 800px;
+        border-radius: 100px;
+    }
     .card {
         border-radius: 0.5rem;
         overflow: hidden;

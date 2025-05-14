@@ -32,25 +32,7 @@
                             </div>
                             <input type="text" id="userSearch" class="form-control border-0 py-2"
                                    placeholder="Tìm kiếm theo tên, email...">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-light dropdown-toggle rounded-pill" type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-filter mr-1"></i> Lọc
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right shadow">
-                                    <h6 class="dropdown-header">Trạng thái</h6>
-                                    <a class="dropdown-item filter-option active" href="#" data-filter="all">
-                                        <i class="fas fa-circle mr-2 text-primary"></i>Tất cả
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item filter-option" href="#" data-filter="active">
-                                        <i class="fas fa-circle mr-2 text-success"></i>Đang hoạt động
-                                    </a>
-                                    <a class="dropdown-item filter-option" href="#" data-filter="inactive">
-                                        <i class="fas fa-circle mr-2 text-secondary"></i>Không hoạt động
-                                    </a>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -329,6 +311,12 @@
     .card {
         border-radius: 0.5rem;
         overflow: hidden;
+    }
+    .form-control {
+        flex: 1;
+        width: 100%;
+        max-width: 800px;
+        border-radius: 100px;
     }
 
     .card-header {
