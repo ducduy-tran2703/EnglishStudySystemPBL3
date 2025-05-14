@@ -12,7 +12,7 @@ using System.Data.Entity; // Đảm bảo đã thêm để truy cập các model
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
-    [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Administrator")]
     public class UsersController : Controller
     {
         private ApplicationDbContext _context;
@@ -38,10 +38,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         }
 
         // GET: Admin/Users
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> ListUser()
         {
-            // Lấy tất cả người dùng từ cơ sở dữ liệu
-            // Lấy luôn các vai trò của từng người dùng để hiển thị
+       
             var usersWithRoles = await _userManager.Users.ToListAsync();
 
             var userViewModels = new List<UserViewModel>();
@@ -62,10 +61,84 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             return View(userViewModels);
         }
+        public ActionResult Details(string id) //Chưa sửa
+        {
+            var user = _userManager.FindById(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            var roles = _userManager.GetRoles(user.Id);
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                IsActive = user.IsActive,
+                AccountStatus = user.AccountStatus,
+                Roles = string.Join(", ", roles)
+            };
+            return View(userViewModel);
+        }
+        public ActionResult Edit(string id)//chưa sửa
+        {
+            var user = _userManager.FindById(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            var roles = _userManager.GetRoles(user.Id);
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                IsActive = user.IsActive,
+                AccountStatus = user.AccountStatus,
+                Roles = string.Join(", ", roles)
+            };
+            return View(userViewModel);
+        }
+        public ActionResult Delete(string id)//Chưa sửa
+        {
+            var user = _userManager.FindById(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            var roles = _userManager.GetRoles(user.Id);
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                IsActive = user.IsActive,
+                AccountStatus = user.AccountStatus,
+                Roles = string.Join(", ", roles)
+            };
+            return View(userViewModel);
+        }
+        public ActionResult Create()//chưa sửa 
+        {
+            var roles = _roleManager.Roles.ToList();
+            var roleSelectList = new List<SelectListItem>();
+            foreach (var role in roles)
+            {
+                roleSelectList.Add(new SelectListItem
+                {
+                    Value = role.Id,
+                    Text = role.Name
+                });
+            }
+            ViewBag.Roles = roleSelectList;
+            return View();
+        }
+            // Các Action khác như Create, Edit, Delete sẽ được thêm sau
 
-        // Các Action khác như Create, Edit, Delete sẽ được thêm sau
-
-        // Action để hiển thị chi tiết quyền của Editor và cấp quyền
-        // Public async Task<ActionResult> ManagePermissions(string id) { ... }
-    }
+            // Action để hiển thị chi tiết quyền của Editor và cấp quyền
+            // Public async Task<ActionResult> ManagePermissions(string id) { ... }
+        }
 }

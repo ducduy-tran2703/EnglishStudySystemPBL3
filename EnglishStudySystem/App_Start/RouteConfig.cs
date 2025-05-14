@@ -16,7 +16,9 @@ namespace EnglishStudySystem
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Load", id = UrlParameter.Optional }
+                defaults: new { controller = "Home", action = "Load", id = UrlParameter.Optional },
+                namespaces: new[] { "EnglishStudySystem.Controllers" }
+
             );
         }
     }
