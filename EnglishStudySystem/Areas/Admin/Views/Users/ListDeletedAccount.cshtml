@@ -14,13 +14,7 @@
                     <h4 class="mb-0 font-weight-bold" style="color:White">
                         <i class="fas fa-users-cog mr-2" style="color:whitesmoke"></i>@ViewBag.Title
                     </h4>
-                    <small class="font-weight-light">Quản lý tất cả người dùng hệ thống</small>
-                </div>
-                <div>
-                    @Html.ActionLink("Tạo Editor", "CreateEditor", "Users", null,
-                        new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
-                    @Html.ActionLink("Tài khoản đã xóa", "ListDeletedAccount", "Users", null,
-                        new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
+                    <small class="font-weight-light">Quản lý tài khoản bị xóa</small>
                 </div>
             </div>
         </div>
@@ -37,7 +31,8 @@
                                 </span>
                             </div>
                             <input type="text" id="userSearch" class="form-control border-0 py-2"
-                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">               
+                                   placeholder="Tìm kiếm theo tên, email...">
+                            
                         </div>
                     </div>
                 </div>
@@ -45,13 +40,6 @@
 
             <!-- Role Tabs with Icons -->
             <ul class="nav nav-tabs nav-justified border-bottom-0 px-4 pt-3" id="userTabs" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active d-flex flex-column align-items-center" id="admin-tab" data-toggle="tab" href="#admin" role="tab">
-                        <i class="fas fa-user-shield fa-lg mb-1"></i>
-                        <span>Admin</span>
-                        <small class="badge badge-pill badge-light mt-1">@Model.Count(u => u.Roles.Contains("Admin"))</small>
-                    </a>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link d-flex flex-column align-items-center" id="editor-tab" data-toggle="tab" href="#editor" role="tab">
                         <i class="fas fa-user-edit fa-lg mb-1"></i>
@@ -82,39 +70,7 @@
                                     <th style="width: 15%" class="border-top-0">Trạng thái</th>
                                     <th style="width: 15%" class="border-top-0 text-center">Thao tác</th>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Where(u => u.Roles.Contains("Admin")))
-                                {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")" data-username="@item.UserName.ToLower()" data-email="@item.Email.ToLower()" data-fullname="@item.FullName.ToLower()">
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
-                                                    @item.UserName.Substring(0, 1).ToUpper()
-                                                </div>
-                                                <span class="font-weight-bold">@item.UserName</span>
-                                            </div>
-                                        </td>
-                                        <td>@item.Email</td>
-                                        <td>@item.FullName</td>
-                                        <td>
-                                            <span class="badge @(item.IsActive ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
-                                                @(item.IsActive ? "Hoạt động" : "Không hoạt động")
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group btn-group-sm shadow" role="group">
-                                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-light" title="Sửa">
-                                                    <i class="fas fa-edit text-primary"></i>
-                                                </a>
-                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
-                                                    <i class="fas fa-info-circle text-info"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
+                            </thead>                            
                         </table>
                     </div>
                 </div>
@@ -135,7 +91,7 @@
                             <tbody>
                                 @foreach (var item in Model.Where(u => u.Roles.Contains("Editor")))
                                 {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")" data-username="@item.UserName.ToLower()" data-email="@item.Email.ToLower()" data-fullname="@item.FullName.ToLower()">
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm bg-gradient-warning text-white rounded-circle d-flex align-items-center justify-content-center me-2">
@@ -156,7 +112,10 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
+                                                    <i class="fas fa-undo text-success"></i>
+                                                </a>
+                                                <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
                                                     <i class="fas fa-trash-alt text-danger"></i>
                                                 </a>
                                             </div>
@@ -184,7 +143,7 @@
                             <tbody>
                                 @foreach (var item in Model.Where(u => u.Roles.Contains("Customer")))
                                 {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")" data-username="@item.UserName.ToLower()" data-email="@item.Email.ToLower()" data-fullname="@item.FullName.ToLower()">
+                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm bg-gradient-info text-white rounded-circle d-flex align-items-center justify-content-center me-2">
@@ -205,7 +164,11 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
+                                                    <i class="fas fa-undo text-success"></i>
+
+                                                </a>
+                                                <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
                                                     <i class="fas fa-trash-alt text-danger"></i>
                                                 </a>
                                             </div>
@@ -253,9 +216,7 @@
             let searchTimeout;
             $('#userSearch').on('keyup', function () {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(function () {
-                    filterUsers($('.filter-option.active').data('filter'));
-                }, 300);
+                searchTimeout = setTimeout(filterUsers, 300);
             });
 
             // Filter functionality
@@ -267,14 +228,29 @@
             });
 
             // Delete confirmation
-            $('.btn-delete').on('click', function (e) {
-                e.preventDefault();
-                const deleteUrl = $(this).attr('href');
+            //$('.btn-delete').on('click', function (e) {
+            //    e.preventDefault();
+            //    const deleteUrl = $(this).attr('href');
 
-                if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
-                    window.location.href = deleteUrl;
-                }
-            });
+            //    Swal.fire({
+            //        title: 'Xác nhận xóa?',
+            //        html: '<div class="alert alert-warning text-left">' +
+            //            '<i class="fas fa-exclamation-triangle mr-2"></i>' +
+            //            'Bạn có chắc muốn xóa tài khoản này? Hành động này không thể hoàn tác.</div>',
+            //        icon: 'warning',
+            //        showCancelButton: true,
+            //        confirmButtonColor: '#d33',
+            //        cancelButtonColor: '#6c757d',
+            //        confirmButtonText: '<i class="fas fa-trash-alt mr-2"></i>Xóa',
+            //        cancelButtonText: '<i class="fas fa-times mr-2"></i>Hủy',
+            //        reverseButtons: true,
+            //        focusCancel: true
+            //    }).then((result) => {
+            //        if (result.isConfirmed) {
+            //            window.location.href = deleteUrl;
+            //        }
+            //    });
+            //});
 
             function filterUsers(statusFilter = 'all') {
                 const searchTerm = $('#userSearch').val().toLowerCase();
@@ -282,26 +258,17 @@
                 let visibleRows = 0;
 
                 activeTab.find('.user-row').each(function () {
-                    const $row = $(this);
-                    const username = $row.data('username');
-                    const email = $row.data('email');
-                    const fullname = $row.data('fullname');
-                    const rowStatus = $row.data('status');
+                    const rowText = $(this).text().toLowerCase();
+                    const rowStatus = $(this).data('status');
 
-                    // Kiểm tra tìm kiếm
-                    const matchesSearch = searchTerm === '' ||
-                        username.includes(searchTerm) ||
-                        email.includes(searchTerm) ||
-                        fullname.includes(searchTerm);
-
-                    // Kiểm tra bộ lọc trạng thái
+                    const matchesSearch = searchTerm === '' || rowText.indexOf(searchTerm) > -1;
                     const matchesFilter = statusFilter === 'all' || rowStatus === statusFilter;
 
                     if (matchesSearch && matchesFilter) {
-                        $row.show();
+                        $(this).show();
                         visibleRows++;
                     } else {
-                        $row.hide();
+                        $(this).hide();
                     }
                 });
 
@@ -341,15 +308,15 @@
 
 <style>
     /* Custom CSS for enhanced appearance */
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
     .form-control {
         flex: 1;
         width: 100%;
         max-width: 800px;
         border-radius: 100px;
-    }
-    .card {
-        border-radius: 0.5rem;
-        overflow: hidden;
     }
 
     .card-header {

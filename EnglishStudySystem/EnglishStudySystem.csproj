@@ -289,6 +289,11 @@
     <Content Include="Areas\Admin\Views\Users\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Users\CreateEditor.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\ListDeletedAccount.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Review.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Revive.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\DeletePermanent.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Delete.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

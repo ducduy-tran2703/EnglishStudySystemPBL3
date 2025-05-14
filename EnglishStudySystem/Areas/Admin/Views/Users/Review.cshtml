@@ -1,0 +1,79 @@
+﻿@model EnglishStudySystem.Models.UserViewModel
+
+@{
+    ViewBag.Title = "Xác nhận xóa tài khoản";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"  style="color:white">@ViewBag.Title</h4>
+                </div>
+                <div class="card-body">
+                    <h5 style="color:black" >Bạn có chắc chắn muốn khôi tài khoản này?</h5>
+
+                    <div class="alert alert-warning">
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến tài khoản này sẽ bị xóa vĩnh viễn.
+                    </div>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">Tên đăng nhập:</dt>
+                        <dd class="col-sm-8">@Model.UserName</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+
+                        <dt class="col-sm-4">Họ tên:</dt>
+                        <dd class="col-sm-8">@Model.FullName</dd>
+
+                        <dt class="col-sm-4">Vai trò:</dt>
+                        <dd class="col-sm-8">@Model.Roles</dd>
+                    </dl>
+
+                    @using (Html.BeginForm("Revive", "Users", new { id = Model.Id }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-actions no-color">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Xác nhận khôi phục
+                            </button>
+                            <a href="@Url.Action("ListUser")" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy bỏ
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            // Confirmation dialog for delete buttons in index view
+            $('.btn-delete').on('click', function(e) {
+                e.preventDefault();
+                var deleteUrl = $(this).attr('href');
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: "Bạn có chắc chắn muốn xóa tài khoản này?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = deleteUrl;
+                    }
+                });
+            });
+        });
+    </script>
+}
