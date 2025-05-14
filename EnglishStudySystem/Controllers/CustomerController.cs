@@ -68,6 +68,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return HttpNotFound();
             }
+            
             // Lấy thông tin bài học nếu cần
             var categories = _context.Categories
             .Where(c => !c.IsDeleted)
@@ -77,8 +78,10 @@ namespace EnglishStudySystem.Controllers
             ViewBag.ListCategories = categories;
             return View(user);
         }
+
         public ActionResult EditProfile()
         {
+            System.Diagnostics.Debug.WriteLine("Entering POST EditProfile1...");
             var userId = User.Identity.GetUserId();
             var user = _context.Users.Find(userId);
             if (user == null)
@@ -93,35 +96,50 @@ namespace EnglishStudySystem.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
-
+            System.Diagnostics.Debug.WriteLine($"Updating user {userId} with:");
+            System.Diagnostics.Debug.WriteLine($"FullName: {model.FullName}");
+            System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
+            System.Diagnostics.Debug.WriteLine($"PhoneNumber: {model.PhoneNumber}");
+            System.Diagnostics.Debug.WriteLine($"DateOfBirth: {model.DateOfBirth}");
             return View(model);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Author,Admin")]
-        [ValidateAntiForgeryToken]
         public ActionResult EditProfile(ProfileViewModel model)
         {
-            if (ModelState.IsValid)
-            {
+            System.Diagnostics.Debug.WriteLine("Entering POST EditProfile...");
+            
                 var userId = User.Identity.GetUserId();
                 var user = _context.Users.Find(userId);
+                System.Diagnostics.Debug.WriteLine($"1:");        
                 if (user == null)
                 {
                     TempData["ErrorMessage"] = "User not found.";
-                    return RedirectToAction("HomePage", "Home");
+                    return RedirectToAction("Login", "Account");
                 }
-
+                System.Diagnostics.Debug.WriteLine($"Updating user {userId} with:");
+                System.Diagnostics.Debug.WriteLine($"FullName: {model.FullName}");
+                System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
+                System.Diagnostics.Debug.WriteLine($"PhoneNumber: {model.PhoneNumber}");
+                System.Diagnostics.Debug.WriteLine($"DateOfBirth: {model.DateOfBirth}");
                 user.FullName = model.FullName;
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
                 user.DateOfBirth = model.DateOfBirth;
 
-                _context.SaveChanges();
-
-                TempData["SuccessMessage"] = "Profile updated successfully!";
-                return RedirectToAction("Infor");
-            }
+                try
+                {
+                    _context.SaveChanges();
+                    TempData["SuccessMessage"] = "Profile updated successfully!";
+                    return RedirectToAction("EditProfile", "Customer");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    ModelState.AddModelError("", "An error occurred while updating the profile.");
+                    return View(model);
+                }
+            
             return View(model);
         }
 

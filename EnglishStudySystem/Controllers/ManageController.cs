@@ -26,8 +26,11 @@ namespace EnglishStudySystem.Controllers
         {
             UserManager = userManager;
             SignInManager = signInManager;
-            
+
             Context = context;
+            //_userManager = userManager;
+            //_signInManager = signInManager;
+            //_context = context;
         }
 
         public ApplicationSignInManager SignInManager
@@ -241,12 +244,7 @@ namespace EnglishStudySystem.Controllers
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
-             var categories = _context.Categories
-            .Where(c => !c.IsDeleted)
-            .OrderByDescending(c => c.CreatedDate)
-            .Take(6)
-            .ToList();
-            ViewBag.ListCategories = categories;
+             
             return View();
         }
 

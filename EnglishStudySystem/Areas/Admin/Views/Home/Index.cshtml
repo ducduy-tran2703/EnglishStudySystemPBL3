@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    
+}
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-users text-primary me-2"></i>Người dùng</h5>
+                <h3 class="mb-0">1,024</h3>
+                <p class="text-muted mb-0">+12% từ tháng trước</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-book text-success me-2"></i>Khóa học</h5>
+                <h3 class="mb-0">56</h3>
+                <p class="text-muted mb-0">+5 khóa mới</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-list text-info me-2"></i>Danh mục</h5>
+                <h3 class="mb-0">12</h3>
+                <p class="text-muted mb-0">3 danh mục mới</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-bell text-warning me-2"></i>Thông báo</h5>
+                <h3 class="mb-0">24</h3>
+                <p class="text-muted mb-0">5 chưa đọc</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0">Hoạt động gần đây</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="admin-table table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Người dùng</th>
+                                <th>Hoạt động</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nguyễn Văn A</td>
+                                <td>Đăng ký khóa học mới</td>
+                                <td>5 phút trước</td>
+                            </tr>
+                            <tr>
+                                <td>Trần Thị B</td>
+                                <td>Hoàn thành bài kiểm tra</td>
+                                <td>1 giờ trước</td>
+                            </tr>
+                            <tr>
+                                <td>Admin</td>
+                                <td>Thêm khóa học mới</td>
+                                <td>2 giờ trước</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0">Thống kê nhanh</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Người dùng mới</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 65%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h6>Khóa học phổ biến</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h6>Hoàn thành khóa học</h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: 30%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
