@@ -109,15 +109,18 @@ namespace EnglishStudySystem.Controllers
             // Lấy URL chuẩn của Action Login và Register (chỉ lấy PathAndQuery)
             string loginUrlPath = Url.Action("Login", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
             string registerUrlPath = Url.Action("Register", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
-
+            string forgotUrlPath = Url.Action("FogotPassword", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
+            string RegisConfirmUrlPath = Url.Action("RegisterConfirmation", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
 
             // So sánh finalReturnUrl với loginUrlPath và registerUrlPath (không phân biệt chữ hoa chữ thường)
             if (!string.IsNullOrEmpty(finalReturnUrl) && // Đảm bảo finalReturnUrl không null/empty
                 (finalReturnUrl.Equals(loginUrlPath, StringComparison.OrdinalIgnoreCase) ||
-                 finalReturnUrl.Equals(registerUrlPath, StringComparison.OrdinalIgnoreCase)))
+                 finalReturnUrl.Equals(registerUrlPath, StringComparison.OrdinalIgnoreCase) || 
+                 finalReturnUrl.Equals(forgotUrlPath, StringComparison.OrdinalIgnoreCase) || 
+                 finalReturnUrl.Equals(RegisConfirmUrlPath, StringComparison.OrdinalIgnoreCase)))
             {
                 // Nếu URL đích là trang Login hoặc Register, FORCE chuyển hướng về trang chủ
-                finalReturnUrl = Url.Action("Index", "Home");
+                finalReturnUrl = Url.Action("HomePage", "Home");
             }
             // --- KẾT THÚC LOGIC KIỂM TRA ---
 
@@ -160,7 +163,6 @@ namespace EnglishStudySystem.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
                     // Lấy thông tin User và lưu vào Session (giữ nguyên logic của bạn)
                     ApplicationUser user = await UserManager.FindByNameAsync(model.UserName);
                     // Lưu ý: User.Identity.GetUserId() chỉ có giá trị sau khi đăng nhập hoàn tất trong Request tiếp theo.
@@ -169,19 +171,34 @@ namespace EnglishStudySystem.Controllers
                     {
                         Session["ID"] = user.Id; // Lấy ID từ user object
                         Session["FullName"] = user.FullName;
+
+                        // Lấy danh sách vai trò của người dùng
+                        var roles = await UserManager.GetRolesAsync(user.Id);
+
+
+                        // KIỂM TRA VAI TRÒ để quyết định chuyển hướng
+                        if (roles.Contains("Admin") || roles.Contains("Editor"))
+                        {
+                            // Nếu là Admin hoặc Editor, chuyển hướng đến Trang chủ Admin Dashboard
+                            // Sử dụng RedirectToAction với area = "Admin"
+                            return RedirectToAction("Index", "Home", new { area = "Admin" });
+                        }
+                        else
+                        {
+                            // Nếu là người dùng thường, sử dụng logic ReturnUrl như đã làm
+                            // RedirectToLocal sẽ xử lý việc chuyển về trang trước đó hoặc trang chủ mặc định
+                            return RedirectToLocal(model.ReturnUrl);
+                        }
                     }
                     else
                     {
-                        // Xử lý trường hợp không tìm thấy user (dù đăng nhập thành công?) - rất hiếm
-                        Session["ID"] = null;
-                        Session["FullName"] = "Người dùng";
+                        // Trường hợp rất hiếm: Đăng nhập thành công nhưng không tìm thấy user object
+                        // Xử lý lỗi hoặc đăng xuất lại
+                        AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); // Đảm bảo đăng xuất lại
+                        ModelState.AddModelError("", "Đăng nhập thành công nhưng có lỗi khi tải thông tin người dùng.");
+                        // Giữ lại model.ReturnUrl khi hiển thị lại View lỗi
+                        return View(model);
                     }
-
-
-                    // CHUYỂN HƯỚNG sau khi đăng nhập thành công.
-                    // Sử dụng model.ReturnUrl (giá trị đã được xác định ở GET action và truyền qua form)
-                    // Phương thức RedirectToLocal sẽ kiểm tra an toàn lần cuối và chuyển hướng.
-                    return RedirectToLocal(model.ReturnUrl);
 
 
                 case SignInStatus.LockedOut:
@@ -599,7 +616,8 @@ namespace EnglishStudySystem.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+           Session.Clear();
+            return RedirectToAction("HomePage", "Home");
         }
 
         //

@@ -124,3 +124,9 @@
     font-size: 0.8rem; /* Đặt font size nhỏ hơn cho ngày tạo */
     color: #888; /* Màu chữ xám nhạt hơn cho ngày tạo */
 }
+/* Thêm vào tệp LearningActivities.css */
+
+/* --- Điều chỉnh CSS cho các phần tử BÊN TRONG card danh mục để giảm chiều dài và bố cục --- */
+
+/* Điều chỉnh container flex cho Tiêu đề, Mô tả, Giá tiền */
+/* Giảm khoảng cách dưới của khối này */

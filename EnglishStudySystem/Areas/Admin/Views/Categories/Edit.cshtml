@@ -1,0 +1,86 @@
+﻿@model EnglishStudySystem.Models.Category
+
+@{
+    ViewBag.Title = "Chỉnh sửa Danh mục";
+    // Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@* Form sẽ submit đến Action Edit (POST) trong cùng Controller *@
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Danh mục</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @* Trường ẩn cho ID (quan trọng để biết đang chỉnh sửa bản ghi nào) *@
+        @Html.HiddenFor(model => model.Id)
+
+        @* Các trường nhập liệu (tương tự như Create) *@
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5 })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @* Hiển thị thông tin audit fields (Chỉ hiển thị, không cho sửa) *@
+        @* Bạn có thể thêm các trường ẩn cho các thuộc tính audit fields nếu muốn gửi chúng đi trong form,
+            nhưng tốt hơn là lấy lại bản ghi gốc từ DB ở POST Edit và cập nhật lại chúng. *@
+        @* Ví dụ: @Html.HiddenFor(model => model.CreatedByUserId) *@
+
+
+        @* Nút Submit *@
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+@* Liên kết trở lại trang danh sách (quyết định dựa trên trạng thái IsDeleted) *@
+<div>
+    @if (Model.IsDeleted)
+    {
+        @Html.ActionLink("Hủy", "Details", new { id = Model.Id }) @* Quay lại trang chi tiết nếu đang ở trạng thái xóa *@
+    }
+    else
+    {
+        @Html.ActionLink("Hủy", "Details", new { id = Model.Id }) @* Quay lại trang chi tiết *@
+    }
+    |
+    @if (Model.IsDeleted)
+    {
+        @Html.ActionLink("Quay lại Danh sách đã xóa", "DeletedIndex")
+    }
+    else
+    {
+        @Html.ActionLink("Quay lại Danh sách", "Index")
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

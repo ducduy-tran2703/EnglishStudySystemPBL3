@@ -32,7 +32,11 @@
                             </div>
                             <input type="text" id="userSearch" class="form-control border-0 py-2"
                                    placeholder="Tìm kiếm theo tên, email...">
-                            
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary border-0" type="button" id="clearSearch">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,7 +74,7 @@
                                     <th style="width: 15%" class="border-top-0">Trạng thái</th>
                                     <th style="width: 15%" class="border-top-0 text-center">Thao tác</th>
                                 </tr>
-                            </thead>                            
+                            </thead>
                         </table>
                     </div>
                 </div>
@@ -219,6 +223,12 @@
                 searchTimeout = setTimeout(filterUsers, 300);
             });
 
+            // Clear search button
+            $('#clearSearch').on('click', function () {
+                $('#userSearch').val('');
+                filterUsers();
+            });
+
             // Filter functionality
             $('.filter-option').on('click', function (e) {
                 e.preventDefault();
@@ -227,52 +237,41 @@
                 filterUsers($(this).data('filter'));
             });
 
-            // Delete confirmation
-            //$('.btn-delete').on('click', function (e) {
-            //    e.preventDefault();
-            //    const deleteUrl = $(this).attr('href');
-
-            //    Swal.fire({
-            //        title: 'Xác nhận xóa?',
-            //        html: '<div class="alert alert-warning text-left">' +
-            //            '<i class="fas fa-exclamation-triangle mr-2"></i>' +
-            //            'Bạn có chắc muốn xóa tài khoản này? Hành động này không thể hoàn tác.</div>',
-            //        icon: 'warning',
-            //        showCancelButton: true,
-            //        confirmButtonColor: '#d33',
-            //        cancelButtonColor: '#6c757d',
-            //        confirmButtonText: '<i class="fas fa-trash-alt mr-2"></i>Xóa',
-            //        cancelButtonText: '<i class="fas fa-times mr-2"></i>Hủy',
-            //        reverseButtons: true,
-            //        focusCancel: true
-            //    }).then((result) => {
-            //        if (result.isConfirmed) {
-            //            window.location.href = deleteUrl;
-            //        }
-            //    });
-            //});
-
             function filterUsers(statusFilter = 'all') {
                 const searchTerm = $('#userSearch').val().toLowerCase();
                 const activeTab = $('.tab-pane.active');
                 let visibleRows = 0;
 
                 activeTab.find('.user-row').each(function () {
-                    const rowText = $(this).text().toLowerCase();
-                    const rowStatus = $(this).data('status');
+                    const row = $(this);
+                    const userName = row.find('td:eq(0)').text().toLowerCase();
+                    const email = row.find('td:eq(1)').text().toLowerCase();
+                    const fullName = row.find('td:eq(2)').text().toLowerCase();
+                    const rowStatus = row.data('status');
 
-                    const matchesSearch = searchTerm === '' || rowText.indexOf(searchTerm) > -1;
+                    const matchesSearch = searchTerm === '' ||
+                        userName.includes(searchTerm) ||
+                        email.includes(searchTerm) ||
+                        fullName.includes(searchTerm);
+
                     const matchesFilter = statusFilter === 'all' || rowStatus === statusFilter;
 
                     if (matchesSearch && matchesFilter) {
-                        $(this).show();
+                        row.show();
                         visibleRows++;
                     } else {
-                        $(this).hide();
+                        row.hide();
                     }
                 });
 
                 updateEmptyState(visibleRows);
+
+                // Show/hide clear button based on search input
+                if ($('#userSearch').val().trim() !== '') {
+                    $('#clearSearch').show();
+                } else {
+                    $('#clearSearch').hide();
+                }
             }
 
             function updateEmptyState(visibleRows) {
@@ -294,7 +293,7 @@
             }
 
             function resetFilters() {
-                $('#userSearch').val('');
+                $('#userSearch').val('').trigger('keyup');
                 $('.filter-option').removeClass('active');
                 $('.filter-option[data-filter="all"]').addClass('active');
                 filterUsers();
@@ -302,6 +301,7 @@
 
             // Initialize
             updateEmptyState();
+            $('#clearSearch').hide(); // Hide clear button initially
         });
     </script>
 }
@@ -312,6 +312,7 @@
         border-radius: 0.5rem;
         overflow: hidden;
     }
+
     .form-control {
         flex: 1;
         width: 100%;
@@ -454,4 +455,14 @@
         color: #6c757d;
         font-weight: 600;
     }
+
+    /* Clear search button style */
+    #clearSearch {
+        display: none;
+        transition: all 0.3s;
+    }
+
+        #clearSearch:hover {
+            color: #dc3545 !important;
+        }
 </style>

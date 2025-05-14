@@ -1,7 +1,6 @@
 ﻿@model EnglishStudySystem.Models.Category
 @{
     ViewBag.Title = "Thanh toán - " + Model.Name;
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var lessons = ViewBag.Lessons as List<EnglishStudySystem.Models.Lesson>;
 }
 
@@ -87,13 +86,52 @@
         </div>
     </div>
 </main>
+<!-- Modal thông báo đơn giản -->
+<div class="modal fade" id="paymentResultModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <i id="paymentResultIcon" class="fas fa-4x mb-4"></i>
+                <h4 id="paymentResultTitle" class="mb-3"></h4>
+                <p id="paymentResultMessage" class="mb-4"></p>
+                <button type="button" class="btn btn-primary px-4" id="confirmResultButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
     <script>
         $(document).ready(function () {
-            // 1. Nút Thanh toán
+            var resultModal = new bootstrap.Modal(document.getElementById('paymentResultModal'));
+            var categoryId = @Model.Id;
+
+            // Hàm hiển thị kết quả đơn giản
+            function showSimpleResult(isSuccess) {
+                var icon = $('#paymentResultIcon');
+                var title = $('#paymentResultTitle');
+                var msg = $('#paymentResultMessage');
+
+                if (isSuccess) {
+                    icon.removeClass().addClass('fas fa-check-circle text-success fa-4x');
+                    title.text('Thành công');
+                    title.removeClass('text-danger').addClass('text-success');
+                    msg.text('Thanh toán đã được xử lý thành công');
+                } else {
+                    icon.removeClass().addClass('fas fa-times-circle text-danger fa-4x');
+                    title.text('Thất bại');
+                    title.removeClass('text-success').addClass('text-danger');
+                    msg.text('Thanh toán không thành công');
+                }
+
+                $('#confirmResultButton').off('click').on('click', function() {
+                    resultModal.hide();
+                    window.location.href = '@Url.Action("Details", "Category")' + '?id=' + categoryId;
+                });
+
+                resultModal.show();
+            }
+
+            // Nút Thanh toán Momo
             $('#btnPayment').click(function() {
                 var $btn = $(this);
                 $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
@@ -101,66 +139,82 @@
 
                 $.post('@Url.Action("PaymentMomo", "Payment")', {
                     amount: @Model.Price,
-                }, function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        // Tự động kiểm tra thanh toán sau 5 giây
-                        setTimeout(checkPaymentStatus, 5000);
-                    } else {
-                        toastr.error(response.message);
-                    }
-                }).fail(function() {
-                    toastr.error('Không thể kết nối đến server');
+                    categoryId: categoryId
                 }).always(function() {
                     $btn.html('<i class="fas fa-money-bill-wave me-2"></i>THANH TOÁN QUA MOMO');
                     $btn.prop('disabled', false);
                 });
             });
 
-            // 2. Nút Kiểm tra
-            $('#btnCheckPayment').click(checkPaymentStatus);
+            // Nút Kiểm tra thanh toán
+            // Nút Kiểm tra thanh toán
+$('#btnCheckPayment').click(function() {
+    var $btn = $(this);
+    $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
+    $btn.prop('disabled', true);
 
-            // Hàm kiểm tra trạng thái thanh toán
-            function checkPaymentStatus() {
-                var $btn = $('#btnCheckPayment');
-                $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> ĐANG KIỂM TRA...');
-                $btn.prop('disabled', true);
-
-                $.get('@Url.Action("CheckPaymentMomo", "Payment")', function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        // Nếu thanh toán thành công, có thể chuyển hướng hoặc làm gì đó
-                    } else {
-                        toastr.warning(response.message);
-                    }
-                }).fail(function() {
-                    toastr.error('Không thể kiểm tra trạng thái thanh toán');
-                }).always(function() {
-                    $btn.html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
-                    $btn.prop('disabled', false);
-                });
-            }
+    // Thêm tham số amount vào request
+    $.get('@Url.Action("CheckPaymentMomo", "Payment")', {
+        amount: @Model.Price, // Truyền amount từ model
+        categoryId: categoryId
+    }, function(response) {
+        if (response && typeof response.success !== 'undefined') {
+            showSimpleResult(response.success);
+        } else {
+            showSimpleResult(false);
+        }
+    }).fail(function() {
+        showSimpleResult(false);
+    }).always(function() {
+        $btn.html('<i class="fas fa-sync-alt me-2"></i>KIỂM TRA THANH TOÁN');
+        $btn.prop('disabled', false);
+    });
+});
         });
     </script>
-
-    <style>
-        /* Thêm style cho toast message */
-        .toast {
-            font-size: 14px;
-            padding: 15px;
-        }
-
-        .toast-success {
-            background-color: #28a745;
-        }
-
-        .toast-error {
-            background-color: #dc3545;
-        }
-
-        .toast-warning {
-            background-color: #ffc107;
-            color: #212529;
-        }
-    </style>
 }
+
+<style>
+    /* Thêm style cho toast message */
+    .toast {
+        font-size: 14px;
+        padding: 15px;
+    }
+
+    .toast-success {
+        background-color: #28a745;
+    }
+
+    .toast-error {
+        background-color: #dc3545;
+    }
+
+    .toast-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    #paymentResultModal .modal-content {
+        border: none;
+        border-radius: 12px;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #paymentResultModal .modal-body {
+        padding: 2rem;
+    }
+
+    #confirmResultButton {
+        min-width: 100px;
+</style>

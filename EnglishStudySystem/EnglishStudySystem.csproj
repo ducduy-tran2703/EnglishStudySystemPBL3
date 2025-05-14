@@ -169,6 +169,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\CategoriesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
+    <Compile Include="Controllers\PaymentController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -202,6 +204,10 @@
     <Compile Include="Migrations\202505121537059_AddLessonModel1.cs" />
     <Compile Include="Migrations\202505121537059_AddLessonModel1.Designer.cs">
       <DependentUpon>202505121537059_AddLessonModel1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.cs" />
+    <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
+      <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -257,6 +263,7 @@
     <Content Include="Content\CSS2\DetailUserStyle.css" />
     <Content Include="Content\CSS2\EditProfileStyle.css" />
     <Content Include="Content\CSS2\ForgetPasswordStyle.css" />
+    <Content Include="Content\CSS\LearningActivities.css" />
     <Content Include="Content\CSS\RegisterStyle.css" />
     <Content Include="Content\CSS\StyleLayout.css" />
     <Content Include="Content\CSS\_NotificationDropdownPartial.css" />
@@ -273,6 +280,11 @@
     <Content Include="Areas\Admin\Views\Shared\AdminLayoutPage.cshtml" />
     <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Categories\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Categories\DeletedIndex.cshtml" />
+    <Content Include="Areas\Admin\Views\Categories\Details.cshtml" />
+    <Content Include="Areas\Admin\Views\Categories\Create.cshtml" />
+    <Content Include="Areas\Admin\Views\Categories\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Users\ListUser.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Edit.cshtml" />
@@ -320,14 +332,12 @@
     <Content Include="Views\Account\SendCode.cshtml" />
     <Content Include="Views\Account\VerifyCode.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\ManageLogins.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Category\Details.cshtml" />
     <Content Include="Views\Account\RegisterConfirmation.cshtml" />
     <Content Include="Views\Account\ConfirmEmailConfirmation.cshtml" />
@@ -338,6 +348,12 @@
     <Content Include="Views\Notification\_NotificationDropdownPartial.cshtml" />
     <Content Include="Views\Customer\DetailUser.cshtml" />
     <Content Include="Views\Customer\EditProfile.cshtml" />
+    <Content Include="Views\Manage\ChangePassword.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Test\Test.cshtml" />
+    <Content Include="Views\Customer\_BoughtCoursesStats.cshtml" />
+    <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
+    <Content Include="Views\Customer\LearningActivities.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -386,6 +402,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505121537059_AddLessonModel1.resx">
       <DependentUpon>202505121537059_AddLessonModel1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.resx">
+      <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

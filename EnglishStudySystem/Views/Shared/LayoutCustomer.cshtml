@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html>
 <head>
     @{
@@ -9,84 +10,93 @@
     @Styles.Render("~/Content/css")
     <link rel="stylesheet" href="~/Content/CSS/StyleLayout.css" />
     @Scripts.Render("~/bundles/modernizr")
+    <!-- Thêm thư viện Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <!-- Thêm jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="border: 3px solid #28a745; border-radius: 5px;">
-        <div class="container-fluid">
-            <!-- Brand & Navigation Items -->
-            <div class="d-flex align-items-center">
-                <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="#">
-                    <i class="fas fa-globe fs-4 me-2 text-success"></i>
-                    <span>ESystem</span>
-                </a>
-
-                <div class="d-flex">
-                    <a href="@Url.Action("HomePage", "Home")" class="nav-link me-3">
-                        <i class="fas fa-home me-1"></i> Trang chủ
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="border: 3px solid #28a745; border-radius: 5px;">
+            <div class="container-fluid">
+                <!-- Brand & Navigation Items -->
+                <div class="d-flex align-items-center">
+                    <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="#">
+                        <i class="fas fa-globe fs-4 me-2 text-success"></i>
+                        <span>ESystem</span>
                     </a>
-                    <!-- Danh mục Dropdown -->
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-list me-1"></i> Danh mục
+
+                    <div class="d-flex">
+                        <a href="@Url.Action("HomePage", "Home")" class="nav-link me-3">
+                            <i class="fas fa-home me-1"></i> Trang chủ
                         </a>
-                        <ul class="dropdown-menu" id="CategoryList">
-                            @if (ViewBag.ListCategories != null)
-                            {
-                                foreach (var category in (List<EnglishStudySystem.Models.Category>)ViewBag.ListCategories)
+                        <!-- Danh mục Dropdown -->
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-list me-1"></i> Danh mục
+                            </a>
+                            <ul class="dropdown-menu" id="CategoryList">
+                                @if (ViewBag.ListCategories != null)
                                 {
-                                    <li>
-                                        <a href="@Url.Action("Details", "Category", new { id = category.Id })">
-                                            @category.Name
-                                        </a>
-                                    </li>
+                                    foreach (var category in (List<EnglishStudySystem.Models.Category>)ViewBag.ListCategories)
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("Details", "Category", new { id = category.Id })">
+                                                @category.Name
+                                            </a>
+                                        </li>
+                                    }
                                 }
-                            }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Bar (Center) -->
+                <div class="search-bar mx-auto" style="width: 40%;">
+                    <form action="/Home/FindHomePage" method="get" class="search-form">
+                        <div class="input-group">
+                            <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control border-success" placeholder="Tìm kiếm..." style="border-radius: 20px 0 0 20px;">
+                            <button class="btn btn-success" type="submit" style="border-radius: 0 20px 20px 0;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- User Actions -->
+                <div class="d-flex align-items-center">
+                    <!-- My Courses Icon -->
+                    <a href="@Url.Action("LearningActivities", "Customer")" class="nav-link me-3" data-bs-toggle="tooltip" title="Quản lý hoạt động học tập">
+                        <i class="fas fa-book fs-4"></i>
+                    </a>
+
+                    <div class="dropdown me-3" data-bs-toggle="tooltip" title="Thông báo">
+                        <a class="nav-link" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fs-4"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                            @Html.Action("List", "Notification")
                         </ul>
                     </div>
-                </div>
-            </div>
-
-            <!-- Search Bar (Center) -->
-            <div class="search-bar mx-auto" style="width: 40%;">
-                <form action="/Home/FindHomePage" method="get" class="search-form">
-                    <div class="input-group">
-                        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control border-success" placeholder="Tìm kiếm..." style="border-radius: 20px 0 0 20px;">
-                        <button class="btn btn-success" type="submit" style="border-radius: 0 20px 20px 0;">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- User Actions -->
-            <div class="d-flex align-items-center">
-                <!-- My Courses Icon -->
-                <a href="@Url.Action("MyCourses", "Courses")" class="nav-link me-3" data-bs-toggle="tooltip" title="Khóa học của tôi">
-                    <i class="fas fa-book fs-4"></i>
-                </a>
-
-
-                <div class="dropdown me-3" data-bs-toggle="tooltip" title="Thông báo">
-                    <a class="nav-link" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
-                        <i class="fas fa-bell fs-4"></i>
-                    </a>
-                    @* Thêm lớp dropdown-menu-end vào thẻ <ul> để menu mở sang trái *@
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                        @Html.Action("List", "Notification")
-                    </ul>
-                    </li>
-
-                </div>
 
                 <!-- User Profile Dropdown -->
                 <div class="dropdown" data-bs-toggle="tooltip" title="Người dùng">
                     <a class="nav-link" href="#" id="userDropdown" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle fs-4"></i>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")">Thông tin cá nhân</a></li>
                         <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")">Đổi mật khẩu</a></li>
-                        <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+                        <li>
+                            @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">
+                                    Đăng xuất
+                                </a>
+                            }
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -95,14 +105,21 @@
 </header>
 <body>
     @RenderBody()
-    @RenderSection("Scripts", required: false)
-    @RenderSection("Styles", required: false)
+
+    <!-- Load các script ở cuối body -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("scripts", required: false)
+
+    <script>
+        // Activate tooltips
+        $(document).ready(function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Activate tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
+</html>

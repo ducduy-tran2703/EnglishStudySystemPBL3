@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using EnglishStudySystem.Models;
+using Microsoft.AspNet.Identity;
 
 namespace EnglishStudySystem.Controllers
 {
@@ -18,9 +20,8 @@ namespace EnglishStudySystem.Controllers
         {
             _context = context;
         }
-
         // In CategoryController.cs (no changes needed, your existing code is fine)
-        public ActionResult Details(int id)
+        public ActionResult Details(int id) // `id` ở đây chính là ID của category
         {
             var category = _context.Categories
                 .FirstOrDefault(c => c.Id == id && !c.IsDeleted);
@@ -34,7 +35,23 @@ namespace EnglishStudySystem.Controllers
                 .Where(l => l.CategoryId == id && !l.IsDeleted)
                 .OrderBy(l => l.CreatedDate)
                 .ToList();
-
+            // Kiểm tra người dùng đã mua CHÍNH XÁC category này chưa
+            bool daMua = false;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                daMua = _context.Payments
+                    .Any(p => p.UserId == userId &&
+                             p.Status == "Completed" &&
+                             p.CategoryId == id); // So sánh với ID category hiện tại
+            }
+            var categoriesQuery = _context.Categories
+                .Where(c => !c.IsDeleted);
+            var categories = categoriesQuery
+                .Take(6) // giữ nếu bạn chỉ muốn 6 kết quả, có thể bỏ nếu muốn toàn bộ
+                .ToList();
+            ViewBag.ListCategories = categories;
+            ViewBag.DaMua = daMua;
             ViewBag.Lessons = lessons;
             return View(category);
         }
