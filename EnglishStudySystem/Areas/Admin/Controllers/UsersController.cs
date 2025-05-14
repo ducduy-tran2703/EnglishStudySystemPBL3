@@ -8,7 +8,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using EnglishStudySystem.Models;
 using System.Data.Entity; // Đảm bảo đã thêm để truy cập các models của bạn
-
+using EnglishStudySystem.Areas.Admin.ViewModel;
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
@@ -61,14 +61,17 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             return View(userViewModels);
         }
-        public ActionResult Details(string id) //Chưa sửa
+        public async Task<ActionResult> Details(string id)
         {
-            var user = _userManager.FindById(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return HttpNotFound();
             }
-            var roles = _userManager.GetRoles(user.Id);
+
+            // Get roles of the user asynchronously
+            var roles = await _userManager.GetRolesAsync(user.Id);
+
             var userViewModel = new UserViewModel
             {
                 Id = user.Id,
@@ -79,8 +82,46 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 AccountStatus = user.AccountStatus,
                 Roles = string.Join(", ", roles)
             };
+            
+            // Add purchased courses if user is a Customer
+            if (roles.Contains("Customer"))
+            {
+                var purchasedCourses = await _context.Categories
+                    .Where(uc => uc.CreatedByUserId == user.Id && !uc.IsDeleted)
+                    .Select(uc => new Category
+                    {
+                        Id = uc.Id,
+                        Name = uc.Name,
+                        Description = uc.Description,
+                        Price = uc.Price,
+                        CreatedDate = uc.CreatedDate
+                    })
+                    .ToListAsync(); // Make it asynchronous
+
+                userViewModel.PurchasedCategories = purchasedCourses;
+            }
+
+            // Add created courses if user is an Editor
+            if (roles.Contains("Editor"))
+            {
+                var createdCourses = await _context.Categories
+                    .Where(c => c.CreatedByUserId == id && !c.IsDeleted)
+                    .Select(c => new Category
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Description = c.Description,
+                        Price = c.Price,
+                        CreatedDate = c.CreatedDate
+                    })
+                    .ToListAsync(); // Make it asynchronous
+
+                userViewModel.Categories = createdCourses;
+            }
+
             return View(userViewModel);
         }
+
         public ActionResult Edit(string id)//chưa sửa
         {
             var user = _userManager.FindById(id);
@@ -121,24 +162,49 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             };
             return View(userViewModel);
         }
-        public ActionResult Create()//chưa sửa 
+        //[Authorize(Roles = "Admin")]
+        public ActionResult CreateEditor()
         {
-            var roles = _roleManager.Roles.ToList();
-            var roleSelectList = new List<SelectListItem>();
-            foreach (var role in roles)
-            {
-                roleSelectList.Add(new SelectListItem
-                {
-                    Value = role.Id,
-                    Text = role.Name
-                });
-            }
-            ViewBag.Roles = roleSelectList;
             return View();
         }
-            // Các Action khác như Create, Edit, Delete sẽ được thêm sau
 
-            // Action để hiển thị chi tiết quyền của Editor và cấp quyền
-            // Public async Task<ActionResult> ManagePermissions(string id) { ... }
+        [HttpPost]
+        //[Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateEditor(RegisterEditorViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    IsActive = true,
+                   
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    // Gán quyền Editor
+                    await _userManager.AddToRoleAsync(user.Id, "Editor");
+
+                    // Gửi email thông báo (nếu cần)
+                    // await SendEditorAccountEmail(user.Email, model.UserName, model.Password);
+
+                    TempData["SuccessMessage"] = "Đã tạo tài khoản Editor thành công!";
+                    return RedirectToAction("Index");
+                }
+
+                
+            }
+
+            // Nếu có lỗi, hiển thị lại form với thông báo lỗi
+            return View(model);
         }
+
+
+    }
 }

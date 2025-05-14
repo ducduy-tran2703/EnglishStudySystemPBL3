@@ -1,0 +1,69 @@
+﻿/* createEditor.css */
+.createEditor-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: none;
+}
+
+.createEditor-card-header {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    border-radius: 10px 10px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.createEditor-form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.createEditor-form-control {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s;
+}
+
+    .createEditor-form-control:focus {
+        border-color: #2575fc;
+        box-shadow: 0 0 0 0.2rem rgba(37, 117, 252, 0.25);
+    }
+
+.createEditor-btn-primary {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;   
+}
+
+    .createEditor-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+    }
+
+.createEditor-btn-secondary {
+    border: 1px solid #e0e0e0;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+    .createEditor-btn-secondary:hover {
+        background-color: #f8f9fa;
+        border-color: #dae0e5;
+    }
+
+.createEditor-validation-error {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.createEditor-password-hint {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
