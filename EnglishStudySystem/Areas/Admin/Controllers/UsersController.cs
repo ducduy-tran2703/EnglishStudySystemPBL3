@@ -11,6 +11,7 @@ using System.Data.Entity; // Đảm bảo đã thêm để truy cập các model
 using EnglishStudySystem.Areas.Admin.ViewModel;
 using Microsoft.Owin.Logging;
 using System.Security.Claims;
+using System.Net;
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
@@ -355,5 +356,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             //return RedirectToAction("Delete", new { id });
         }
+        
     }
 }

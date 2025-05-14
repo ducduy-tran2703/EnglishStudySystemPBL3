@@ -68,15 +68,14 @@
                                 <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
                                 <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")"><i class="fas fa-key me-2"></i>Đổi mật khẩu</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
-                                    {
-                                        @Html.AntiForgeryToken()
-                                        <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">
-                                            Đăng xuất
-                                        </a>
-                                    }
-                                                            </li>
+                                @using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">
+                                        Đăng xuất
+                                    </a>
+                                }
+
                             </ul>
                         </div>
                     </div>
