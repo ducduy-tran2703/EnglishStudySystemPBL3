@@ -139,6 +139,39 @@ namespace EnglishStudySystem.Controllers
             
             return View(model);
         }
+        public ActionResult LearningActivities()
+        {
+            return View();
+        }
+        public ActionResult GetBoughtCoursesStats()
+        {
+            ApplicationDbContext _context = new ApplicationDbContext();
+            var categories = _context.Categories
+                .Where(c => !c.IsDeleted)
+                .OrderByDescending(c => c.CreatedDate)
+                .Take(6)
+                .ToList();
+
+            var userIds = categories.Select(c => c.CreatedByUserId).Distinct().ToList();
+
+            var users = _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToDictionary(u => u.Id, u => u.FullName);
+            ViewBag.UserNames = users;
+
+            return PartialView("_BoughtCoursesStats", categories);
+        }
+        public ActionResult GetLessonsHistoryStats()
+        {
+            ApplicationDbContext _context = new ApplicationDbContext();
+            var lessons = _context.Lessons
+                .Where(l => !l.IsDeleted)
+                .OrderByDescending(l => l.CreatedDate)
+                .Take(6)
+                .ToList();
+            return PartialView("_LessonsHistoryStats", lessons);
+
+        }
 
     }
 }

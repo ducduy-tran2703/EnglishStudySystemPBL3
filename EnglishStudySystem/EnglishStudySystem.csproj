@@ -263,6 +263,7 @@
     <Content Include="Content\CSS2\DetailUserStyle.css" />
     <Content Include="Content\CSS2\EditProfileStyle.css" />
     <Content Include="Content\CSS2\ForgetPasswordStyle.css" />
+    <Content Include="Content\CSS\LearningActivities.css" />
     <Content Include="Content\CSS\RegisterStyle.css" />
     <Content Include="Content\CSS\StyleLayout.css" />
     <Content Include="Content\CSS\_NotificationDropdownPartial.css" />
@@ -332,7 +333,6 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Category\Details.cshtml" />
     <Content Include="Views\Account\RegisterConfirmation.cshtml" />
     <Content Include="Views\Account\ConfirmEmailConfirmation.cshtml" />
@@ -344,6 +344,11 @@
     <Content Include="Views\Customer\DetailUser.cshtml" />
     <Content Include="Views\Customer\EditProfile.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Test\Test.cshtml" />
+    <Content Include="Views\Customer\_BoughtCoursesStats.cshtml" />
+    <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
+    <Content Include="Views\Customer\LearningActivities.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
