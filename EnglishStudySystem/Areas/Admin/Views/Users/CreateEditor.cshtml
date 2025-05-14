@@ -1,0 +1,95 @@
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.RegisterEditorViewModel
+
+@{
+    ViewBag.Title = "Tạo tài khoản Editor";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml";
+}
+
+@section Styles {
+    <link href="~/Areas/Admin/Content/CSS/createUserStyle.css" rel="stylesheet" />
+}
+
+<div class="container-fluid px-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card createEditor-card">
+                <div class="card-header createEditor-card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-edit mr-2"></i>@ViewBag.Title
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("CreateEditor", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.UserName, new { @class = "createEditor-form-label" })
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control createEditor-form-control", placeholder = "Nhập tên đăng nhập" })
+                                    @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "createEditor-validation-error text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Email, new { @class = "createEditor-form-label" })
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control createEditor-form-control", placeholder = "Nhập email" })
+                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "createEditor-validation-error text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.FullName, new { @class = "createEditor-form-label" })
+                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control createEditor-form-control", placeholder = "Nhập họ và tên đầy đủ" })
+                                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "createEditor-validation-error text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Password, new { @class = "createEditor-form-label" })
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control createEditor-form-control", placeholder = "Nhập mật khẩu" })
+                                    <div class="progress mt-2" style="height: 5px;">
+                                        <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small id="password-strength-text" class="createEditor-password-hint"></small>
+                                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "createEditor-validation-error text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "createEditor-form-label" })
+                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control createEditor-form-control", placeholder = "Nhập lại mật khẩu" })
+                                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "createEditor-validation-error text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4 text-center">
+                            <button type="submit" class="btn createEditor-btn-primary mr-3">
+                                <i class="fas fa-save mr-2"></i>Tạo tài khoản
+                            </button>
+                            @Html.ActionLink("Hủy bỏ", "Index", null, new { @class = "btn createEditor-btn-secondary" })
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Areas/Admin/Content/JS/createEditor.js"></script>
+}
