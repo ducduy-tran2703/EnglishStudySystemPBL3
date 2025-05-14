@@ -616,7 +616,7 @@ namespace EnglishStudySystem.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            Session.Clear();
+           Session.Clear();
             return RedirectToAction("HomePage", "Home");
         }
 
