@@ -1,9 +1,4 @@
-﻿/* LearningActivities.css */
-
-/* Xóa các quy tắc body không cần thiết khi dùng Layout */
-/* body { ... } */
-
-/* Điều chỉnh quy tắc cho container mới của View */
+﻿
 .container-view-content {
     /* Giữ lại các kiểu dáng hiển thị */
     background-color: #fff; /* Màu nền trắng cho container */
