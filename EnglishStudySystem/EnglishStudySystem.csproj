@@ -177,6 +177,7 @@
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LessonController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\PaymentController.cs" />
@@ -353,6 +354,7 @@
     <Content Include="Views\Customer\_BoughtCoursesStats.cshtml" />
     <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
     <Content Include="Views\Customer\LearningActivities.cshtml" />
+    <Content Include="Views\Lesson\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />

@@ -20,7 +20,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 {
 
     // Đặt Authorize cho Controller để chỉ Admin hoặc Editor mới có thể truy cập
-    //[Authorize(Roles = "Administrator, Editor")]
+    [Authorize(Roles = "Administrator, Editor")]
     public class CategoriesController : Controller
     {
         // Khai báo DbContext để truy vấn dữ liệu
@@ -132,6 +132,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
 
             // Nếu dữ liệu không hợp lệ, hiển thị lại form với dữ liệu đã nhập và thông báo lỗi
+            
             return View(category);
         }
 
