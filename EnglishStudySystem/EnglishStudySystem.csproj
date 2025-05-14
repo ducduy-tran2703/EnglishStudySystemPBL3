@@ -355,7 +355,6 @@
     <Content Include="Views\Customer\LearningActivities.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Content\JS\" />
   </ItemGroup>
