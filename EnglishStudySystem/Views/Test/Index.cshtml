@@ -1,8 +1,51 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="vi">
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Thông tin cá nhân";
 }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoạt động học tập</title>
+    <link rel="stylesheet" href="~/Content/CSS/LearningActivities.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Hoạt động học tập</h1>
+        <hr> <div class="card-container">
+            <div class="card all">
+                <div class="icon">
+                    <img src="all_icon.png" alt="Tất cả">
+                </div>
+                <div class="text">All</div>
+                <div class="number">0</div>
+            </div>
 
-<h2>Index</h2>
+            <div class="card completed">
+                <div class="icon">
+                    <img src="completed_icon.png" alt="Hoàn thành">
+                </div>
+                <div class="text">Completed</div>
+                <div class="number">0</div>
+            </div>
 
+            <div class="card in-progress">
+                <div class="icon">
+                    <img src="inprogress_icon.png" alt="Đang tiến hành">
+                </div>
+                <div class="text">In progress</div>
+                <div class="number">0</div>
+            </div>
+
+            <div class="card failed">
+                <div class="icon">
+                    <img src="failed_icon.png" alt="Thất bại">
+                </div>
+                <div class="text">Failed</div>
+                <div class="number">0</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

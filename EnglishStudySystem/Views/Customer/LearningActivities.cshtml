@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "Hoạt động học tập";
+    Layout = "~/Views/Shared/LayoutCustomer.cshtml";
+}
+
+<link rel="stylesheet" href="~/Content/CSS/LearningActivities.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+    window.dispatchEvent(new Event('resize'));
+    $('#myModal').on('shown.bs.modal', function () {
+        window.dispatchEvent(new Event('resize'));
+    });
+</script>
+
+@* Nội dung chính của View - Đặt trong container-content *@
+<div class="container-content">
+    <h1>Hoạt động học tập</h1>
+    <hr>
+    <div class="card-container">
+        @* Cập nhật data-url với đường dẫn thực tế đến Action Controller của bạn *@
+        <div class="card all" data-url="@Url.Action("GetBoughtCoursesStats", "Customer")">
+            @* Ví dụ: Gọi Action GetBoughtCoursesStats trong Controller LearningActivity *@
+            <div class="icon">
+                <i class="bi bi-book" aria-label="Khóa học đã mua"></i>
+            </div>
+            <div class="text">Khóa học đã mua</div>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card completed" data-url="@Url.Action("GetLessonsHistoryStats", "Customer")">
+            @* Ví dụ *@
+            <div class="icon">
+                <i class="bi bi-list-check" aria-label="Lịch sử bài học"></i>
+            </div>
+            <div class="text">Lịch sử bài học</div>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card in-progress" data-url="@Url.Action("GetFavoriteLessonsStats", "LearningActivity")">
+            @* Ví dụ *@
+            <div class="icon">
+                <i class="bi bi-heart" aria-label="Bài học yêu thích"></i>
+            </div>
+            <div class="text">Bài học yêu thích</div>
+            <div class="number">0</div>
+        </div>
+
+        <div class="card failed" data-url="@Url.Action("GetTestHistoryStats", "LearningActivity")">
+            @* Ví dụ *@
+            <div class="icon">
+                <i class="bi bi-journal-text" aria-label="Lịch sử bài kiểm tra"></i>
+            </div>
+            <div class="text">Lịch sử bài kiểm tra</div>
+            <div class="number">0</div>
+        </div>
+    </div>
+
+    @* Khu vực hiển thị thống kê - Nội dung Partial View sẽ được tải và chèn vào đây *@
+    <div class="statistics-section">
+        <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+            Đang tải...
+        </div>
+        @* Partial View sẽ được tải và hiển thị ở đây *@
+    </div>
+
+</div>
+
+@section scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.card');
+            const statisticsSection = document.querySelector('.statistics-section');
+            const loadingIndicator = document.getElementById('loading-indicator');
+
+            // Hàm để tải nội dung từ URL (Action Controller) và hiển thị trong statisticsSection
+            async function loadStatsContent(url) {
+                statisticsSection.innerHTML = ''; // Xóa nội dung cũ (Partial View trước đó)
+                loadingIndicator.style.display = 'block'; // Hiển thị loading
+
+                try {
+                    const response = await fetch(url); // Gửi yêu cầu AJAX
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const html = await response.text(); // Lấy nội dung HTML từ Partial View
+                    statisticsSection.innerHTML = html; // Chèn nội dung vào khu vực hiển thị
+                } catch (error) {
+                    console.error("Lỗi khi tải thống kê:", error);
+                    statisticsSection.innerHTML = '<p style="color: red; text-align: center;">Không thể tải dữ liệu thống kê.</p>';
+                } finally {
+                    loadingIndicator.style.display = 'none'; // Ẩn loading
+                }
+            }
+
+            // Hàm bỏ lớp active khỏi tất cả cards
+            function removeActiveClass() {
+                cards.forEach(card => {
+                    card.classList.remove('active');
+                });
+            }
+
+            cards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const targetUrl = this.dataset.url; // Lấy URL từ data-url của card
+
+                    if (targetUrl && !this.classList.contains('active')) { // Kiểm tra URL và chỉ xử lý nếu card chưa active
+                        removeActiveClass(); // Bỏ active class khỏi các card khác
+                        this.classList.add('active'); // Thêm active class cho card được click
+                        loadStatsContent(targetUrl); // Tải nội dung thống kê từ Controller/Partial View
+                    } else if (this.classList.contains('active')) {
+                        // Tùy chọn: Nếu nhấp lại vào card đang active, có thể làm gì đó (ví dụ: ẩn nội dung)
+                        // statisticsSection.innerHTML = '';
+                        // removeActiveClass();
+                    }
+                });
+            });
+
+            // Tùy chọn: Tải nội dung của card "Khóa học đã mua" mặc định khi tải trang
+            const defaultCard = document.querySelector('.card.all');
+            if (defaultCard) {
+                const defaultUrl = defaultCard.dataset.url;
+                if (defaultUrl) {
+                    defaultCard.classList.add('active');
+                    loadStatsContent(defaultUrl);
+                }
+            }
+        });
+    </script>
+}

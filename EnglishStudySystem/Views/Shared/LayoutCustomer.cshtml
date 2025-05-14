@@ -67,7 +67,7 @@
                 <!-- User Actions -->
                 <div class="d-flex align-items-center">
                     <!-- My Courses Icon -->
-                    <a href="@Url.Action("MyCourses", "Courses")" class="nav-link me-3" data-bs-toggle="tooltip" title="Khóa học của tôi">
+                    <a href="@Url.Action("LearningActivities", "Customer")" class="nav-link me-3" data-bs-toggle="tooltip" title="Quản lý hoạt động học tập">
                         <i class="fas fa-book fs-4"></i>
                     </a>
 
@@ -85,7 +85,7 @@
                     <a class="nav-link" href="#" id="userDropdown" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle fs-4"></i>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")">Thông tin cá nhân</a></li>
                         <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")">Đổi mật khẩu</a></li>
                         <li>
