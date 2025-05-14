@@ -1,148 +1,76 @@
 ﻿@model IEnumerable<EnglishStudySystem.Models.Category>
-@* Khai báo kiểu dữ liệu của Model. Thay thế "YourNamespace.Models" bằng namespace thực tế của lớp Category của bạn *@
-
-
-@* Đảm bảo ViewBag.UserNames chứa Dictionary<string, string> (UserId, FullName) *@
 @{
     var userNames = ViewBag.UserNames as Dictionary<string, string>;
 }
-<h3 class="section-title">Khóa học đã mua</h3>
+<h3 class="section-title text-center text-primary mb-4">Khóa học đã mua</h3>
 
 @if (Model != null && Model.Any())
 {
-    <div class="bought-courses-list">
-        @foreach (var category in Model)
-        {
-            @* Bọc toàn bộ nội dung thẻ bằng thẻ <a> để làm cho nó có thể nhấp được *@
-            @* Thay thế "Course" bằng tên Controller của bạn và "Details" bằng tên Action hiển thị chi tiết khóa học *@
-            @* Đảm bảo category.Id là thuộc tính ID duy nhất của khóa học *@
-            <a href="@Url.Action("Details", "Course", new { id = category.Id })" class="course-item-link">
-                <div class="course-item-improved">
-                    <div class="course-title-improved">@category.Name</div>
+    <div class="container">
+        <div class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var category in Model)
+            {
+                <div class="col d-flex align-items-stretch">
+                    <a href="@Url.Action("Details", "Category", new { id = category.Id })" class="text-decoration-none text-dark w-100">
+                        <div class="card course-card h-100 shadow-sm border-0">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-primary">@category.Name</h5>
 
-                    @* Giả định rằng lớp Category có thuộc tính 'Summary' hoặc 'Description' *@
-                    @* Nếu tên thuộc tính khác, hãy thay đổi '@category.Summary' thành tên thuộc tính đúng *@
-                    @if (!string.IsNullOrEmpty(category.Description))
-                    {
-                        <div class="course-summary-improved">@category.Description</div>
-                    }
-                    else if (!string.IsNullOrEmpty(category.Description))
-                    {
-                        <div class="course-summary-improved">@category.Description</div>
-                    }
-
-
-                    <div class="course-meta-improved">
-                        <div class="meta-item">
-                            <span class="meta-label">Người tạo:</span>
-                            <span class="meta-value">
-                                @if (userNames != null && userNames.ContainsKey(category.CreatedByUserId))
+                                @if (!string.IsNullOrEmpty(category.Description))
                                 {
-                                    @userNames[category.CreatedByUserId]
+                                    <p class="card-text text-muted flex-grow-1">@category.Description</p>
                                 }
-                                else
-                                {
-                                    @:Không rõ (@category.CreatedByUserId) @* <--- Thêm tạm thời để debug *@
-                                }
-                            </span>
+
+                                <div class="mt-auto pt-3 border-top">
+                                    <p class="mb-1">
+                                        <strong>Người tạo:</strong>
+                                        @if (userNames != null && userNames.ContainsKey(category.CreatedByUserId))
+                                        {
+                                            @userNames[category.CreatedByUserId]
+                                        }
+                                        else
+                                        {
+                                            @:Không rõ (@category.CreatedByUserId)
+                                        }
+                                    </p>
+                                    <p class="mb-0"><strong>Ngày đăng:</strong> @category.CreatedDate.ToString("dd/MM/yyyy")</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Ngày đăng:</span>
-                            @* Sử dụng CreatedDate làm Ngày đăng. Nếu có thuộc tính ngày đăng khác, hãy thay đổi '@category.CreatedDate' *@
-                            <span class="meta-value">@category.CreatedDate.ToString("dd/MM/yyyy")</span>
-                        </div>
-                    </div>
-                    @* Bạn có thể thêm các thông tin khác về category ở đây nếu cần *@
+                    </a>
                 </div>
-            </a>
-        }
+            }
+        </div>
     </div>
 }
 else
 {
-    <p style="text-align: center; color: #777;">Chưa có khóa học nào được mua hoặc dữ liệu không khả dụng.</p>
+    <p class="text-center text-muted">Chưa có khóa học nào được mua hoặc dữ liệu không khả dụng.</p>
 }
 
 <style>
-    /* Định dạng CSS cho Partial View này để làm cho nó đẹp hơn */
-    .bought-courses-list {
-        margin-top: 20px;
-        display: grid; /* Sử dụng Grid để tạo bố cục linh hoạt */
-        gap: 15px; /* Khoảng cách giữa các item */
-        /* Có thể tùy chỉnh số cột bằng grid-template-columns nếu cần */
-        /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+    .course-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
     }
 
-    /* CSS cho thẻ <a> bọc item */
-    .course-item-link {
-        text-decoration: none; /* Loại bỏ gạch chân mặc định của link */
-        color: inherit; /* Kế thừa màu chữ từ phần tử cha thay vì màu link mặc định */
-        display: block; /* Biến thẻ <a> thành block element để bọc toàn bộ nội dung */
-        /* background-color: transparent; Có thể thêm nếu cần */
-    }
-
-    /* Giữ lại CSS cho item bên trong link */
-    .course-item-improved {
-        border: 1px solid #ddd; /* Viền nhẹ */
-        padding: 20px; /* Padding bên trong item */
-        border-radius: 8px; /* Bo góc nhẹ nhàng */
-        background-color: #ffffff; /* Nền trắng */
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ nhẹ */
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Thêm hiệu ứng hover */
-        height: 100%; /* Quan trọng: Giúp các thẻ có chiều cao bằng nhau trong grid */
-        box-sizing: border-box; /* Bao gồm padding và border trong tổng chiều cao/rộng */
-    }
-
-        .course-item-improved:hover {
-            transform: translateY(-5px); /* Nhô lên một chút khi hover */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Bóng đổ rõ hơn khi hover */
-            cursor: pointer; /* Thay đổi con trỏ thành hình bàn tay khi hover */
+        .course-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+            background: linear-gradient(to right, #ffffff, #f8faff);
         }
 
-    .course-title-improved {
-        font-size: 1.3em; /* Tiêu đề lớn hơn */
-        font-weight: bold;
-        color: #0056b3; /* Màu xanh đậm hơn cho tiêu đề */
-        margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
-        border-bottom: 1px solid #eee; /* Đường kẻ dưới tiêu đề */
-        padding-bottom: 10px;
+    .card-title {
+        font-weight: 700;
     }
 
-    .course-summary-improved {
-        font-size: 1em;
-        color: #555; /* Màu xám cho tóm tắt */
-        margin-bottom: 15px; /* Khoảng cách dưới tóm tắt */
-        line-height: 1.5; /* Giãn dòng cho dễ đọc */
+    .card-text {
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 
-    .course-meta-improved {
-        font-size: 0.9em; /* Font nhỏ hơn cho meta */
-        color: #666; /* Màu xám cho meta */
-        display: flex; /* Sử dụng Flexbox để sắp xếp meta items */
-        justify-content: space-between; /* Đẩy các item ra hai bên */
-        flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
-        padding-top: 10px;
-        border-top: 1px solid #eee; /* Đường kẻ trên meta */
-        margin-top: auto; /* Đẩy meta xuống cuối thẻ nếu thẻ có chiều cao khác nhau */
-    }
-
-    .meta-item {
-        /* Có thể thêm margin-right nếu justify-content không phải space-between */
-        margin-bottom: 5px; /* Khoảng cách dưới mỗi meta item nếu xuống dòng */
-    }
-
-    .meta-label {
-        font-weight: bold;
-        margin-right: 5px;
-        color: #333; /* Màu đậm hơn cho label */
-    }
-
-    .meta-value {
-        /* Không cần định dạng đặc biệt */
-    }
     .section-title {
-        text-align: center; /* Căn giữa nội dung văn bản */
-        margin-bottom: 20px; /* Thêm khoảng cách dưới tiêu đề cho đẹp hơn */
-        color: #333; /* Đặt màu chữ cho tiêu đề (tùy chọn) */
+        font-size: 1.8rem;
+        font-weight: 600;
     }
 </style>
