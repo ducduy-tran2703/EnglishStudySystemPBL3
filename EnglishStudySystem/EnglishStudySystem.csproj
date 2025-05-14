@@ -169,7 +169,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
@@ -232,6 +234,10 @@
     <Compile Include="ViewModel\HomeIndexViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Admin\Content\CSS\AdminLayout.css" />
+    <Content Include="Areas\Admin\Content\CSS\createUserStyle.css" />
+    <Content Include="Areas\Admin\Content\JS\AdminLayout.js" />
+    <Content Include="Areas\Admin\Content\JS\createEditor.js" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -265,7 +271,13 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\Admin\Views\web.config" />
-    <Content Include="Areas\Admin\Views\Users\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\AdminLayoutPage.cshtml" />
+    <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\ListUser.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Details.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\CreateEditor.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -304,7 +316,6 @@
     <Content Include="Views\Account\SendCode.cshtml" />
     <Content Include="Views\Account\VerifyCode.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\ManageLogins.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
@@ -322,13 +333,12 @@
     <Content Include="Views\Notification\_NotificationDropdownPartial.cshtml" />
     <Content Include="Views\Customer\DetailUser.cshtml" />
     <Content Include="Views\Customer\EditProfile.cshtml" />
+    <Content Include="Views\Manage\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Views\Shared\" />
     <Folder Include="Content\JS\" />
-    <Folder Include="Views\Notification\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
