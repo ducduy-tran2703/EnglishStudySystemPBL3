@@ -1,0 +1,111 @@
+﻿@model EnglishStudySystem.Models.Category
+
+@{
+    ViewBag.Title = "Chi tiết Danh mục";
+    // Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div>
+    <h4>Chi tiết</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        @* Sử dụng class Bootstrap cho hiển thị label và giá trị *@
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd>
+            @String.Format("{0:C}", Model.Price)
+        </dd>
+
+        @* Hiển thị trạng thái xóa mềm và thời gian xóa (nếu có) *@
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDeleted)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsDeleted)
+        </dd>
+
+        @if (Model.IsDeleted)
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.DeletedAt)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.DeletedAt)
+            </dd>
+        }
+
+        @* Hiển thị thông tin audit fields *@
+        <dt>
+            @Html.DisplayNameFor(model => model.CreatedByUserId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreatedByUserId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CreatedByUserRole)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreatedByUserRole)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+
+        @* Chỉ hiển thị nếu đã được cập nhật *@
+        @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.UpdatedByUserId)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UpdatedByUserId)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.UpdatedByUserRole)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UpdatedByUserRole)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.UpdatedDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UpdatedDate)
+            </dd>
+        }
+
+
+    </dl>
+</div>
+<p>
+    @* Liên kết trở lại trang danh sách phù hợp (đang hoạt động hoặc đã xóa) *@
+    @if (Model.IsDeleted)
+    {
+        @Html.ActionLink("Quay lại Danh sách đã xóa", "DeletedIndex")
+    }
+    else
+    {
+        @Html.ActionLink("Chỉnh sửa", "Edit", new { id = Model.Id }) 
+        @Html.ActionLink("Quay lại Danh sách", "Index")
+}
+</p>

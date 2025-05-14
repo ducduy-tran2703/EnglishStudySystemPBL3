@@ -1,0 +1,81 @@
+﻿@model IEnumerable<EnglishStudySystem.Models.Category>
+
+@{
+    ViewBag.Title = "Quản lý Danh mục (Đang hoạt động)";
+    // Có thể thiết lập Layout riêng cho Admin nếu bạn có
+    // Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<p>
+    @* Liên kết đến trang tạo danh mục mới *@
+    @Html.ActionLink("Thêm mới Danh mục", "Create", null, new { @class = "btn btn-primary" })
+
+    @* Liên kết đến trang danh sách các danh mục đã xóa *@
+    @Html.ActionLink("Xem Danh mục đã xóa", "DeletedIndex", null, new { @class = "btn btn-secondary" })
+</p>
+
+<table class="table table-striped table-hover">
+    @* Thêm class Bootstrap cho bảng đẹp hơn *@
+    <thead>
+        @* Thêm thẻ thead cho tiêu đề bảng *@
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedByUserId) @* Hiển thị người tạo *@
+            </th>
+            <th></th> @* Cột cho các hành động *@
+        </tr>
+    </thead> @* Kết thúc thead *@
+    <tbody>
+        @* Thêm thẻ tbody cho nội dung bảng *@
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @* Định dạng hiển thị Price (tùy chọn) *@
+                    @String.Format("{0:C}", item.Price) @* Định dạng tiền tệ (cần cấu hình Culture nếu dùng) *@
+                    @* Hoặc chỉ hiển thị giá trị: *@
+                    @* @Html.DisplayFor(modelItem => item.Price) *@
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate) @* Hiển thị ngày tạo *@
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedByUserId) @* Hiển thị ID người tạo *@
+                    @* Bạn có thể cần join bảng User để hiển thị tên người tạo thay vì ID *@
+                </td>
+                <td>
+                    @* Các liên kết hành động *@
+                    @Html.ActionLink("Chỉnh sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" }) | @* Thêm class Bootstrap *@
+                    @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-info btn-sm" }) | @* Thêm class Bootstrap *@
+
+                    @* Form cho Xóa mềm (sử dụng POST) *@
+                    @using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @style = "display:inline;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm danh mục này?');">Xóa mềm</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody> @* Kết thúc tbody *@
+</table> @* Kết thúc table *@

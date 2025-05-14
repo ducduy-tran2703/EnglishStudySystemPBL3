@@ -21,12 +21,7 @@ namespace EnglishStudySystem.Controllers
         {
              _context = context;
         }
-        public ActionResult Load()
-        {
-            Session["Layout"] = "~/Views/Shared/_Layout.cshtml";
-            return RedirectToAction("HomePage", "Home");
 
-        }
         public ActionResult HomePage(string sortOrder)
         {
             // Truy vấn ban đầu (lọc deleted)
@@ -64,7 +59,6 @@ namespace EnglishStudySystem.Controllers
 
             // Truyền dữ liệu qua ViewBag
             ViewBag.UserNames = users;
-            ViewBag.Layout = Session["Layout"];
             ViewBag.ListCategories = categories;
             ViewBag.CurrentSort = sortOrder;
 
@@ -103,7 +97,6 @@ namespace EnglishStudySystem.Controllers
 
             // Truyền dữ liệu qua ViewBag
             ViewBag.UserNames = users;
-            ViewBag.Layout = Session["Layout"];
             ViewBag.ListCategories = ViewBagcategories;
             ViewBag.Keyword = keyword;
             return View(categories);

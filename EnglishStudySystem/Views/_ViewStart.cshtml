@@ -1,4 +1,28 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@using Microsoft.AspNet.Identity // Cần để truy cập User.Identity và User.IsInRole
+@{
+    // Mặc định ban đầu cho các View NGOÀI Area Admin là Layout công khai
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Layout cho người dùng chưa đăng nhập
+
+    //// Kiểm tra xem người dùng hiện tại có được xác thực (đã đăng nhập) hay không
+    if (User.Identity.IsAuthenticated)
+    {
+        //    // Nếu đã đăng nhập, kiểm tra xem họ CÓ thuộc vai trò Admin HOẶC Editor hay không
+        //    if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+        //    {
+        //        // Nếu là Admin hoặc Editor, và View này đang ở ngoài Area Admin,
+        //        // chúng ta có thể để họ sử dụng Layout mặc định (công khai)
+        //        // hoặc chuyển sang một Layout riêng nếu bạn muốn Admin/Editor có Layout khác ngay cả ở trang công khai.
+        //        // Với kịch bản phổ biến, Admin/Editor khi ở ngoài Area Admin vẫn thấy Layout công khai.
+        //        // Do đó, chúng ta KHÔNG cần thay đổi Layout ở đây cho họ.
+        //        Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml";
+        //    }
+        //    else // Người dùng đã đăng nhập nhưng KHÔNG phải Admin hay Editor (Là người dùng thường)
+        //    {
+        //        // Nếu là người dùng thường đã đăng nhập (không phải Admin/Editor)
+        //        // Sử dụng Layout dành riêng cho người dùng thường đã đăng nhập
+        Layout = "~/Views/Shared/LayoutCustomer.cshtml";
+    }
+    //}
+    // Else (Người dùng chưa đăng nhập), Layout vẫn giữ nguyên là "~/Views/Shared/_Layout.cshtml"
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
