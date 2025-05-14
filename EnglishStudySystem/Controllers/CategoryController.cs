@@ -20,25 +20,11 @@ namespace EnglishStudySystem.Controllers
         {
             _context = context;
         }
-        public ActionResult Load(int id)
-        {
-            Session["Layout"] = null;
-            if (User.Identity.GetUserId() == null)
-            {
-                Session["Layout"] = "~/Views/Shared/_Layout.cshtml";
-            }
-            else
-            {
-                Session["Layout"] = "~/Views/Shared/LayoutCustomer.cshtml";
-            }
-            return RedirectToAction("Details", "Category", new {id = id});
-
-        }
         // In CategoryController.cs (no changes needed, your existing code is fine)
-        public ActionResult Details(int id)
+        public ActionResult Details(int id) // `id` ở đây chính là ID của category
         {
-                var category = _context.Categories
-                    .FirstOrDefault(c => c.Id == id && !c.IsDeleted);
+            var category = _context.Categories
+                .FirstOrDefault(c => c.Id == id && !c.IsDeleted);
 
             if (category == null)
             {
@@ -49,13 +35,19 @@ namespace EnglishStudySystem.Controllers
                 .Where(l => l.CategoryId == id && !l.IsDeleted)
                 .OrderBy(l => l.CreatedDate)
                 .ToList();
-            var categoriesQuery = _context.Categories
-                .Where(c => !c.IsDeleted);
-            var categories = categoriesQuery
-                .Take(6) // giữ nếu bạn chỉ muốn 6 kết quả, có thể bỏ nếu muốn toàn bộ
-                .ToList();
-            ViewBag.Layout = Session["layout"];
-            ViewBag.ListCategories = categories;
+            string ID = id.ToString();
+            // Kiểm tra người dùng đã mua CHÍNH XÁC category này chưa
+            bool daMua = false;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                daMua = _context.Payments
+                    .Any(p => p.UserId == userId &&
+                             p.Status == "Completed" &&
+                             p.TransactionId == ID); // So sánh với ID category hiện tại
+            }
+
+            ViewBag.DaMua = daMua;
             ViewBag.Lessons = lessons;
             return View(category);
         }

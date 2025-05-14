@@ -27,9 +27,24 @@
                 }
             </span>
             <!-- Shopping Icon Button -->
-            <a href="@Url.Action("Payment", "Customer", new { categoryId = Model.Id })" class="btn btn-success ms-2 d-flex align-items-center">
-                <i class="fa fa-shopping-cart me-2"></i> Mua ngay
-            </a>
+            @if (ViewBag.DaMua)
+            {
+                <span class="btn btn-secondary ms-2 d-flex align-items-center" disabled>
+                    <i class="fa fa-check-circle me-2"></i> Đã mua
+                </span>
+            }
+            else if (User.Identity.IsAuthenticated)
+            {
+                <a href="@Url.Action("Payment", "Customer", new { categoryId = Model.Id })" class="btn btn-success ms-2 d-flex align-items-center">
+                    <i class="fa fa-shopping-cart me-2"></i> Mua ngay
+                </a>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")" class="btn btn-success ms-2 d-flex align-items-center">
+                    <i class="fa fa-shopping-cart me-2"></i> Mua ngay
+                </a>
+            }
         </div>
     </div>
     <!-- Lessons List -->
@@ -52,9 +67,24 @@
                                         <p class="text-muted small mb-0">@lesson.Description</p>
                                     }
                                 </div>
-                                <a href="#" class="btn btn-sm btn-success px-3">
-                                    Xem bài học
-                                </a>
+                                @if (ViewBag.DaMua || !Model.Price.HasValue || Model.Price == 0)
+                                {
+                                    <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })" class="btn btn-sm btn-success px-3">
+                                        Xem bài học
+                                    </a>
+                                }
+                                else if (User.Identity.IsAuthenticated)
+                                {
+                                    <a href="@Url.Action("Payment", "Customer", new { categoryId = Model.Id })" class="btn btn-sm btn-warning px-3">
+                                        Mua để xem
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })" class="btn btn-sm btn-success px-3">
+                                        Xem bài học
+                                    </a>
+                                }
                             </div>
                         </div>
                     }
