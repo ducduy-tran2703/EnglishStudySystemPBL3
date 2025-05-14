@@ -7,20 +7,22 @@
 
 @section Styles {
     <link href="~/Areas/Admin/Content/CSS/createUserStyle.css" rel="stylesheet" />
+    <link href="~/Content/CSS2/DetailUserStyle.css" rel="stylesheet" />
+
 }
 
 <div class="container-fluid px-4 py-3">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card createEditor-card">
-                <div class="card-header createEditor-card-header">
-                    <h4 class="mb-0">
+                <div class="card-header createEditor-card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%)">
+                    <h4 class="mb-0" style="color:white">
                         <i class="fas fa-user-edit mr-2"></i>@ViewBag.Title
                     </h4>
                 </div>
 
                 <div class="card-body p-4">
-                    @using (Html.BeginForm("CreateEditor", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    @using (Html.BeginForm("CreateEditor", "Users", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                     {
                         @Html.AntiForgeryToken()
 
@@ -77,10 +79,10 @@
                         </div>
 
                         <div class="form-group mt-4 text-center">
-                            <button type="submit" class="btn createEditor-btn-primary mr-3">
-                                <i class="fas fa-save mr-2"></i>Tạo tài khoản
+                            <button type="submit" class="detail-user-btn detail-user-btn-edit">
+                                <i class="fas fa-save mr-2"></i> Tạo tài khoản
                             </button>
-                            @Html.ActionLink("Hủy bỏ", "Index", null, new { @class = "btn createEditor-btn-secondary" })
+                            @Html.ActionLink("Hủy bỏ", "ListUser", null, new { @class = "detail-user-btn detail-user-btn-change-password"})
                         </div>
                     }
                 </div>
