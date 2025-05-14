@@ -14,13 +14,7 @@
                     <h4 class="mb-0 font-weight-bold" style="color:White">
                         <i class="fas fa-users-cog mr-2" style="color:whitesmoke"></i>@ViewBag.Title
                     </h4>
-                    <small  class="font-weight-light" >Quản lý tất cả người dùng hệ thống</small>
-                </div>
-                <div>
-                    @Html.ActionLink("Tạo Editor", "CreateEditor", "Users", null,
-                        new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
-                    @Html.ActionLink("Tài khoản đã xóa", "ListDeletedAccount", "Users", null,
-                        new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
+                    <small class="font-weight-light">Quản lý tài khoản bị xóa</small>
                 </div>
             </div>
         </div>
@@ -65,13 +59,6 @@
             <!-- Role Tabs with Icons -->
             <ul class="nav nav-tabs nav-justified border-bottom-0 px-4 pt-3" id="userTabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active d-flex flex-column align-items-center" id="admin-tab" data-toggle="tab" href="#admin" role="tab">
-                        <i class="fas fa-user-shield fa-lg mb-1"></i>
-                        <span>Admin</span>
-                        <small class="badge badge-pill badge-light mt-1">@Model.Count(u => u.Roles.Contains("Admin"))</small>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link d-flex flex-column align-items-center" id="editor-tab" data-toggle="tab" href="#editor" role="tab">
                         <i class="fas fa-user-edit fa-lg mb-1"></i>
                         <span>Editor</span>
@@ -101,39 +88,7 @@
                                     <th style="width: 15%" class="border-top-0">Trạng thái</th>
                                     <th style="width: 15%" class="border-top-0 text-center">Thao tác</th>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Where(u => u.Roles.Contains("Admin")))
-                                {
-                                    <tr class="user-row" data-status="@(item.IsActive ? "active" : "inactive")">
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
-                                                    @item.UserName.Substring(0, 1).ToUpper()
-                                                </div>
-                                                <span class="font-weight-bold">@item.UserName</span>
-                                            </div>
-                                        </td>
-                                        <td>@item.Email</td>
-                                        <td>@item.FullName</td>
-                                        <td>
-                                            <span class="badge @(item.IsActive ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
-                                                @(item.IsActive ? "Hoạt động" : "Không hoạt động")
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group btn-group-sm shadow" role="group">
-                                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-light" title="Sửa">
-                                                    <i class="fas fa-edit text-primary"></i>
-                                                </a>
-                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
-                                                    <i class="fas fa-info-circle text-info"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
+                            </thead>                            
                         </table>
                     </div>
                 </div>
@@ -175,7 +130,10 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
+                                                    <i class="fas fa-undo text-success"></i>
+                                                </a>
+                                                <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
                                                     <i class="fas fa-trash-alt text-danger"></i>
                                                 </a>
                                             </div>
@@ -224,7 +182,11 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
+                                                    <i class="fas fa-undo text-success"></i>
+
+                                                </a>
+                                                <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
                                                     <i class="fas fa-trash-alt text-danger"></i>
                                                 </a>
                                             </div>
@@ -286,34 +248,24 @@
             // Delete confirmation
             //$('.btn-delete').on('click', function (e) {
             //    e.preventDefault();
-            //    const deleteUrl = $(this).attr('href');  // Lấy URL xóa tài khoản
+            //    const deleteUrl = $(this).attr('href');
 
-            //    // Gửi yêu cầu AJAX để xóa tài khoản
-            //    $.ajax({
-            //        url: deleteUrl,
-            //        type: 'POST',  // Sử dụng POST để xóa tài khoản
-            //        data: { 
-            //            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() // Đảm bảo bảo mật CSRF
-            //        },
-            //        success: function (response) {
-            //            // Nếu xóa thành công, ẩn dòng dữ liệu trong bảng
-            //            Swal.fire({
-            //                title: 'Xóa thành công!',
-            //                text: 'Tài khoản đã được xóa.',
-            //                icon: 'success',
-            //                confirmButtonText: 'OK'
-            //            }).then(() => {
-            //                // Ẩn dòng người dùng đã xóa
-            //                window.location.reload(); // Tải lại trang để hiển thị thay đổi
-            //            });
-            //        },
-            //        error: function () {
-            //            Swal.fire({
-            //                title: 'Lỗi!',
-            //                text: 'Không thể xóa tài khoản.',
-            //                icon: 'error',
-            //                confirmButtonText: 'OK'
-            //            });
+            //    Swal.fire({
+            //        title: 'Xác nhận xóa?',
+            //        html: '<div class="alert alert-warning text-left">' +
+            //            '<i class="fas fa-exclamation-triangle mr-2"></i>' +
+            //            'Bạn có chắc muốn xóa tài khoản này? Hành động này không thể hoàn tác.</div>',
+            //        icon: 'warning',
+            //        showCancelButton: true,
+            //        confirmButtonColor: '#d33',
+            //        cancelButtonColor: '#6c757d',
+            //        confirmButtonText: '<i class="fas fa-trash-alt mr-2"></i>Xóa',
+            //        cancelButtonText: '<i class="fas fa-times mr-2"></i>Hủy',
+            //        reverseButtons: true,
+            //        focusCancel: true
+            //    }).then((result) => {
+            //        if (result.isConfirmed) {
+            //            window.location.href = deleteUrl;
             //        }
             //    });
             //});
