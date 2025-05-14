@@ -10,7 +10,9 @@
 *@
 @model List<EnglishStudySystem.Models.Lesson>
 
-@* Nhúng CSS trực tiếp vào View - Đã cập nhật màu sắc và khoảng cách *@
+@{
+    var viewDates = ViewBag.ViewDates as Dictionary<int, DateTime>;
+}
 <style>
     /* Định dạng cho tiêu đề Lịch sử Bài học */
     .statistics-section h3 {
@@ -106,8 +108,8 @@
 
 
 @*
-    Kiểm tra xem danh sách bài học có dữ liệu hay không.
-    Nếu không có bài học nào, hiển thị thông báo.
+    var viewDates = ViewBag.ViewDates as Dictionary<int, DateTime>;  Kiểm tra xem danh sách bài học có dữ liệu hay không.
+      Nếu không có bài học nào, hiển thị thông báo.
 *@
 @if (Model != null && Model.Any())
 {
@@ -140,7 +142,7 @@
 
                         @* Hiển thị Ngày tạo *@
                         <p>
-                            <small>Ngày học: @lesson.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                            <small>Ngày học: @viewDates[lesson.Id].ToString("dd/MM/yyyy HH:mm")</small>
                         </p>
 
                         @* Các thông tin khác nếu muốn *@

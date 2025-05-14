@@ -355,6 +355,7 @@
     <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
     <Content Include="Views\Customer\LearningActivities.cshtml" />
     <Content Include="Views\Lesson\Details.cshtml" />
+    <Content Include="Views\Customer\_FavoriteLessonsStats.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />

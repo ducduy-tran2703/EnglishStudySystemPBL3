@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using EnglishStudySystem.Models;
@@ -145,33 +146,67 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult GetBoughtCoursesStats()
         {
+            var userId = User.Identity.GetUserId();
+
             ApplicationDbContext _context = new ApplicationDbContext();
-            var categories = _context.Categories
-                .Where(c => !c.IsDeleted)
-                .OrderByDescending(c => c.CreatedDate)
-                .Take(6)
+
+            var boughtCategories = _context.Payments
+                .Where(p => p.UserId == userId && p.Status == "Completed")
+                .OrderByDescending(p => p.PaymentDate)
+                .Select(p => p.Category)
+                .Distinct()
                 .ToList();
 
-            var userIds = categories.Select(c => c.CreatedByUserId).Distinct().ToList();
+            var creatorUserIds = boughtCategories.Select(c => c.CreatedByUserId).Distinct().ToList();
 
             var users = _context.Users
-                .Where(u => userIds.Contains(u.Id))
+                .Where(u => creatorUserIds.Contains(u.Id))
                 .ToDictionary(u => u.Id, u => u.FullName);
+
             ViewBag.UserNames = users;
 
-            return PartialView("_BoughtCoursesStats", categories);
+            return PartialView("_BoughtCoursesStats", boughtCategories);
         }
+
         public ActionResult GetLessonsHistoryStats()
         {
+            var userId = User.Identity.GetUserId();
+
             ApplicationDbContext _context = new ApplicationDbContext();
-            var lessons = _context.Lessons
-                .Where(l => !l.IsDeleted)
-                .OrderByDescending(l => l.CreatedDate)
+
+            var lessonHistories = _context.LessonHistories
+                .Where(h => h.UserId == userId && !h.Lesson.IsDeleted)
+                .OrderByDescending(h => h.ViewDate)
                 .Take(6)
                 .ToList();
-            return PartialView("_LessonsHistoryStats", lessons);
 
+            var lessons = lessonHistories.Select(h => h.Lesson).ToList();
+
+            var viewDates = lessonHistories.ToDictionary(h => h.LessonId, h => h.ViewDate);
+            ViewBag.ViewDates = viewDates;
+
+            return PartialView("_LessonsHistoryStats", lessons);
         }
+
+        public ActionResult GetFavoriteLessonsStats()
+        {
+            var userId = User.Identity.GetUserId();
+            using (var _context = new ApplicationDbContext())
+            {
+                var favoriteLessons = _context.SavedLessons
+                    .Where(s => s.UserId == userId)
+                    .OrderByDescending(s => s.SavedDate)
+                    .Select(s => s.Lesson)
+                    .Where(l => !l.IsDeleted)
+                    .Distinct()
+                    .Take(6)
+                    .ToList();
+
+                return PartialView("_FavoriteLessonsStats", favoriteLessons);
+            }
+        }
+
+
 
     }
 }
