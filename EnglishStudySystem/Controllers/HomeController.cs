@@ -47,7 +47,7 @@ namespace EnglishStudySystem.Controllers
             }
 
             var categories = categoriesQuery
-                .Take(6) // giữ nếu bạn chỉ muốn 6 kết quả, có thể bỏ nếu muốn toàn bộ
+                 // giữ nếu bạn chỉ muốn 6 kết quả, có thể bỏ nếu muốn toàn bộ
                 .ToList();
 
             // Lấy danh sách userIds từ các categories

@@ -32,7 +32,38 @@ namespace EnglishStudySystem.Controllers
                 return PartialView("_NotificationDropdownPartial", userNotifications);
             }
         }
-       public ActionResult SeedLessons()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult MarkAsRead(int id)
+        {
+            try
+            {
+                var currentUserId = User.Identity.GetUserId();
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                using (var db = new ApplicationDbContext())
+                {
+                    var userNotification = db.UserNotifications
+                                          .FirstOrDefault(un => un.Id == id && un.UserId == currentUserId);
+
+                    if (userNotification != null)
+                    {
+                        userNotification.IsRead = true;
+                        db.SaveChanges();
+                        return Json(new { success = true });
+                    }
+                    return Json(new { success = false, message = "Notification not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        public ActionResult SeedLessons()
             {
                 try
                 {
@@ -68,7 +99,7 @@ namespace EnglishStudySystem.Controllers
                     var currentDate = DateTime.Now;
 
                     // Tạo 3 bài học cho mỗi CategoryId từ 3 đến 7
-                    for (int categoryId = 3; categoryId <= 7; categoryId++)
+                    for (int categoryId = 16; categoryId <= 20; categoryId++)
                     {
                         // Lấy ngẫu nhiên 3 tên bài học khác nhau
                         var selectedLessons = lessonNames.OrderBy(x => random.Next()).Take(3).ToList();
@@ -104,7 +135,7 @@ namespace EnglishStudySystem.Controllers
             try
             {
                 ApplicationDbContext db = new ApplicationDbContext();
-                string userId = "581b7f8c-0129-44fc-961f-a190484fdcd6"; // ID người dùng cụ thể
+                string userId = "3b500f36-d7ab-4da0-a443-0f88a80899c3"; // ID người dùng cụ thể
 
                 // Kiểm tra xem đã có dữ liệu Lesson chưa
                 if (!db.Lessons.Any())
@@ -346,6 +377,80 @@ namespace EnglishStudySystem.Controllers
 
             // Trộn các đáp án để không phải lúc nào đáp án đúng cũng ở vị trí đầu tiên
             return answers.OrderBy(x => random.Next()).ToList();
+        }
+        public ActionResult Seed()
+        {
+            ApplicationDbContext context = new ApplicationDbContext();
+            var userId = "581b7f8c-0129-44fc-961f-a190484fdcd6"; // ID người dùng nhận thông báo
+            var senderId = "8c442efe-67d7-4ec6-a238-6adb7700b15b"; // ID người gửi (admin)
+            var now = DateTime.Now;
+
+            // Tạo danh sách thông báo
+            var notifications = new List<Notification>
+    {
+        new Notification
+        {
+            Title = "Hoạt động học tập mới",
+            Content = "Bạn có một hoạt động học tập mới đang chờ hoàn thành.",
+            CreatedDate = now.AddDays(-2),
+            SenderId = senderId, // Sử dụng senderId đã chỉ định
+            TargetController = "Customer",
+            TargetAction = "LearningActivities",
+            TargetArea = "", // Không sử dụng area
+            PrimaryRelatedEntityId = 1, // ID bài học/hoạt động liên quan
+            SecondaryRelatedEntityId = null,
+            RelatedEntityType = "LearningActivity",
+            IsDeleted = false
+        },
+        new Notification
+        {
+            Title = "Nhắc nhở hoàn thành bài học",
+            Content = "Bạn có bài học chưa hoàn thành trong 3 ngày qua.",
+            CreatedDate = now.AddDays(-1),
+            SenderId = senderId, // Sử dụng senderId đã chỉ định
+            TargetController = "Customer",
+            TargetAction = "LearningActivities",
+            TargetArea = "",
+            PrimaryRelatedEntityId = 2,
+            SecondaryRelatedEntityId = null,
+            RelatedEntityType = "LearningActivity",
+            IsDeleted = false
+        },
+        new Notification
+        {
+            Title = "Thông báo khuyến mãi",
+            Content = "Chương trình khuyến mãi đặc biệt dành cho học viên.",
+            CreatedDate = now,
+            SenderId = senderId, // Sử dụng senderId đã chỉ định
+            TargetController = "Customer",
+            TargetAction = "LearningActivities",
+            TargetArea = "",
+            PrimaryRelatedEntityId = null,
+            SecondaryRelatedEntityId = null,
+            RelatedEntityType = "Promotion",
+            IsDeleted = false
+        }
+    };
+
+            context.Notifications.AddRange(notifications);
+            context.SaveChanges();
+
+            // Tạo liên kết UserNotification cho người dùng
+            var userNotifications = new List<UserNotification>();
+            foreach (var notification in notifications)
+            {
+                userNotifications.Add(new UserNotification
+                {
+                    UserId = userId,
+                    NotificationId = notification.Id,
+                    IsRead = false,
+                    IsDeleted = false
+                });
+            }
+
+            context.UserNotifications.AddRange(userNotifications);
+            context.SaveChanges();
+            return Content("Dữ liệu thông báo đã được khởi tạo thành công.");
         }
     }
         

@@ -2,95 +2,139 @@
 
 
 @{
-    ViewBag.Title = "Chi tiết Danh mục & Bài học"; 
+    ViewBag.Title = "Chi tiết Danh mục";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white mb-0" style="background: linear-gradient(135deg, #2c3e50, #3498db); padding: 10px 20px; border-radius: 8px;">
+            <i class="fas fa-folder-open me-2"></i>@ViewBag.Title
+        </h2>
+        <div>
+            @if (Model.IsDeleted)
+            {
+                @Html.ActionLink("Quay lại Danh sách đã xóa", "DeletedIndex", null, new { @class = "btn btn-dark" })
+            }
+            else
+            {
+                @Html.ActionLink("Chỉnh sửa", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning me-2" })
+                @Html.ActionLink("Quay lại Danh sách", "Index", null, new { @class = "btn btn-primary" })
+            }
+        </div>
+    </div>
 
-@* --- Phần hiển thị chi tiết Danh mục (Sử dụng ViewModel properties) --- *@
-<div>
-    <h4>Thông tin Danh mục</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
+    <div class="card shadow-sm" style="border: none; border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
+            <h4 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Thông tin chi tiết
+            </h4>
+        </div>
+        <div class="card-body" style="background-color: #f8f9fa;">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="info-item mb-3 p-3 bg-white rounded shadow-sm">
+                        <h5 class="mb-2" style="color: #3498db;"><i class="fas fa-tag me-2"></i>Tên danh mục</h5>
+                        <p class="fs-5">@Model.Name</p>
+                    </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
+                    <div class="info-item mb-3 p-3 bg-white rounded shadow-sm">
+                        <h5 class="mb-2" style="color: #3498db;"><i class="fas fa-dollar-sign me-2"></i>Giá</h5>
+                        <p class="fs-5" style="color: #27ae60; font-weight: bold;">@String.Format("{0:C}", Model.Price)</p>
+                    </div>
+                </div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd>
-            @String.Format("{0:C}", Model.Price)
-        </dd>
+                <div class="col-md-6">
+                    <div class="info-item mb-3 p-3 bg-white rounded shadow-sm">
+                        <h5 class="mb-2" style="color: #3498db;"><i class="fas fa-align-left me-2"></i>Mô tả</h5>
+                        <p class="fs-5">@(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả" : Model.Description)</p>
+                    </div>
 
-        @* Hiển thị trạng thái xóa mềm và thời gian xóa (nếu có) *@
-        <dt>
-            @Html.DisplayNameFor(model => model.IsDeleted)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.IsDeleted)
-        </dd>
+                    <div class="info-item mb-3 p-3 bg-white rounded shadow-sm">
+                        <h5 class="mb-2" style="color: #3498db;"><i class="fas fa-trash-alt me-2"></i>Trạng thái</h5>
+                        <span class="badge" style="background-color: @(Model.IsDeleted ? "#e74c3c" : "#2ecc71");">
+                            @(Model.IsDeleted ? "Đã xóa" : "Đang hoạt động")
+                        </span>
+                        @if (Model.IsDeleted)
+                        {
+                            <p class="text-muted small mt-1">Ngày xóa: @Model.DeletedAt?.ToString("dd/MM/yyyy HH:mm")</p>
+                        }
+                    </div>
+                </div>
+            </div>
 
-        @if (Model.IsDeleted)
-        {
-            <dt>
-                @Html.DisplayNameFor(model => model.DeletedAt)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.DeletedAt)
-            </dd>
+            <hr style="border-top: 1px solid #ddd; opacity: 0.2;" />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="p-3 bg-white rounded shadow-sm">
+                        <h5 style="color: #3498db;"><i class="fas fa-user-plus me-2"></i>Thông tin tạo</h5>
+                        <div class="info-item mb-2">
+                            <span class="text-muted">Người tạo:</span>
+                            <span class="fw-bold">@Model.CreatedByUserId</span>
+                            <span class="badge" style="background-color: #3498db;">@Model.CreatedByUserRole</span>
+                        </div>
+                        <div class="info-item mb-2">
+                            <span class="text-muted">Ngày tạo:</span>
+                            <span class="fw-bold">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+                {
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white rounded shadow-sm">
+                            <h5 style="color: #3498db;"><i class="fas fa-user-edit me-2"></i>Thông tin cập nhật</h5>
+                            <div class="info-item mb-2">
+                                <span class="text-muted">Người cập nhật:</span>
+                                <span class="fw-bold">@Model.UpdatedByUserId</span>
+                                <span class="badge" style="background-color: #3498db;">@Model.UpdatedByUserRole</span>
+                            </div>
+                            <div class="info-item mb-2">
+                                <span class="text-muted">Ngày cập nhật:</span>
+                                <span class="fw-bold">@Model.UpdatedDate.GetValueOrDefault().ToString("dd/MM/yyyy")</span>
+                             
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        @* Hiển thị thông tin audit fields *@
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedByUserId)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedByUserId)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedByUserRole)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedByUserRole)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
+        .card-header {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
 
-        @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
-        {
-            <dt>
-                @Html.DisplayNameFor(model => model.UpdatedByUserId)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.UpdatedByUserId)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.UpdatedByUserRole)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.UpdatedByUserRole)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.UpdatedDate)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.UpdatedDate)
-            </dd>
+        .info-item h5 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .info-item p {
+            margin-bottom: 0;
+            padding-left: 26px;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
         }
     </dl>
 </div>
@@ -156,16 +200,15 @@
 </table>
 @* --- Kết thúc phần danh sách Bài học --- *@
 
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #f39c12;
+            color: white;
+        }
 
-<p>
-    @* Liên kết trở lại trang danh sách Danh mục *@
-    @if (Model.IsDeleted)
-    {
-        @Html.ActionLink("Quay lại Danh sách Danh mục đã xóa", "DeletedIndex", "Categories")
-    }
-    else
-    {
-        @Html.ActionLink("Chỉnh sửa Danh mục", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) @* Liên kết sửa Danh mục *@
-        @Html.ActionLink("Quay lại Danh sách Danh mục", "Index", "Categories")
-    }
-</p>
+        .btn-dark {
+            background-color: #2c3e50;
+            border-color: #2c3e50;
+        }
+    </style>
+}

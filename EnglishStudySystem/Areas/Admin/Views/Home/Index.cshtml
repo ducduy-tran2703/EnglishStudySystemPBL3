@@ -1,4 +1,4 @@
-﻿@using EnglishStudySystem.Areas.Admin.ViewModel 
+﻿@using EnglishStudySystem.Areas.Admin.ViewModel
 @model DashboardViewModel
 @{
     ViewBag.Title = "Thống Kê Hệ Thống";
@@ -35,7 +35,7 @@
                                     <div class="detail-title">Học viên mua nhiều nhất:</div>
                                     <p class="detail-text"><strong>Tên:</strong> @Model.UserStats.TopCustomer.Name</p>
                                     <p class="detail-text"><strong>Số lần mua:</strong> @Model.UserStats.TopCustomer.TotalPurchases</p>
-                                    <p class="detail-text"><strong>Tổng chi tiêu:</strong> @string.Format("{0:N0}", Model.UserStats.TopCustomer.TotalSpent) đ</p>
+                                    <p class="detail-text"><strong>Tổng chi tiêu:</strong> $ @string.Format("{0:N0}", Model.UserStats.TopCustomer.TotalSpent)</p>
                                     @if (Model.UserStats.TopCustomer.PurchasedCategories != null && Model.UserStats.TopCustomer.PurchasedCategories.Any())
                                     {
                                         <p class="detail-text"><strong>Danh mục đã mua:</strong> @string.Join(", ", Model.UserStats.TopCustomer.PurchasedCategories.Select(c => c.Name))</p>
@@ -73,15 +73,15 @@
                             </div>
                             <div class="stats-item mb-2">
                                 <div class="stat-label">Tổng doanh thu:</div>
-                                <div class="stat-value">@string.Format("{0:N0}", Model.RevenueStats.TotalRevenue) $</div>
+                                <div class="stat-value">$ @string.Format("{0:N0}", Model.RevenueStats.TotalRevenue)</div>
                             </div>
                             <div class="stats-item mb-2">
                                 <div class="stat-label">Doanh thu tháng này:</div>
-                                <div class="stat-value">@string.Format("{0:N0}", Model.RevenueStats.MonthlyRevenue) $</div>
+                                <div class="stat-value">$ @string.Format("{0:N0}", Model.RevenueStats.MonthlyRevenue)</div>
                             </div>
                             <div class="stats-item">
                                 <div class="stat-label">Doanh thu năm nay:</div>
-                                <div class="stat-value">@string.Format("{0:N0}", Model.RevenueStats.YearlyRevenue) $</div>
+                                <div class="stat-value">$ @string.Format("{0:N0}", Model.RevenueStats.YearlyRevenue)</div>
                             </div>
                         </div>
                         <div class="col-auto card-icon">
@@ -111,7 +111,7 @@
                                     <div class="detail-title">Danh mục phổ biến nhất:</div>
                                     <p class="detail-text"><strong>Tên:</strong> @Model.LessonStats.MostPopularCategory.Name</p>
                                     <p class="detail-text"><strong>Số lần mua:</strong> @Model.LessonStats.MostPopularCategory.TotalPurchases</p>
-                                    <p class="detail-text"><strong>Doanh thu:</strong> @string.Format("{0:N0}", Model.LessonStats.MostPopularCategory.Revenue) đ</p>
+                                    <p class="detail-text"><strong>Doanh thu:</strong> $ @string.Format("{0:N0}", Model.LessonStats.MostPopularCategory.Revenue)</p>
                                 </div>
                             }
                             else
@@ -126,7 +126,7 @@
                                 <div class="stats-item-detail border-top pt-2">
                                     <div class="detail-title">Danh mục sinh lời nhất:</div>
                                     <p class="detail-text"><strong>Tên:</strong> @Model.LessonStats.MostProfitableCategory.Name</p>
-                                    <p class="detail-text"><strong>Doanh thu:</strong> @string.Format("{0:N0}", Model.LessonStats.MostProfitableCategory.Revenue) đ</p>
+                                    <p class="detail-text"><strong>Doanh thu:</strong> $ @string.Format("{0:N0}", Model.LessonStats.MostProfitableCategory.Revenue)</p>
                                 </div>
                             }
                             else
@@ -155,7 +155,6 @@
                 </div>
                 <div class="card-body">
                     <div class="chart-area" style="height: 320px;">
-                        @* Giữ nguyên chiều cao hoặc điều chỉnh nếu cần *@
                         <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
@@ -186,18 +185,13 @@
                                         <tr>
                                             <td>@editor.EditorName</td>
                                             <td class="text-center">@editor.TotalCategoriesCreated</td>
-                                            <td class="text-right">@string.Format("{0:N0}", editor.TotalRevenue) đ</td>
+                                            <td class="text-right">$ @string.Format("{0:N0}", editor.TotalRevenue)</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
-                        if (Model.EditorStats.Count > 5)
-                        {
-                            <div class="text-center mt-3">
-                                <a href="#" class="btn btn-sm btn-outline-primary">Xem tất cả Editors →</a>
-                            </div>
-                        }
+                        
                     }
                     else
                     {
@@ -211,7 +205,7 @@
 
 
 @section scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> @* Cập nhật phiên bản Chart.js nếu muốn *@
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script>
         $(document).ready(function () {
             // Biểu đồ doanh thu
@@ -221,16 +215,16 @@
                 var chartData = {
                     labels: [],
                     datasets: [{
-                        label: 'Doanh thu (VND)',
+                        label: 'Doanh thu ($)', // Đã thay đổi
                         data: [],
-                        backgroundColor: 'rgba(78, 115, 223, 0.05)', // Màu nền nhạt hơn
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
                         borderColor: 'rgba(78, 115, 223, 1)',
                         borderWidth: 2,
-                        pointBackgroundColor: 'rgba(78, 115, 223, 1)', // Màu của điểm
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
-                        tension: 0.4, // Mềm mại hơn
+                        tension: 0.4,
                         fill: true
                     }]
                 };
@@ -256,7 +250,7 @@
                                 },
                                 ticks: {
                                     font: {
-                                        family: "'Nunito', sans-serif", // Sử dụng font nhất quán
+                                        family: "'Nunito', sans-serif",
                                     },
                                     color: '#858796'
                                 }
@@ -265,20 +259,21 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', 'đ'); // Định dạng tiền tệ chuẩn hơn
+                                        // Đã thay đổi: Định dạng USD
+                                        return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
                                     },
                                     font: {
                                         family: "'Nunito', sans-serif",
                                     },
                                     color: '#858796',
-                                    padding: 10 // Thêm khoảng cách cho ticks trục Y
+                                    padding: 10
                                 },
                                 grid: {
                                     color: "rgba(234, 236, 244, 1)",
                                     zeroLineColor: "rgba(234, 236, 244, 1)",
                                     borderDash: [2],
                                     zeroLineBorderDash: [2],
-                                    drawBorder: false // Bỏ đường viền của lưới trục Y
+                                    drawBorder: false
                                 }
                             }
                         },
@@ -290,17 +285,18 @@
                                 backgroundColor: "rgb(255,255,255)",
                                 bodyColor: "#858796",
                                 titleColor: '#6e707e',
-                                titleFont: { family: "'Nunito', sans-serif", size: 14, weight: '600'}, // Đậm hơn
+                                titleFont: { family: "'Nunito', sans-serif", size: 14, weight: '600'},
                                 bodyFont: { family: "'Nunito', sans-serif", size: 12 },
                                 borderColor: '#dddfeb',
                                 borderWidth: 1,
                                 padding: 15,
                                 displayColors: false,
-                                intersect: false, // Tooltip luôn hiển thị khi hover gần điểm
-                                mode: 'index',    // Hiển thị tooltip cho tất cả dataset tại index đó
+                                intersect: false,
+                                mode: 'index',
                                 callbacks: {
                                     label: function(context) {
-                                        return context.parsed.y.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', 'đ');
+                                         // Đã thay đổi: Định dạng USD
+                                        return '$' + context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
                                     }
                                 }
                             }
@@ -308,11 +304,11 @@
                         elements: {
                             point:{
                                 radius: 3,
-                                hoverRadius: 5, // Tăng hover radius
-                                hitRadius: 10 // Tăng vùng nhận diện click/hover
+                                hoverRadius: 5,
+                                hitRadius: 10
                             },
                             line: {
-                                borderWidth: 2.5 // Đường line dày hơn một chút
+                                borderWidth: 2.5
                             }
                         }
                     }
