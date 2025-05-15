@@ -1,17 +1,17 @@
-﻿@model EnglishStudySystem.Models.Category
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.CategoryDetailsWithLessonsViewModel 
+
 
 @{
-    ViewBag.Title = "Chi tiết Danh mục";
-    // Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Chi tiết Danh mục & Bài học"; 
 }
 
 <h2>@ViewBag.Title</h2>
 
+@* --- Phần hiển thị chi tiết Danh mục (Sử dụng ViewModel properties) --- *@
 <div>
-    <h4>Chi tiết</h4>
+    <h4>Thông tin Danh mục</h4>
     <hr />
     <dl class="dl-horizontal">
-        @* Sử dụng class Bootstrap cho hiển thị label và giá trị *@
         <dt>
             @Html.DisplayNameFor(model => model.Name)
         </dt>
@@ -71,7 +71,6 @@
             @Html.DisplayFor(model => model.CreatedDate)
         </dd>
 
-        @* Chỉ hiển thị nếu đã được cập nhật *@
         @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
         {
             <dt>
@@ -93,19 +92,80 @@
                 @Html.DisplayFor(model => model.UpdatedDate)
             </dd>
         }
-
-
     </dl>
 </div>
+@* --- Kết thúc phần chi tiết Danh mục --- *@
+
+<hr />
+
+@* --- Phần hiển thị danh sách Bài học --- *@
+<h3>Danh sách Bài học (@Model.Name)</h3>
+
 <p>
-    @* Liên kết trở lại trang danh sách phù hợp (đang hoạt động hoặc đã xóa) *@
+    @* Liên kết đến trang thêm mới Bài học cho danh mục này *@
+    @Html.ActionLink("Thêm mới Bài học", "Create", "Lessons", new { categoryId = Model.Id }, new { @class = "btn btn-primary" })
+</p>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Lessons.FirstOrDefault().Title) @* Lấy tên thuộc tính từ Model Lesson *@
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lessons.FirstOrDefault().Description) @* Lấy tên thuộc tính từ Model Lesson *@
+            </th>
+            @* Thêm các cột khác của Bài học nếu muốn hiển thị *@
+            <th></th> @* Cột cho các hành động quản lý Bài học *@
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Lessons != null && Model.Lessons.Any()) 
+        {
+            foreach (var lesson in Model.Lessons.OrderBy(l => l.CreatedDate))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => lesson.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => lesson.Description)
+                    </td>
+                    @* Hiển thị các thuộc tính khác của Bài học *@
+                    <td>
+                        @* Các liên kết quản lý Bài học *@
+                        @Html.ActionLink("Chi tiết", "Details", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-info btn-sm" }) |
+                        @Html.ActionLink("Chỉnh sửa", "Edit", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-warning btn-sm" }) |
+                        @* Thêm Form Xóa mềm Bài học (tương tự Category Index) *@
+                        @using (Html.BeginForm("SoftDelete", "Lessons", new { id = lesson.Id }, FormMethod.Post, new { @style = "display:inline;" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài học này?');">Xóa mềm</button>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">Chưa có bài học nào trong danh mục này.</td> @* Colspan bằng số cột trong table *@
+            </tr>
+        }
+    </tbody>
+</table>
+@* --- Kết thúc phần danh sách Bài học --- *@
+
+
+<p>
+    @* Liên kết trở lại trang danh sách Danh mục *@
     @if (Model.IsDeleted)
     {
-        @Html.ActionLink("Quay lại Danh sách đã xóa", "DeletedIndex")
+        @Html.ActionLink("Quay lại Danh sách Danh mục đã xóa", "DeletedIndex", "Categories")
     }
     else
     {
-        @Html.ActionLink("Chỉnh sửa", "Edit", new { id = Model.Id }) 
-        @Html.ActionLink("Quay lại Danh sách", "Index")
-}
+        @Html.ActionLink("Chỉnh sửa Danh mục", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) @* Liên kết sửa Danh mục *@
+        @Html.ActionLink("Quay lại Danh sách Danh mục", "Index", "Categories")
+    }
 </p>

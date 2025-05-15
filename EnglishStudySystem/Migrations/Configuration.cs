@@ -12,7 +12,7 @@
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
 protected override void Seed(EnglishStudySystem.Models.ApplicationDbContext context)
