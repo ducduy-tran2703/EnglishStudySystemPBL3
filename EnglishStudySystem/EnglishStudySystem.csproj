@@ -176,11 +176,11 @@
     <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\EditorStatItemViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\LessonStatsViewModel.cs" />
-<<<<<<< HEAD
-    <Compile Include="Areas\Admin\ViewModel\CategoryCreateViewModel.cs" />
-=======
+
     <Compile Include="Areas\Admin\ViewModel\QuickStatsViewModel.cs" />
->>>>>>> Hieu2
+
+    <Compile Include="Areas\Admin\ViewModel\CategoryCreateViewModel.cs" />
+
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\RevenueStatsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\UserStatsViewModel.cs" />
