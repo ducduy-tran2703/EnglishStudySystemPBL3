@@ -1,0 +1,20 @@
+﻿
+@model EnglishStudySystem.Areas.Admin.ViewModels.QuickStatsViewModel
+
+<div class="admin-stat me-3" title="Tổng số Khách hàng">
+    <i class="fas fa-users text-primary me-1"></i>
+    <span>@Model.TotalCustomers.ToString("N0")</span>
+</div>
+<div class="admin-stat me-3" title="Tổng số Biên tập viên">
+    <i class="fas fa-user-edit text-info me-1"></i>
+    <span>@Model.TotalEditors.ToString("N0")</span>
+</div>
+<div class="admin-stat me-3" title="Tổng số Khóa học">
+    <i class="fas fa-book text-success me-1"></i>
+    <span>@Model.TotalCourses.ToString("N0")</span>
+</div>
+<div class="admin-stat" title="Tổng Lợi nhuận">
+    @* Bỏ me-3 cho mục cuối cùng nếu muốn *@
+    <i class="fas fa-coins text-warning me-1"></i> @* Icon mới cho lợi nhuận *@
+    <span>@Model.TotalRevenue.ToString("N0") đ</span> @* Định dạng tiền tệ *@
+</div>
