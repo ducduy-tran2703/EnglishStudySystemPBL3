@@ -1,0 +1,167 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-money-bill-wave text-primary me-2"></i>Tổng thu nhập</h5>
+                <h3 class="mb-0">@string.Format("{0:N0}", Model.TotalRevenue) đ</h3>
+                <p class="text-muted mb-0">Tất cả thời gian</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-calendar-alt text-success me-2"></i>Tháng này</h5>
+                <h3 class="mb-0">@string.Format("{0:N0}", Model.MonthlyRevenue) đ</h3>
+                <p class="text-muted mb-0">Từ @DateTime.Now.ToString("MM/yyyy")</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-calendar-week text-info me-2"></i>Tuần này</h5>
+                <h3 class="mb-0">@string.Format("{0:N0}", Model.WeeklyRevenue) đ</h3>
+                <p class="text-muted mb-0">Tuần @(System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(DateTime.Now, System.Globalization.CalendarWeekRule.FirstDay, DayOfWeek.Monday))</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-card">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-book text-warning me-2"></i>Khóa học</h5>
+                <h3 class="mb-0">@Model.TotalCourses</h3>
+                <p class="text-muted mb-0">@Model.TotalLessons bài học</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0">Biểu đồ thu nhập</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="admin-card">
+            <div class="card-header">
+                <h5 class="mb-0">Thanh toán gần đây</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var payment in Model.RecentPayments)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">@payment.UserName</h6>
+                                    <small class="text-muted">@payment.PaymentMethod - @payment.Status</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="fw-bold">@string.Format("{0:N0}", payment.Amount) đ</span>
+                                    <br>
+                                    <small class="text-muted">@payment.TimeAgo</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Biểu đồ thu nhập (cần tự tính toán dữ liệu nếu muốn)
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            var revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                    datasets: [{
+                        label: 'Thu nhập (VND)',
+                        data: [1000000, 1500000, 1200000, 1800000, 2000000, 1700000],
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + ' đ';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString() + ' đ';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .admin-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .admin-card .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+        }
+
+        .admin-card .card-body {
+            padding: 20px;
+        }
+
+    .list-group-item {
+        border-left: 0;
+        border-right: 0;
+        padding: 1.25rem;
+    }
+
+        .list-group-item:first-child {
+            border-top: 0;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: 0;
+        }
+</style>

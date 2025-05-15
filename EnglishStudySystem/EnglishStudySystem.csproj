@@ -172,7 +172,12 @@
     <Compile Include="Areas\Admin\Controllers\CategoriesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\EditorStatItemViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\LessonStatsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\RevenueStatsViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\UserStatsViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
@@ -294,6 +299,7 @@
     <Content Include="Areas\Admin\Views\Users\Revive.cshtml" />
     <Content Include="Areas\Admin\Views\Users\DeletePermanent.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Delete.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Dashboard.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
