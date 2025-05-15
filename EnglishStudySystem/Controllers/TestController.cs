@@ -66,7 +66,7 @@ namespace EnglishStudySystem.Controllers
 
             if (attempt == null || attempt.IsCompleted)
             {
-                return RedirectToAction("Completed", new { attemptId = attemptId });
+                return RedirectToAction("Details", "Lesson",new { id = attempt.Test.LessonId });
             }
 
             // Tính thời gian còn lại
@@ -89,7 +89,7 @@ namespace EnglishStudySystem.Controllers
 
             if (attempt == null || attempt.IsCompleted)
             {
-                return RedirectToAction("Completed", new { attemptId = attemptId });
+                return RedirectToAction("Details", "Lesson", new { id = attempt.Test.LessonId });
             }
 
             int score = 0;
@@ -158,7 +158,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.UrlBack = Request.UrlReferrer?.ToString();
+            var referrer = Request.UrlReferrer?.ToString();
             return View(attempt);
         }
     }
