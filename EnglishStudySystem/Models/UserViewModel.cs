@@ -29,5 +29,6 @@ namespace EnglishStudySystem.Models
         public List<Category> Categories { get; set; } = new List<Category>();
         [Display(Name = "Các bài viết đã mua")]
         public List<Category> PurchasedCategories { get; set; } = new List<Category>();
+
     }
 }

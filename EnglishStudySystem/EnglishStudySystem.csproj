@@ -171,12 +171,17 @@
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\CategoriesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Admin\Controllers\SharedController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
     <Compile Include="Areas\Admin\ViewModel\CategoryDetailsWithLessonsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\EditorStatItemViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\LessonStatsViewModel.cs" />
+
+    <Compile Include="Areas\Admin\ViewModel\QuickStatsViewModel.cs" />
+
     <Compile Include="Areas\Admin\ViewModel\CategoryCreateViewModel.cs" />
+
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\RevenueStatsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\UserStatsViewModel.cs" />
@@ -326,6 +331,7 @@
     <Content Include="Areas\Admin\Views\Users\DeletePermanent.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Dashboard.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\_QuickStats.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -391,6 +397,7 @@
     <Content Include="Views\Test\TakeTest.cshtml" />
     <Content Include="Views\Test\Completed.cshtml" />
     <Content Include="Views\Test\Details.cshtml" />
+    <Content Include="Views\Shared\_CommentPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />

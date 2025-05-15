@@ -254,3 +254,32 @@ hr {
 .statistics-section {
     position: relative;
 }
+.statistics-section {
+    max-height: 500px; /* Đặt chiều cao tối đa bạn mong muốn */
+    overflow-y: auto; /* Thêm thanh cuộn dọc nếu nội dung vượt quá chiều cao tối đa */
+    /* Các thuộc tính CSS hiện có của statistics-section nếu có */
+    padding: 15px; /* Ví dụ: thêm padding để nội dung không dính sát viền */
+    border: 1px solid #ddd; /* Ví dụ: thêm viền để dễ nhận biết khu vực */
+    margin-top: 20px; /* Ví dụ: thêm khoảng cách với các thẻ bên trên */
+}
+
+/* Tùy chọn: Thêm kiểu cho thanh cuộn nếu muốn tùy chỉnh giao diện */
+
+.statistics-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+/*.statistics-section::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.statistics-section::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.statistics-section::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+*/

@@ -16,9 +16,10 @@ namespace EnglishStudySystem.Controllers
             var currentUserId = User.Identity.GetUserId(); // Lấy ID người dùng hiện tại
             ViewBag.UserId = currentUserId; // Truyền vào ViewBag
             var lesson = _db.Lessons
-                .Include(l => l.Category)
-                .Include(l => l.Comments.Select(c => c.User))
-                .FirstOrDefault(l => l.Id == id);
+    .Include(l => l.Category)
+    .Include(l => l.Comments.Select(c => c.User))
+    .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
+    .FirstOrDefault(l => l.Id == id);
             if (lesson != null)
             {
                 // Lấy thông tin người tạo
@@ -73,25 +74,30 @@ namespace EnglishStudySystem.Controllers
                 .OrderByDescending(l => l.CreatedDate)
                 .Take(5)
                 .ToList();
-
+            // Trong action Details
+            var lessonTests = _db.Tests
+                .Where(t => t.LessonId == id && !t.IsDeleted)
+                .OrderBy(t => t.CreatedDate)
+                .ToList();
+            ViewBag.LessonTests = lessonTests;
             ViewBag.Comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
             ViewBag.IsSaved = isSaved;
             ViewBag.RelatedLessons = relatedLessons;
 
             return View(lesson);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public JsonResult AddComment(int lessonId, string content)
+        public JsonResult AddComment(Comment model) // Sửa thành model binding thay vì tham số riêng lẻ
         {
-            try
+            if (ModelState.IsValid)
             {
                 var comment = new Comment
                 {
-                    LessonId = lessonId,
-                    Content = content,
+                    LessonId = model.LessonId,
+                    Content = model.Content,
+                    ParentCommentId = model.ParentCommentId, // Thêm dòng này
                     UserId = User.Identity.GetUserId(),
                     CreatedDate = DateTime.Now,
                     IsDeleted = false
@@ -102,10 +108,7 @@ namespace EnglishStudySystem.Controllers
 
                 return Json(new { success = true });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors) });
         }
 
         [HttpPost]
