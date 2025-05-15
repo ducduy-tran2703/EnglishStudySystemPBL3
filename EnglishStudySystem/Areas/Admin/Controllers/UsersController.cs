@@ -43,26 +43,39 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // GET: Admin/Users
         public async Task<ActionResult> ListUser()
         {
-       
-            var usersWithRoles = await _userManager.Users.ToListAsync();
+            // Lấy TẤT CẢ user từ database
+            var allUsersFromDb = await _userManager.Users.ToListAsync();
+            System.Diagnostics.Debug.WriteLine($"Total users fetched from DB: {allUsersFromDb.Count}"); // Ghi log số lượng
 
             var userViewModels = new List<UserViewModel>();
-            foreach (var user in usersWithRoles)
+            if (allUsersFromDb.Any()) // Chỉ lặp nếu có user
             {
-                var roles = await _userManager.GetRolesAsync(user.Id);
-                if(user.IsActive == true)
-                userViewModels.Add(new UserViewModel
+                foreach (var user in allUsersFromDb)
                 {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    IsActive = user.IsActive,
-                    AccountStatus = user.AccountStatus,
-                    Roles = string.Join(", ", roles)
-                });
+                    System.Diagnostics.Debug.WriteLine($"Processing user: {user.UserName}, IsActive: {user.IsActive}"); // Ghi log từng user
+
+                    if (user.IsActive == true) // Điều kiện lọc
+                    {
+                        var roles = await _userManager.GetRolesAsync(user.Id);
+                        userViewModels.Add(new UserViewModel
+                        {
+                            Id = user.Id,
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            FullName = user.FullName,
+                            IsActive = user.IsActive,
+                            // AccountStatus = user.AccountStatus, // Đảm bảo ApplicationUser có thuộc tính này
+                            Roles = string.Join(", ", roles)
+                        });
+                    }
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("No users found in the database.");
             }
 
+            System.Diagnostics.Debug.WriteLine($"Number of active users being sent to view: {userViewModels.Count}");
             return View(userViewModels);
         }
         public async Task<ActionResult> Details(string id)
@@ -216,7 +229,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 {
                     // Gán quyền Editor
                     await _userManager.AddToRoleAsync(user.Id, "Editor");
-
+                    //_context.SaveChanges();
                     // Gửi email thông báo (nếu cần)
                     // await SendEditorAccountEmail(user.Email, model.UserName, model.Password);
 
@@ -338,6 +351,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return HttpNotFound();
             }
             var result = await _userManager.DeleteAsync(user);
+            await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Tài khoản đã được xóa thành công!";
