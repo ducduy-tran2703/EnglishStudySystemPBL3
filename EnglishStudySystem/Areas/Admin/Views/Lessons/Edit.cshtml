@@ -1,0 +1,164 @@
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.LessonEditViewModel
+
+@{
+    ViewBag.Title = "Chỉnh sửa Bài học";
+
+}
+
+<h2>@ViewBag.Title</h2>
+
+
+<h4>Danh mục: @Model.CategoryName</h4> 
+<hr />
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken() 
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CategoryId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Title, "", new  {@class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4 })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Video_URL, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Video_URL, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Video_URL, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        @* --- Kết thúc Trường nhập liệu cho Video_URL --- *@
+
+
+        @* --- Hiển thị Audit Fields (Lấy từ ViewModel) --- *@
+        <hr />
+        <h4>Thông tin theo dõi</h4>
+        <dl class="dl-horizontal">
+            @Html.DisplayNameFor(model => model.CreatedByUserId)
+            <dd>@Html.DisplayFor(model => model.CreatedByUserId)</dd>
+            @Html.DisplayNameFor(model => model.CreatedDate)
+            <dd>@Html.DisplayFor(model => model.CreatedDate)</dd>
+            @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+            {
+                @Html.DisplayNameFor(model => model.UpdatedByUserId)
+                <dd>@Html.DisplayFor(model => model.UpdatedByUserId)</dd>
+                @Html.DisplayNameFor(model => model.UpdatedDate)
+                <dd>@Html.DisplayFor(model => model.UpdatedDate)</dd>
+            }
+            @* Hiển thị CreatedByUserRole và UpdatedByUserRole nếu cần *@
+            @* @Html.DisplayNameFor(model => model.CreatedByUserRole) *@
+            @* <dd>@Html.DisplayFor(model => model.CreatedByUserRole)</dd> *@
+            @* @if (!string.IsNullOrEmpty(Model.UpdatedByUserId)) *@
+            @* { *@
+            @* @Html.DisplayNameFor(model => model.UpdatedByUserRole) *@
+            @* <dd>@Html.DisplayFor(model => model.UpdatedByUserRole)</dd> *@
+            @* } *@
+        </dl>
+        <hr />
+
+
+        @* --- Nút Lưu --- *@
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Lưu Bài học" class="btn btn-primary" />
+            </div>
+        </div>
+        @* --- Kết thúc Nút Lưu --- *@
+    </div>
+}
+
+<hr />
+
+@* --- Phần Quản lý Bài kiểm tra (Tests) --- *@
+<h3>Bài kiểm tra của Bài học này</h3>
+
+<p>
+    @* Liên kết đến trang thêm mới Bài kiểm tra cho Bài học này *@
+    @* Bạn cần tạo TestController và Action Create nhận lessonId *@
+    @Html.ActionLink("Thêm mới Bài kiểm tra", "Create", "Tests", new { lessonId = Model.Id
+}, new { @class = "btn btn-success" })
+</p>
+
+@if (Model.Tests != null && Model.Tests.Any()) // Kiểm tra danh sách Tests trong ViewModel không rỗng
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().Title) @* Lấy tên thuộc tính từ Model Test *@
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().QuestionCount) @* Lấy tên thuộc tính từ Model Test *@
+                </th>
+                <th></th> @* Cột cho các hành động quản lý Bài kiểm tra *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var test in Model.Tests.OrderBy(t => t.Id))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => test.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => test.QuestionCount)
+                    </td>
+                    <td>
+                        @* Các liên kết quản lý Bài kiểm tra *@
+                        @* Bạn cần tạo các Action Details, Edit, SoftDelete trong TestController *@
+                        @Html.ActionLink("Chi tiết Test", "Details", "Tests", new { id = test.Id }, new { @class = "btn btn-info btn-sm" }) |
+                        @Html.ActionLink("Chỉnh sửa Test", "Edit", "Tests", new { id = test.Id }, new { @class = "btn btn-warning btn-sm" }) |
+                        @* Form Xóa mềm Test (tương tự Lesson) *@
+                        @using (Html.BeginForm("SoftDelete", "Tests", new { id = test.Id }, FormMethod.Post, new { @style = "display:inline;" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài kiểm tra này?');">Xóa mềm</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Chưa có bài kiểm tra nào cho bài học này.</p>
+}
+@* --- Kết thúc Phần Quản lý Bài kiểm tra --- *@
+
+
+<hr />
+
+@* --- Liên kết quay lại --- *@
+<div>
+    @* Liên kết quay lại trang Chi tiết Danh mục (nơi có danh sách bài học) *@
+    @* CategoryId có sẵn trong ViewModel *@
+    @Html.ActionLink("Quay lại Chi tiết Danh mục", "Details", "Categories", new { id = Model.CategoryId }, null)
+</div>
+@* --- Kết thúc Liên kết quay lại --- *@
+
+
+@section Scripts {
+    @* Đảm bảo include script validation của jQuery *@
+    @Scripts.Render("~/bundles/jqueryval")
+    @* Nếu sử dụng trình soạn thảo rich text, include script của nó ở đây *@
+}
