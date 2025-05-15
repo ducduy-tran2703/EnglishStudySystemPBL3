@@ -83,29 +83,20 @@ namespace EnglishStudySystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
-        public JsonResult AddComment(int lessonId, string content)
+        public ActionResult AddComment(Comment comment, int? parentCommentId)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var comment = new Comment
-                {
-                    LessonId = lessonId,
-                    Content = content,
-                    UserId = User.Identity.GetUserId(),
-                    CreatedDate = DateTime.Now,
-                    IsDeleted = false
-                };
+                comment.UserId = User.Identity.GetUserId();
+                comment.CreatedDate = DateTime.Now;
+                comment.ParentCommentId = parentCommentId; // Set parent comment ID nếu có
 
                 _db.Comments.Add(comment);
                 _db.SaveChanges();
 
                 return Json(new { success = true });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors) });
         }
 
         [HttpPost]

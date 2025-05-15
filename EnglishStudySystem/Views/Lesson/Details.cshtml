@@ -60,17 +60,13 @@
                             <form id="commentForm" method="post" action="@Url.Action("AddComment", "Lesson")">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="LessonId" value="@Model.Id" />
+                                <input type="hidden" name="ParentCommentId" id="parentCommentId" value="" />
                                 <div class="form-group mb-3">
-                                    <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required></textarea>
+                                    <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required id="commentContent"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-success">Gửi bình luận</button>
+                                <button type="button" class="btn btn-outline-secondary" id="cancelReply" style="display:none;">Hủy phản hồi</button>
                             </form>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info mb-4">
-                            <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })" class="text-primary">Đăng nhập</a> để bình luận
                         </div>
                     }
 
@@ -78,24 +74,9 @@
                     <div id="commentsList">
                         @if (comments != null && comments.Any())
                         {
-                            foreach (var comment in comments)
+                            foreach (var comment in comments.Where(c => c.ParentCommentId == null))
                             {
-                                <div class="media mb-4 @(comment.IsDeleted ? "opacity-50" : "")">
-                                    <img src="https://via.placeholder.com/50" class="rounded-circle me-3" alt="User">
-                                    <div class="media-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h5 class="mb-0">@comment.User.UserName</h5>
-                                            <small class="text-muted">@comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
-                                        </div>
-                                        <p class="mb-2">@comment.Content</p>
-                                        @if (User.Identity.IsAuthenticated && ViewBag.UserId == comment.UserId)
-                                        {
-                                            <div>
-                                                <button class="btn btn-sm btn-outline-danger btn-delete-comment" data-comment-id="@comment.Id">Xóa</button>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
+                                @Html.Partial("_CommentPartial", comment)
                             }
                         }
                         else
@@ -224,6 +205,42 @@
                 });
             });
         });
+        // Xử lý nút phản hồi
+        $(document).on('click', '.btn-reply', function () {
+            var commentId = $(this).data('comment-id');
+            $('#parentCommentId').val(commentId);
+            $('#commentContent').focus().attr('placeholder', 'Viết phản hồi của bạn...');
+            $('#cancelReply').show();
+
+            // Cuộn đến form comment
+            $('html, body').animate({
+                scrollTop: $('#commentForm').offset().top - 100
+            }, 300);
+        });
+
+        // Xử lý nút hủy phản hồi
+        $('#cancelReply').click(function () {
+            $('#parentCommentId').val('');
+            $('#commentContent').attr('placeholder', 'Viết bình luận của bạn...');
+            $(this).hide();
+        });
+
+        // Sửa lại form submission
+        $('#commentForm').submit(function (e) {
+            e.preventDefault();
+            var $form = $(this);
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: $form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload(); // Reload trang để hiển thị comment mới
+                    }
+                }
+            });
+        });
     </script>
 
     <style>
@@ -275,6 +292,13 @@
     .heart-beat {
         animation: heartBeat 0.5s;
     }
-    </style>
+        /* Style cho phần phản hồi */
+        .media .border-start {
+            border-left: 3px solid #dee2e6 !important;
+        }
+
+        .btn-reply {
+            margin-right: 5px;
+        }
     </style>
 }

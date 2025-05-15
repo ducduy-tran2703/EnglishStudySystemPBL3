@@ -216,19 +216,19 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
+    <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
     <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
       <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.cs" />
+    <EmbeddedResource Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.cs" />
     <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.Designer.cs">
       <DependentUpon>202505150619388_MakeSelectedAnswerIdNullable.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.cs" />
+    <EmbeddedResource Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.cs" />
     <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.Designer.cs">
       <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.cs" />
+    <EmbeddedResource Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.cs" />
     <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.Designer.cs">
       <DependentUpon>202505150954451_AlterSelectedAnswerIdToNullable.cs</DependentUpon>
     </Compile>
@@ -383,6 +383,7 @@
     <Content Include="Views\Test\TakeTest.cshtml" />
     <Content Include="Views\Test\Completed.cshtml" />
     <Content Include="Views\Test\Details.cshtml" />
+    <Content Include="Views\Shared\_CommentPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
