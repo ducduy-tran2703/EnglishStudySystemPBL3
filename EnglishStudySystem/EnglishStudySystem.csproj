@@ -218,6 +218,10 @@
     <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.Designer.cs">
       <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.cs" />
+    <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.Designer.cs">
+      <DependentUpon>202505150954451_AlterSelectedAnswerIdToNullable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -424,6 +428,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.resx">
       <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.resx">
+      <DependentUpon>202505150954451_AlterSelectedAnswerIdToNullable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

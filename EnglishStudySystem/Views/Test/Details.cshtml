@@ -17,11 +17,10 @@
 
             <h2 class="text-center">@ViewBag.Title</h2> @* text-center căn giữa tiêu đề *@
 
-            @if (TempData["Message"] != null)
+           @if (Model.IsCompleted) // Kiểm tra nếu bài làm đã hoàn thành
             {
                 <div class="alert alert-info" role="alert">
-                    @* Sử dụng lớp alert của Bootstrap cho thông báo *@
-                    @TempData["Message"]
+                    <i class="glyphicon glyphicon-info-sign"></i> Bạn đã hoàn thành bài kiểm tra này.
                 </div>
             }
 
