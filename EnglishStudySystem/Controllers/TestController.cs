@@ -16,7 +16,6 @@ namespace EnglishStudySystem.Controllers
 
         // GET: Test/Start/5 (5 là testId)
         [Authorize]
-        [Authorize]
         public ActionResult Start(int id)
         {
             string userId = User.Identity.GetUserId();
@@ -67,7 +66,7 @@ namespace EnglishStudySystem.Controllers
 
             if (attempt == null || attempt.IsCompleted)
             {
-                return RedirectToAction("Completed", new { attemptId = attemptId });
+                return RedirectToAction("Details", "Lesson",new { id = attempt.Test.LessonId });
             }
 
             // Tính thời gian còn lại
@@ -90,7 +89,7 @@ namespace EnglishStudySystem.Controllers
 
             if (attempt == null || attempt.IsCompleted)
             {
-                return RedirectToAction("Completed", new { attemptId = attemptId });
+                return RedirectToAction("Details", "Lesson", new { id = attempt.Test.LessonId });
             }
 
             int score = 0;
