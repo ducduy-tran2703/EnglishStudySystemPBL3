@@ -158,7 +158,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return HttpNotFound();
             }
-            var referrer = Request.UrlReferrer?.ToString();
+            ViewBag.UrlBack = Request.UrlReferrer?.ToString();
             return View(attempt);
         }
     }
