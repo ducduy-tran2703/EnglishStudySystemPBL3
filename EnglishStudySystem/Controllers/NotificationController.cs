@@ -99,7 +99,7 @@ namespace EnglishStudySystem.Controllers
                     var currentDate = DateTime.Now;
 
                     // Tạo 3 bài học cho mỗi CategoryId từ 3 đến 7
-                    for (int categoryId = 3; categoryId <= 7; categoryId++)
+                    for (int categoryId = 16; categoryId <= 20; categoryId++)
                     {
                         // Lấy ngẫu nhiên 3 tên bài học khác nhau
                         var selectedLessons = lessonNames.OrderBy(x => random.Next()).Take(3).ToList();
@@ -135,7 +135,7 @@ namespace EnglishStudySystem.Controllers
             try
             {
                 ApplicationDbContext db = new ApplicationDbContext();
-                string userId = "581b7f8c-0129-44fc-961f-a190484fdcd6"; // ID người dùng cụ thể
+                string userId = "3b500f36-d7ab-4da0-a443-0f88a80899c3"; // ID người dùng cụ thể
 
                 // Kiểm tra xem đã có dữ liệu Lesson chưa
                 if (!db.Lessons.Any())

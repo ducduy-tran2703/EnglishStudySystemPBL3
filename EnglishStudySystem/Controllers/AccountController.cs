@@ -298,11 +298,11 @@ namespace EnglishStudySystem.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    //await UserManager.AddToRoleAsync(user.Id, "Customer");
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    await UserManager.AddToRoleAsync(user.Id, "Customer");
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                      var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // Send the email with the confirmation link
                     if (UserManager.EmailService != null)
@@ -322,7 +322,7 @@ namespace EnglishStudySystem.Controllers
                         // Redirect to an error page or back to registration with an error message
                         return View("Error"); // Cần có View Error.cshtml
                     }
-
+                    
                     // Redirect to a page informing the user to check their email
                     return RedirectToAction("RegisterConfirmation", new { email = user.Email });
 
@@ -369,6 +369,7 @@ namespace EnglishStudySystem.Controllers
                 // You can redirect to a success page or the login page.
                  ViewBag.StatusMessage = "Cảm ơn bạn đã xác nhận Email của mình!"; // Message for a confirmation view
                // return RedirectToAction("ConfirmEmailConfirmation"); // Redirect to a success view
+                 
                  return RedirectToAction("Login"); // Alternatively, redirect to login page
             }
             else
