@@ -121,7 +121,8 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
 
             // Lấy khóa học ĐÃ TẠO nếu user là Editor
-            if (roles.Contains("Editor"))
+            if (roles.Contains("Editor")|| roles.Contains("Editor"))
+
             {
                 // GIẢ SỬ:
                 // 1. Model Category (EF model) có thuộc tính CreatedByUserId (string, là Id của người tạo).
