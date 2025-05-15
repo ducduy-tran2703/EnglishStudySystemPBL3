@@ -67,6 +67,11 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         }
         public async Task<ActionResult> Details(string id)
         {
+            if (string.IsNullOrEmpty(id)) // Thêm kiểm tra id null hoặc rỗng
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
@@ -76,56 +81,47 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             // Get roles of the user asynchronously
             var roles = await _userManager.GetRolesAsync(user.Id);
 
-            var userViewModel = new UserViewModel
+            // UserViewModel của bạn (từ EnglishStudySystem.Models)
+            // đã tự khởi tạo Categories và PurchasedCategories thành List<Category> rỗng
+            // trong constructor của nó.
+            var userViewModel = new UserViewModel // UserViewModel từ namespace Models hoặc Admin.ViewModel
             {
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
-                FullName = user.FullName,
+                FullName = user.FullName,           // Đảm bảo ApplicationUser có FullName
                 IsActive = user.IsActive,
-                AccountStatus = user.AccountStatus,
+                AccountStatus = user.AccountStatus, // Đảm bảo ApplicationUser có AccountStatus và kiểu khớp
                 Roles = string.Join(", ", roles)
+                // Categories và PurchasedCategories sẽ được điền bên dưới
             };
-            
-            // Add purchased courses if user is a Customer
+
+            // Lấy khóa học ĐÃ MUA nếu user là Customer
             if (roles.Contains("Customer"))
             {
-                var purchasedCourses = await _context.Categories
-                    .Where(uc => uc.CreatedByUserId == user.Id && !uc.IsDeleted)
-                    .Select(uc => new Category
-                    {
-                        Id = uc.Id,
-                        Name = uc.Name,
-                        Description = uc.Description,
-                        Price = uc.Price,
-                        CreatedDate = uc.CreatedDate
-                    })
-                    .ToListAsync(); // Make it asynchronous
-
-                userViewModel.PurchasedCategories = purchasedCourses;
+                userViewModel.PurchasedCategories = await _context.Payments
+                    .Where(p => p.UserId == user.Id && p.Status == "Completed" && p.Category != null)
+                    .OrderByDescending(p => p.PaymentDate)
+                    .Select(p => p.Category) // Lấy đối tượng Category (EF model) trực tiếp từ Payment
+                    .Distinct() // Nếu bạn cần đảm bảo mỗi category chỉ xuất hiện một lần
+                    .ToListAsync(); // Entity Framework sẽ lấy các đối tượng Category này từ CSDL
             }
 
-            // Add created courses if user is an Editor
+            // Lấy khóa học ĐÃ TẠO nếu user là Editor
             if (roles.Contains("Editor"))
             {
-                var createdCourses = await _context.Categories
-                    .Where(c => c.CreatedByUserId == id && !c.IsDeleted)
-                    .Select(c => new Category
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        Description = c.Description,
-                        Price = c.Price,
-                        CreatedDate = c.CreatedDate
-                    })
-                    .ToListAsync(); // Make it asynchronous
+                // GIẢ SỬ:
+                // 1. Model Category (EF model) có thuộc tính CreatedByUserId (string, là Id của người tạo).
+                // 2. Model Category có IsDeleted (bool hoặc bool?) để không hiển thị các khóa đã xóa mềm.
 
-                userViewModel.Categories = createdCourses;
+                userViewModel.Categories = await _context.Categories
+     .Where(c => c.CreatedByUserId == user.Id && (c.IsDeleted == true || c.IsDeleted == false))
+     .OrderByDescending(c => c.CreatedDate)
+     .ToListAsync();
             }
 
             return View(userViewModel);
         }
-
         public ActionResult Edit(string id)//chưa sửa
         {
             var user = _userManager.FindById(id);
