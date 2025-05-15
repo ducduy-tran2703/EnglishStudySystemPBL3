@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -142,7 +143,46 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult LearningActivities()
         {
-            return View();
+            var userId = User.Identity.GetUserId();
+
+            using (var _context = new ApplicationDbContext())
+            {
+                // 1. Số lượng khóa học đã mua
+                var boughtCoursesCount = _context.Payments
+                    .Where(p => p.UserId == userId && p.Status == "Completed")
+                    .Select(p => p.CategoryId)
+                    .Distinct()
+                    .Count();
+
+                // 2. Số lượng bài học đã xem
+                var viewedLessonsCount = _context.LessonHistories
+                    .Where(h => h.UserId == userId && !h.Lesson.IsDeleted)
+                    .Select(h => h.LessonId)
+                    .Distinct()
+                    .Count();
+
+                // 3. Số lượng bài học yêu thích
+                var favoriteLessonsCount = _context.SavedLessons
+                    .Where(s => s.UserId == userId)
+                    .Select(s => s.LessonId)
+                    .Distinct()
+                    .Count();
+
+                // 4. Số lượng bài kiểm tra đã làm
+                var takenTestsCount = _context.UserTestAttempts
+                    .Where(uta => uta.UserId == userId)
+                    .Select(uta => uta.TestId)
+                    .Distinct()
+                    .Count();
+
+                // Tạo ViewModel hoặc sử dụng ViewBag để truyền dữ liệu
+
+                ViewBag.BoughtCoursesCount = boughtCoursesCount;
+                ViewBag.ViewedLessonsCount = viewedLessonsCount;
+                ViewBag.FavoriteLessonsCount = favoriteLessonsCount;
+                ViewBag.TakenTestsCount = takenTestsCount;
+                return View();
+            }
         }
         public ActionResult GetBoughtCoursesStats()
         {
@@ -177,7 +217,6 @@ namespace EnglishStudySystem.Controllers
             var lessonHistories = _context.LessonHistories
                 .Where(h => h.UserId == userId && !h.Lesson.IsDeleted)
                 .OrderByDescending(h => h.ViewDate)
-                .Take(6)
                 .ToList();
 
             var lessons = lessonHistories.Select(h => h.Lesson).ToList();
@@ -209,9 +248,16 @@ namespace EnglishStudySystem.Controllers
             var userId = User.Identity.GetUserId();
             using (var _context = new ApplicationDbContext())
             {
-                var ListTest = _context.Tests
+                // Lấy danh sách các Test mà user đã làm (qua bảng UserTestAttempt)
+                var tests = _context.UserTestAttempts
+                    .Where(uta => uta.UserId == userId)
+                    .Include(uta => uta.Test)
+                    .Include(uta => uta.Test.Lesson)
+                    .Select(uta => uta.Test) // Chỉ lấy thông tin Test
+                    .Distinct() // Loại bỏ trùng lặp
                     .ToList();
-                return PartialView("_TestHistoryStats", ListTest);
+
+                return PartialView("_TestHistoryStats", tests);
             }
         }
     }
