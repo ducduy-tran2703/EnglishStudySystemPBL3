@@ -22,7 +22,7 @@
         var url = Url.Action(item.Notification.TargetAction, item.Notification.TargetController, new
         {
             area = item.Notification.TargetArea,
-            primaryId = item.Notification.PrimaryRelatedEntityId,
+            id = item.Notification.PrimaryRelatedEntityId,
             secondaryId = item.Notification.SecondaryRelatedEntityId
         });
 
