@@ -172,7 +172,13 @@
     <Compile Include="Areas\Admin\Controllers\CategoriesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\EditorStatItemViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\LessonStatsViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\CategoryCreateViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\RevenueStatsViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\UserStatsViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
@@ -210,6 +216,10 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
+    <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
+      <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.cs" />
     <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.Designer.cs">
       <DependentUpon>202505150619388_MakeSelectedAnswerIdNullable.cs</DependentUpon>
@@ -217,6 +227,10 @@
     <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.cs" />
     <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.Designer.cs">
       <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.cs" />
+    <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.Designer.cs">
+      <DependentUpon>202505150954451_AlterSelectedAnswerIdToNullable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -303,6 +317,7 @@
     <Content Include="Areas\Admin\Views\Users\Revive.cshtml" />
     <Content Include="Areas\Admin\Views\Users\DeletePermanent.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Delete.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Dashboard.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -418,12 +433,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.resx">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.resx">
-      <DependentUpon>202505150619388_MakeSelectedAnswerIdNullable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.resx">
-      <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
