@@ -74,13 +74,14 @@ namespace EnglishStudySystem.Controllers
                 .OrderByDescending(l => l.CreatedDate)
                 .Take(5)
                 .ToList();
-            // Trong action Details
+
+               ViewBag.Comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
             var lessonTests = _db.Tests
-                .Where(t => t.LessonId == id && !t.IsDeleted)
-                .OrderBy(t => t.CreatedDate)
-                .ToList();
+    .Where(t => t.LessonId == id && !t.IsDeleted)
+    .OrderBy(t => t.CreatedDate)
+    .ToList();
+
             ViewBag.LessonTests = lessonTests;
-            ViewBag.Comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
             ViewBag.IsSaved = isSaved;
             ViewBag.RelatedLessons = relatedLessons;
 
@@ -91,7 +92,7 @@ namespace EnglishStudySystem.Controllers
         [Authorize]
         public JsonResult AddComment(Comment model) // Sửa thành model binding thay vì tham số riêng lẻ
         {
-            if (ModelState.IsValid)
+            try
             {
                 var comment = new Comment
                 {
@@ -108,7 +109,10 @@ namespace EnglishStudySystem.Controllers
 
                 return Json(new { success = true });
             }
-            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors) });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
