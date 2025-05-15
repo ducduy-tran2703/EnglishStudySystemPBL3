@@ -109,6 +109,31 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             return View(viewModel);
         }
 
+        // GET: Admin/Lessons/Details/5
+        // Lấy Entity Lesson và truyền trực tiếp sang View
+        public async Task<ActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            // Lấy Bài học theo ID và NẠP (INCLUDE) các Entity liên quan bằng cú pháp EF6 chuẩn
+            // - Category để hiển thị tên danh mục
+            // - Tests để hiển thị danh sách bài kiểm tra (sẽ lọc ở View)
+            var lesson = await db.Lessons
+                                 .Include(l => l.Category) // <-- Include chuẩn EF6
+                                 .Include(l => l.Tests) // <-- Include chuẩn EF6 (sẽ nạp TẤT CẢ Tests)
+                                 .SingleOrDefaultAsync(l => l.Id == id);
+
+            if (lesson == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Truyền Entity Lesson trực tiếp sang View
+            return View(lesson);
+        }
 
         // GET: Admin/Lessons/Edit/5
         // Trả về View với LessonEditViewModel

@@ -341,6 +341,7 @@
     <Content Include="Areas\Admin\Views\Shared\_QuickStats.cshtml" />
     <Content Include="Areas\Admin\Views\Lessons\Create.cshtml" />
     <Content Include="Areas\Admin\Views\Lessons\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Lessons\Details.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
