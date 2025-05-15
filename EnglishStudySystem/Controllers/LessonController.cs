@@ -10,15 +10,15 @@ namespace EnglishStudySystem.Controllers
     public class LessonController : Controller
     {
         private ApplicationDbContext _db = new ApplicationDbContext();
-
         [HttpGet]
         public ActionResult Details(int id)
         {
+            var currentUserId = User.Identity.GetUserId(); // Lấy ID người dùng hiện tại
+            ViewBag.UserId = currentUserId; // Truyền vào ViewBag
             var lesson = _db.Lessons
                 .Include(l => l.Category)
                 .Include(l => l.Comments.Select(c => c.User))
                 .FirstOrDefault(l => l.Id == id);
-
             if (lesson == null)
             {
                 return HttpNotFound();

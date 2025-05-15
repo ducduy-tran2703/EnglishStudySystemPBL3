@@ -88,7 +88,7 @@
                                             <small class="text-muted">@comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
                                         </div>
                                         <p class="mb-2">@comment.Content</p>
-                                        @if (User.Identity.IsAuthenticated && User.Identity.GetUserId() == comment.UserId)
+                                        @if (User.Identity.IsAuthenticated && ViewBag.UserId == comment.UserId)
                                         {
                                             <div>
                                                 <button class="btn btn-sm btn-outline-danger btn-delete-comment" data-comment-id="@comment.Id">Xóa</button>
