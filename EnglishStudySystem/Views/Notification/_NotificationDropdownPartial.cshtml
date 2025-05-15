@@ -6,55 +6,48 @@
     @* CSS tùy chỉnh của bạn (đảm bảo nó nằm SAU Bootstrap) *@
 </head>
 <li class="dropdown-header d-flex flex-column align-items-center">
-    @* Changed align-items-start to align-items-center *@
     <span class="notification-header-title">Thông báo</span>
 </li>
 
-@* Tùy chọn: Thêm một đường kẻ ngang dưới tiêu đề *@
 <li class="dropdown-divider"></li>
-
 
 @if (Model != null && Model.Any())
 {
-    // Lặp qua danh sách các UserNotification
     foreach (var item in Model)
     {
-        // Mỗi item ở đây là một đối tượng UserNotification
-        // item.Notification sẽ chứa dữ liệu của Notification tương ứng
-
-        // Thêm lớp CSS tùy chỉnh dựa trên trạng thái IsRead
-        // Bạn cần định nghĩa các lớp 'unread-notification' và 'read-notification' trong tệp CSS của mình
         var liClass = item.IsRead ? "read-notification" : "unread-notification";
+        var notificationId = item.Id;
+
+        // Xây dựng URL từ các thuộc tính trong Notification
+        var url = Url.Action(item.Notification.TargetAction, item.Notification.TargetController, new
+        {
+            area = item.Notification.TargetArea,
+            primaryId = item.Notification.PrimaryRelatedEntityId,
+            secondaryId = item.Notification.SecondaryRelatedEntityId
+        });
 
         <li class="@liClass">
-            @* <--- Thêm lớp CSS vào thẻ <li> *@
-            @* Bạn có thể tạo link đến trang chi tiết thông báo nếu có *@
-            <a class="dropdown-item" href="#">
-                @* Tiêu đề thông báo *@
+            <a class="dropdown-item notification-link" href="@url" data-notification-id="@notificationId">
                 <strong>@item.Notification.Title</strong>
-
-                @* Nội dung thông báo - thêm logic cắt ngắn *@
                 @{
                     var content = item.Notification.Content;
-                    var maxLength = 50; // Số ký tự tối đa hiển thị trước khi cắt
+                    var maxLength = 50;
                     var truncatedContent = "";
 
                     if (string.IsNullOrEmpty(content))
                     {
-                        truncatedContent = ""; // Xử lý nội dung rỗng hoặc null
+                        truncatedContent = "";
                     }
                     else if (content.Length <= maxLength)
                     {
-                        truncatedContent = content; // Nội dung đủ ngắn, hiển thị toàn bộ
+                        truncatedContent = content;
                     }
                     else
                     {
-                        truncatedContent = content.Substring(0, maxLength) + "..."; // Cắt và thêm "..."
+                        truncatedContent = content.Substring(0, maxLength) + "...";
                     }
                 }
-                <p class="mb-0">@truncatedContent</p> @* <--- Hiển thị nội dung đã xử lý *@
-
-                @* Ngày tạo thông báo *@
+                <p class="mb-0">@truncatedContent</p>
                 <small class="text-muted">@item.Notification.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
             </a>
         </li>
@@ -62,10 +55,40 @@
 }
 else
 {
-    @* Hiển thị khi không có thông báo nào, đặt sau tiêu đề *@
     <li><a class="dropdown-item text-muted" href="#">Không có thông báo nào</a></li>
 }
 
-@* Tùy chọn: Thêm một mục "Xem tất cả" ở cuối dropdown nếu muốn *@
-@* <li class="dropdown-divider"></li> *@
-@* <li><a class="dropdown-item" href="@Url.Action("Index", "Notification")">Xem tất cả</a></li> *@
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            $('.notification-link').click(function(e) {
+                e.preventDefault();
+                var $link = $(this);
+                var notificationId = $link.data('notification-id');
+                var url = $link.attr('href');
+
+                // Gọi AJAX để đánh dấu thông báo đã đọc
+                $.ajax({
+                    url: '@Url.Action("MarkAsRead", "Notification")',
+                    type: 'POST',
+                    data: { id: notificationId },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Cập nhật class ngay lập tức để phản ánh trạng thái đã đọc
+                            $link.closest('li').removeClass('unread-notification').addClass('read-notification');
+                        }
+                        // Chuyển hướng dù thành công hay thất bại
+                        window.location.href = url;
+                    },
+                    error: function() {
+                        // Vẫn chuyển hướng nếu có lỗi
+                        window.location.href = url;
+                    }
+                });
+            });
+        });
+    </script>
+}
