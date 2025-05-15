@@ -16,9 +16,10 @@ namespace EnglishStudySystem.Controllers
             var currentUserId = User.Identity.GetUserId(); // Lấy ID người dùng hiện tại
             ViewBag.UserId = currentUserId; // Truyền vào ViewBag
             var lesson = _db.Lessons
-                .Include(l => l.Category)
-                .Include(l => l.Comments.Select(c => c.User))
-                .FirstOrDefault(l => l.Id == id);
+    .Include(l => l.Category)
+    .Include(l => l.Comments.Select(c => c.User))
+    .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
+    .FirstOrDefault(l => l.Id == id);
             if (lesson != null)
             {
                 // Lấy thông tin người tạo
@@ -74,29 +75,44 @@ namespace EnglishStudySystem.Controllers
                 .Take(5)
                 .ToList();
 
-            ViewBag.Comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
+               ViewBag.Comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
+            var lessonTests = _db.Tests
+    .Where(t => t.LessonId == id && !t.IsDeleted)
+    .OrderBy(t => t.CreatedDate)
+    .ToList();
+
+            ViewBag.LessonTests = lessonTests;
             ViewBag.IsSaved = isSaved;
             ViewBag.RelatedLessons = relatedLessons;
 
             return View(lesson);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddComment(Comment comment, int? parentCommentId)
+        [Authorize]
+        public JsonResult AddComment(Comment model) // Sửa thành model binding thay vì tham số riêng lẻ
         {
-            if (ModelState.IsValid)
+            try
             {
-                comment.UserId = User.Identity.GetUserId();
-                comment.CreatedDate = DateTime.Now;
-                comment.ParentCommentId = parentCommentId; // Set parent comment ID nếu có
+                var comment = new Comment
+                {
+                    LessonId = model.LessonId,
+                    Content = model.Content,
+                    ParentCommentId = model.ParentCommentId, // Thêm dòng này
+                    UserId = User.Identity.GetUserId(),
+                    CreatedDate = DateTime.Now,
+                    IsDeleted = false
+                };
 
                 _db.Comments.Add(comment);
                 _db.SaveChanges();
 
                 return Json(new { success = true });
             }
-            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors) });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]

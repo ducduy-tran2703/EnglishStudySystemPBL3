@@ -60,13 +60,20 @@
                             <form id="commentForm" method="post" action="@Url.Action("AddComment", "Lesson")">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="LessonId" value="@Model.Id" />
-                                <input type="hidden" name="ParentCommentId" id="parentCommentId" value="" />
+                                <input type="hidden" name="ParentCommentId" value="" id="parentCommentId" />
                                 <div class="form-group mb-3">
                                     <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required id="commentContent"></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-success">Gửi bình luận</button>
-                                <button type="button" class="btn btn-outline-secondary" id="cancelReply" style="display:none;">Hủy phản hồi</button>
+                                <div id="replyingTo" class="mb-2 text-muted" style="display: none;"></div>
+                                <button type="submit" class="btn btn-success me-2">Gửi bình luận</button>
+                                <button type="button" class="btn btn-outline-secondary" id="cancelReply" style="display: none;">Hủy</button>
                             </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-4">
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })" class="text-primary">Đăng nhập</a> để bình luận
                         </div>
                     }
 
@@ -74,9 +81,10 @@
                     <div id="commentsList">
                         @if (comments != null && comments.Any())
                         {
-                            foreach (var comment in comments.Where(c => c.ParentCommentId == null))
+                            var rootComments = comments.Where(c => c.ParentCommentId == null).OrderByDescending(c => c.CreatedDate).ToList();
+                            foreach (var comment in rootComments)
                             {
-                                @Html.Partial("_CommentPartial", comment)
+                                @RenderComment(comment, comments)
                             }
                         }
                         else
@@ -88,6 +96,7 @@
             </div>
         </div>
 
+        <!-- Sidebar -->
         <!-- Sidebar -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm mb-4">
@@ -137,38 +146,188 @@
                     </ul>
                 </div>
             </div>
+
+            <!-- Tests Section -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Bài kiểm tra</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        @foreach (var test in ViewBag.LessonTests as List<EnglishStudySystem.Models.Test>)
+                        {
+                            <li class="mb-2">
+                                <a href="@Url.Action("Start", "Test", new { id = test.Id })" class="text-decoration-none">
+                                    <i class="fas fa-question-circle me-2 text-purple"></i>@test.Title
+                                    <span class="badge bg-purple float-end">Làm bài</span>
+                                </a>
+                            </li>
+                        }
+                        @if ((ViewBag.LessonTests as List<EnglishStudySystem.Models.Test>)?.Count == 0)
+                        {
+                            <li class="text-muted">Chưa có bài kiểm tra nào cho bài học này.</li>
+                        }
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
 </main>
 
+@helper RenderComment(EnglishStudySystem.Models.Comment comment, List<EnglishStudySystem.Models.Comment> allComments)
+{
+    <div class="media mb-4 @(comment.IsDeleted ? "opacity-50" : "")" id="comment-@comment.Id">
+        <div class="d-flex align-items-start">
+            <!-- Avatar chỉ là icon người dùng -->
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                <i class="fas fa-user"></i>
+            </div>
+
+            <div class="media-body flex-grow-1">
+                <!-- Tên người dùng và vai trò -->
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div>
+                        <h6 class="mb-0 fw-bold">@comment.User.FullName</h6>
+                        <small class="text-muted">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <span class="badge bg-danger">Admin</span>
+                            }
+                            else if (User.IsInRole("Editor"))
+                            {
+                                <span class="badge bg-warning text-dark">Editor</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info">Học viên</span>
+                            }
+                        </small>
+                    </div>
+                    <small class="text-muted">@comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+
+                <!-- Nội dung comment -->
+                <p class="mb-2">@comment.Content</p>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary btn-reply" data-comment-id="@comment.Id" data-username="@comment.User.FullName">
+                            <i class="fas fa-reply me-1"></i>Phản hồi
+                        </button>
+                        @if (ViewBag.UserId == comment.UserId)
+                        {
+                            <button class="btn btn-sm btn-outline-danger btn-delete-comment" data-comment-id="@comment.Id">
+                                <i class="fas fa-trash-alt me-1"></i>Xóa
+                            </button>
+                        }
+                    </div>
+                }
+
+                <!-- Hiển thị các phản hồi -->
+                @{
+                    var replies = allComments.Where(c => c.ParentCommentId == comment.Id).OrderByDescending(c => c.CreatedDate).ToList();
+                    if (replies.Any())
+                    {
+                        <div class="mt-3 ps-4 border-start">
+                            @foreach (var reply in replies)
+                            {
+                                @RenderComment(reply, allComments)
+                            }
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
+    <style>
+        .text-purple {
+            color: #6f42c1 !important;
+        }
+
+        .bg-purple {
+            background-color: #6f42c1 !important;
+            color: white !important;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25em 0.4em;
+        }
+        .media {
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+
+            .media:hover {
+                background-color: #f0f2f5;
+            }
+
+            .media .media {
+                background-color: #f0f2f5;
+                margin-top: 12px;
+            }
+
+        .border-start {
+            border-left: 3px solid #dee2e6 !important;
+        }
+
+        .ps-4 {
+            padding-left: 1.5rem !important;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.25em 0.4em;
+        }
+
+        .bg-primary {
+            background-color: #0d6efd !important;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .opacity-50 {
+            opacity: 0.5;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             // Save lesson button click handler
             $('#btnSaveLesson').click(function() {
-    var $btn = $(this);
-    var isSaved = $btn.hasClass('btn-danger');
+                var $btn = $(this);
+                var isSaved = $btn.hasClass('btn-danger');
 
-    // Thêm hiệu ứng nhấp nháy
-    $btn.find('i').addClass('heart-beat');
-    setTimeout(() => {
-        $btn.find('i').removeClass('heart-beat');
-    }, 500);
+                // Thêm hiệu ứng nhấp nháy
+                $btn.find('i').addClass('heart-beat');
+                setTimeout(() => {
+                    $btn.find('i').removeClass('heart-beat');
+                }, 500);
 
-    $.post('@Url.Action("ToggleSaveLesson", "Lesson")', {
-        lessonId: @Model.Id
-    }).done(function(response) {
-        if (response.success) {
-            if (isSaved) {
-                $btn.removeClass('btn-danger').addClass('btn-outline-danger');
-                $btn.html('<i class="fas fa-heart me-2 text-danger"></i> Yêu thích');
-            } else {
-                $btn.removeClass('btn-outline-danger').addClass('btn-danger');
-                $btn.html('<i class="fas fa-heart me-2 text-white"></i> Đã yêu thích');
-            }
-        }
-    });
-});
+                $.post('@Url.Action("ToggleSaveLesson", "Lesson")', {
+                    lessonId: @Model.Id
+                }).done(function(response) {
+                    if (response.success) {
+                        if (isSaved) {
+                            $btn.removeClass('btn-danger').addClass('btn-outline-danger');
+                            $btn.html('<i class="fas fa-heart me-2 text-danger"></i> Yêu thích');
+                        } else {
+                            $btn.removeClass('btn-outline-danger').addClass('btn-danger');
+                            $btn.html('<i class="fas fa-heart me-2 text-white"></i> Đã yêu thích');
+                        }
+                    }
+                });
+            });
 
             // Delete comment handler
             $('.btn-delete-comment').click(function() {
@@ -188,7 +347,7 @@
             });
 
             // Comment form submission
-            $('#commentForm').submit(function(e) {
+            $('#commentForm').submit(function (e) {
                 e.preventDefault();
                 var $form = $(this);
 
@@ -196,49 +355,40 @@
                     url: $form.attr('action'),
                     type: 'POST',
                     data: $form.serialize(),
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
-                            // Reload comments
-                            location.reload();
+                            location.reload(); // Reload trang để hiển thị comment mới
+                        } else {
+                            alert('Có lỗi xảy ra: ' + response.message);
                         }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi gửi bình luận');
                     }
                 });
             });
-        });
-        // Xử lý nút phản hồi
-        $(document).on('click', '.btn-reply', function () {
-            var commentId = $(this).data('comment-id');
-            $('#parentCommentId').val(commentId);
-            $('#commentContent').focus().attr('placeholder', 'Viết phản hồi của bạn...');
-            $('#cancelReply').show();
 
-            // Cuộn đến form comment
-            $('html, body').animate({
-                scrollTop: $('#commentForm').offset().top - 100
-            }, 300);
-        });
+            // Reply button handler
+            $(document).on('click', '.btn-reply', function() {
+                var commentId = $(this).data('comment-id');
+                var username = $(this).data('username');
 
-        // Xử lý nút hủy phản hồi
-        $('#cancelReply').click(function () {
-            $('#parentCommentId').val('');
-            $('#commentContent').attr('placeholder', 'Viết bình luận của bạn...');
-            $(this).hide();
-        });
+                $('#parentCommentId').val(commentId);
+                $('#replyingTo').html('Đang phản hồi <strong>' + username + '</strong>').show();
+                $('#cancelReply').show();
+                $('#commentContent').focus();
 
-        // Sửa lại form submission
-        $('#commentForm').submit(function (e) {
-            e.preventDefault();
-            var $form = $(this);
+                $('html, body').animate({
+                    scrollTop: $('#commentForm').offset().top - 100
+                }, 500);
+            });
 
-            $.ajax({
-                url: $form.attr('action'),
-                type: 'POST',
-                data: $form.serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        location.reload(); // Reload trang để hiển thị comment mới
-                    }
-                }
+            // Cancel reply handler
+            $('#cancelReply').click(function() {
+                $('#parentCommentId').val('');
+                $('#replyingTo').html('').hide();
+                $('#cancelReply').hide();
+                $('#commentContent').attr('placeholder', 'Viết bình luận của bạn...').focus();
             });
         });
     </script>
@@ -258,47 +408,66 @@
             background-color: #f8f9fa;
             margin-bottom: 15px;
         }
-        <style>
-    /* Style cho nút Yêu thích */
-    #btnSaveLesson {
-        transition: all 0.3s ease;
-        padding: 8px 16px;
-    }
 
-    /* Trái tim màu đỏ khi chưa yêu thích */
-    .btn-outline-danger .fa-heart {
-        color: #dc3545 !important;
-    }
+            .media .media {
+                background-color: #f0f2f5;
+                margin-top: 10px;
+            }
 
-    /* Trái tim màu trắng khi đã yêu thích */
-    .btn-danger .fa-heart {
-        color: white !important;
-    }
-
-    /* Khi hover nút chưa yêu thích, trái tim chuyển trắng */
-    .btn-outline-danger:hover .fa-heart {
-        color: white !important;
-    }
-
-    /* Hiệu ứng nhấp nháy khi click */
-    @@keyframes heartBeat {
-        0% { transform: scale(1); }
-        25% { transform: scale(1.1); }
-        50% { transform: scale(1); }
-        75% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
-
-    .heart-beat {
-        animation: heartBeat 0.5s;
-    }
-        /* Style cho phần phản hồi */
-        .media .border-start {
+        .border-start {
             border-left: 3px solid #dee2e6 !important;
         }
 
-        .btn-reply {
-            margin-right: 5px;
+        .ps-4 {
+            padding-left: 1.5rem !important;
+        }
+
+        /* Style cho nút Yêu thích */
+        #btnSaveLesson {
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+        }
+
+        /* Trái tim màu đỏ khi chưa yêu thích */
+        .btn-outline-danger .fa-heart {
+            color: #dc3545 !important;
+        }
+
+        /* Trái tim màu trắng khi đã yêu thích */
+        .btn-danger .fa-heart {
+            color: white !important;
+        }
+
+        /* Khi hover nút chưa yêu thích, trái tim chuyển trắng */
+        .btn-outline-danger:hover .fa-heart {
+            color: white !important;
+        }
+
+        /* Hiệu ứng nhấp nháy khi click */
+        @@keyframes heartBeat {
+            0% {
+                transform: scale(1);
+            }
+
+            25% {
+                transform: scale(1.1);
+            }
+
+            50% {
+                transform: scale(1);
+            }
+
+            75% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .heart-beat {
+            animation: heartBeat 0.5s;
         }
     </style>
 }
