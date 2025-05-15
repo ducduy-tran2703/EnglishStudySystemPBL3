@@ -1,4 +1,5 @@
-﻿@model EnglishStudySystem.Models.Category
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.CategoryDetailsWithLessonsViewModel 
+
 
 @{
     ViewBag.Title = "Chi tiết Danh mục";
@@ -135,6 +136,69 @@
             background-color: #3498db;
             border-color: #3498db;
         }
+    </dl>
+</div>
+@* --- Kết thúc phần chi tiết Danh mục --- *@
+
+<hr />
+
+@* --- Phần hiển thị danh sách Bài học --- *@
+<h3>Danh sách Bài học (@Model.Name)</h3>
+
+<p>
+    @* Liên kết đến trang thêm mới Bài học cho danh mục này *@
+    @Html.ActionLink("Thêm mới Bài học", "Create", "Lessons", new { categoryId = Model.Id }, new { @class = "btn btn-primary" })
+</p>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Lessons.FirstOrDefault().Title) @* Lấy tên thuộc tính từ Model Lesson *@
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lessons.FirstOrDefault().Description) @* Lấy tên thuộc tính từ Model Lesson *@
+            </th>
+            @* Thêm các cột khác của Bài học nếu muốn hiển thị *@
+            <th></th> @* Cột cho các hành động quản lý Bài học *@
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Lessons != null && Model.Lessons.Any()) 
+        {
+            foreach (var lesson in Model.Lessons.OrderBy(l => l.CreatedDate))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => lesson.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => lesson.Description)
+                    </td>
+                    @* Hiển thị các thuộc tính khác của Bài học *@
+                    <td>
+                        @* Các liên kết quản lý Bài học *@
+                        @Html.ActionLink("Chi tiết", "Details", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-info btn-sm" }) |
+                        @Html.ActionLink("Chỉnh sửa", "Edit", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-warning btn-sm" }) |
+                        @* Thêm Form Xóa mềm Bài học (tương tự Category Index) *@
+                        @using (Html.BeginForm("SoftDelete", "Lessons", new { id = lesson.Id }, FormMethod.Post, new { @style = "display:inline;" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài học này?');">Xóa mềm</button>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">Chưa có bài học nào trong danh mục này.</td> @* Colspan bằng số cột trong table *@
+            </tr>
+        }
+    </tbody>
+</table>
+@* --- Kết thúc phần danh sách Bài học --- *@
 
         .btn-warning {
             background-color: #f39c12;

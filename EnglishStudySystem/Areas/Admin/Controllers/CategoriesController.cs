@@ -69,18 +69,46 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest); // Trả về lỗi 400 Bad Request
             }
 
-            // Tìm danh mục theo ID (bao gồm cả đã xóa mềm)
-            // Không dùng .Where(!IsDeleted) ở đây vì vẫn muốn xem chi tiết danh mục đã xóa
-            var category = await db.Categories.FindAsync(id);
+            // --- SỬ DỤNG PHÉP CHIẾU (.Select()) ĐỂ NẠP DANH MỤC VÀ BÀI HỌC ĐÃ LỌC ---
+            // Truy vấn và chiếu (project) dữ liệu trực tiếp vào ViewModel.
+            // Điều này hiệu quả hơn so với việc nạp tất cả rồi lọc trong bộ nhớ.
+            var viewModel = await db.Categories
+                .Where(c => c.Id == id) // Lọc danh mục theo ID trước
+                .Select(c => new CategoryDetailsWithLessonsViewModel // Chiếu dữ liệu sang ViewModel
+                {
+                    // Ánh xạ các thuộc tính của Danh mục
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Price = c.Price,
+                    IsDeleted = c.IsDeleted,
+                    DeletedAt = c.DeletedAt,
 
-            // Kiểm tra có tìm thấy danh mục không
-            if (category == null)
+                    // Ánh xạ Audit Fields (nếu cần)
+                    CreatedByUserId = c.CreatedByUserId,
+                    CreatedByUserRole = c.CreatedByUserRole,
+                    CreatedDate = c.CreatedDate,
+                    UpdatedByUserId = c.UpdatedByUserId,
+                    UpdatedByUserRole = c.UpdatedByUserRole,
+                    UpdatedDate = c.UpdatedDate,
+
+                    // Chiếu (project) và lọc danh sách Bài học TẠI ĐÂY
+                    // .ToList() là cần thiết để thực thi truy vấn cho Lessons và đưa kết quả vào bộ nhớ
+                    Lessons = c.Lessons.Where(l => !l.IsDeleted).ToList() // <-- Lọc bài học chưa xóa mềm
+                })
+                .SingleOrDefaultAsync(); // Thực thi truy vấn và lấy một kết quả hoặc null
+
+            // --- KẾT THÚC PHÉP CHIẾU ---
+
+
+            // Kiểm tra có tìm thấy danh mục và ánh xạ ViewModel thành công không
+            if (viewModel == null)
             {
-                return HttpNotFound(); // Trả về lỗi 404 Not Found
+                return HttpNotFound(); // Trả về lỗi 404 nếu không tìm thấy danh mục với ID đó
             }
 
-            // Truyền đối tượng danh mục sang View Details
-            return View(category);
+            // Truyền ViewModel đã có dữ liệu (bao gồm danh sách Bài học đã lọc) sang View Details
+            return View(viewModel); // View sẽ sử dụng CategoryDetailsWithLessonsViewModel
         }
 
 

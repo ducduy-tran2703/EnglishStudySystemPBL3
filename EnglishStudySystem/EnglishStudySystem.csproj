@@ -173,6 +173,7 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\SharedController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Admin\ViewModel\CategoryDetailsWithLessonsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\EditorStatItemViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\LessonStatsViewModel.cs" />
@@ -237,6 +238,10 @@
     <Compile Include="Migrations\202505150954451_AlterSelectedAnswerIdToNullable.Designer.cs">
       <DependentUpon>202505150954451_AlterSelectedAnswerIdToNullable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505151556214_NotificationUpdate.cs" />
+    <Compile Include="Migrations\202505151556214_NotificationUpdate.Designer.cs">
+      <DependentUpon>202505151556214_NotificationUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -265,6 +270,9 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModel\EditProfileViewModel.cs" />
     <Compile Include="ViewModel\HomeIndexViewModel.cs" />
+    <EmbeddedResource Include="Migrations\202505151556214_NotificationUpdate.resx">
+      <DependentUpon>202505151556214_NotificationUpdate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Admin\Content\CSS\AdminLayout.css" />
