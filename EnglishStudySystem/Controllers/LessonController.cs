@@ -19,12 +19,35 @@ namespace EnglishStudySystem.Controllers
                 .Include(l => l.Category)
                 .Include(l => l.Comments.Select(c => c.User))
                 .FirstOrDefault(l => l.Id == id);
+            var userId = User.Identity.GetUserId();
             if (lesson == null)
             {
                 return HttpNotFound();
             }
+            if (User.Identity.IsAuthenticated)
+            {
+                var existingHistory = _db.LessonHistories
+                    .FirstOrDefault(h => h.LessonId == id && h.UserId == userId);
 
-            var userId = User.Identity.GetUserId();
+                if (existingHistory == null)
+                {
+                    // Nếu chưa có trong lịch sử thì thêm mới
+                    _db.LessonHistories.Add(new LessonHistory
+                    {
+                        LessonId = id,
+                        UserId = userId,
+                        ViewDate = DateTime.Now
+                    });
+                }
+                else
+                {
+                    // Nếu đã có thì cập nhật thời gian xem
+                    existingHistory.ViewDate = DateTime.Now;
+                }
+
+                _db.SaveChanges();
+            }
+
             var isSaved = false;
 
             if (!string.IsNullOrEmpty(userId))
