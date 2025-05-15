@@ -1,0 +1,39 @@
+﻿@model EnglishStudySystem.Models.UserTestAttempt
+@{
+    ViewBag.Title = "Kết quả bài kiểm tra";
+}
+
+<h2>@ViewBag.Title: @Model.Test.Title</h2>
+
+<div class="result-summary">
+    <div class="alert @(Model.Score >= 80 ? "alert-success" : Model.Score >= 50 ? "alert-warning" : "alert-danger")">
+        <h3>Điểm số: @Model.Score/100</h3>
+        <p>Thời gian làm bài: @((Model.EndTime - Model.StartTime).Value.ToString(@"mm\:ss"))</p>
+        <p>Ngày làm bài: @Model.AttemptDate.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+</div>
+
+<h3>Chi tiết câu trả lời</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Câu hỏi</th>
+            <th>Đáp án bạn chọn</th>
+            <th>Kết quả</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var userAnswer in Model.UserAnswers)
+        {
+            <tr class="@(userAnswer.IsCorrect ? "success" : "danger")">
+                <td>@userAnswer.Question.Content</td>
+                <td>@userAnswer.SelectedAnswer.Content</td>
+                <td>@(userAnswer.IsCorrect ? "Đúng" : "Sai")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Details", "Test", new { id = Model.TestId })" class="btn btn-default">
+    Xem lại đề thi
+</a>

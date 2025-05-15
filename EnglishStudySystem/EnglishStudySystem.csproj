@@ -178,6 +178,7 @@
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LessonController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\PaymentController.cs" />
@@ -213,6 +214,14 @@
     <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
     <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
       <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.cs" />
+    <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.Designer.cs">
+      <DependentUpon>202505150619388_MakeSelectedAnswerIdNullable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.cs" />
+    <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.Designer.cs">
+      <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -358,9 +367,14 @@
     <Content Include="Views\Customer\_BoughtCoursesStats.cshtml" />
     <Content Include="Views\Customer\_LessonsHistoryStats.cshtml" />
     <Content Include="Views\Customer\LearningActivities.cshtml" />
+    <Content Include="Views\Lesson\Details.cshtml" />
+    <Content Include="Views\Customer\_FavoriteLessonsStats.cshtml" />
+    <Content Include="Views\Customer\_TestHistoryStats.cshtml" />
+    <Content Include="Views\Test\TakeTest.cshtml" />
+    <Content Include="Views\Test\Completed.cshtml" />
+    <Content Include="Views\Test\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Content\JS\" />
   </ItemGroup>
@@ -409,9 +423,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.resx">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.resx">
-      <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

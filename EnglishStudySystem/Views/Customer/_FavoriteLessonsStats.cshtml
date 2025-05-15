@@ -6,22 +6,21 @@
     - Mỗi mục bài học có thể nhấn vào để xem chi tiết.
     - Khoảng cách giữa các mục được thu hẹp.
     - Tiêu đề được căn giữa.
-    - Màu chủ đạo là xanh lá cây.
+    - Màu chủ đạo là màu vàng.
 *@
 @model List<EnglishStudySystem.Models.Lesson>
 
-@{
-    var viewDates = ViewBag.ViewDates as Dictionary<int, DateTime>;
-}
+@* Nhúng CSS trực tiếp vào View - Đã cập nhật màu sắc chủ đạo thành vàng và tinh chỉnh nhỏ *@
 <style>
     /* Định dạng cho tiêu đề Lịch sử Bài học */
     .statistics-section h3 {
-        color: #28a745; /* Màu xanh lá cây */
-        border-bottom: 2px solid #e9ecef; /* Đường gạch dưới nhẹ (giữ màu trung tính hoặc dùng màu xanh lá cây nhạt hơn) */
+        color: #ffc107; /* Màu vàng chủ đạo */
+        border-bottom: 2px solid #e9ecef; /* Đường gạch dưới nhẹ (giữ màu trung tính) */
         padding-bottom: 10px; /* Khoảng cách dưới đường gạch */
         margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
         font-size: 1.8em; /* Kích thước font lớn hơn */
         text-align: center; /* Căn giữa tiêu đề */
+        font-weight: bold; /* Làm đậm tiêu đề */
     }
 
     /* Định dạng cho danh sách chứa các bài học */
@@ -33,10 +32,10 @@
     .lesson-history-item {
         background-color: #fff; /* Nền trắng cho mỗi mục */
         border: 1px solid #e0e0e0; /* Viền nhẹ */
-        border-radius: 5px; /* Bo tròn góc */
+        border-radius: 8px; /* Bo tròn góc nhiều hơn một chút (ví dụ từ 5px lên 8px) */
         /* padding: 15px; */ /* Bỏ padding ở đây vì sẽ áp dụng cho thẻ a bên trong */
-        margin-bottom: 10px; /* Giảm khoảng cách giữa các mục bài học (ví dụ từ 15px xuống 10px) */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Đổ bóng nhẹ */
+        margin-bottom: 12px; /* Điều chỉnh khoảng cách giữa các mục (ví dụ từ 10px lên 12px) */
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.07); /* Đổ bóng rõ hơn một chút */
         overflow: hidden; /* Đảm bảo hiệu ứng hover và border-radius hiển thị đúng */
         position: relative; /* Cần thiết cho thẻ a bao quanh */
     }
@@ -47,26 +46,24 @@
             padding: 15px; /* Áp dụng padding vào thẻ a */
             text-decoration: none; /* Bỏ gạch chân mặc định của link */
             color: inherit; /* Thừa hưởng màu chữ từ cha (lesson-history-item) */
-            /* transition: background-color 0.2s ease; */ /* Có thể thêm hiệu ứng nền khi hover nếu muốn */
+            transition: background-color 0.2s ease; /* Thêm hiệu ứng nền khi hover */
         }
 
-        /* Hiệu ứng khi di chuột qua mục bài học (áp dụng cho item cha hoặc link) */
+        /* Hiệu ứng khi di chuột qua mục bài học */
         .lesson-history-item:hover {
-            transform: translateY(-3px); /* Nhấc nhẹ mục lên khi di chuột */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng rõ hơn khi di chuột */
+            transform: translateY(-4px); /* Nhấc mục lên nhiều hơn một chút khi di chuột */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Đổ bóng rõ hơn nhiều khi di chuột */
         }
 
         /* Tùy chọn: Đổi màu nền nhẹ khi hover */
-        /*
-    .lesson-history-item a:hover {
-         background-color: #f8f9fa;
-    }
-    */
+        .lesson-history-item a:hover {
+            background-color: #fff8e1; /* Màu vàng rất nhạt cho nền khi hover */
+        }
 
 
         /* Định dạng cho tiêu đề của từng bài học (h4) */
         .lesson-history-item h4 {
-            color: #218838; /* Màu xanh lá cây đậm hơn cho tiêu đề */
+            color: #d39e00; /* Màu vàng sẫm hơn cho tiêu đề bài học */
             margin-top: 0; /* Bỏ khoảng cách trên mặc định của h4 */
             margin-bottom: 5px; /* Khoảng cách dưới tiêu đề */
             font-size: 1.3em; /* Kích thước font cho tiêu đề bài học */
@@ -74,49 +71,36 @@
 
         /* Định dạng cho mô tả bài học (p) */
         .lesson-history-item p {
-            color: #555; /* Màu chữ xám hơn cho mô tả */
+            color: #555; /* Màu chữ xám hơn cho mô tả (giữ nguyên để dễ đọc) */
             margin-bottom: 5px; /* Khoảng cách dưới mô tả */
             line-height: 1.5; /* Khoảng cách dòng */
         }
 
             /* Định dạng cho ngày tạo (small bên trong p) */
             .lesson-history-item p small {
-                color: #6c757d; /* Màu chữ xám nhạt hơn cho ngày tháng */
+                color: #6c757d; /* Màu chữ xám nhạt hơn cho ngày tháng (giữ nguyên để dễ đọc) */
                 font-size: 0.9em; /* Kích thước font nhỏ hơn cho ngày tháng */
                 display: block; /* Hiển thị ngày tháng trên dòng riêng */
                 margin-top: 8px; /* Khoảng cách trên ngày tháng */
             }
 
     /* Định dạng cho đường kẻ phân cách (hr) */
-    /* Thường sẽ ẩn hr khi sử dụng border-bottom hoặc margin-bottom cho item */
     .lessons-history-list hr {
-        display: none; /* Ẩn đường kẻ hr */
+        display: none; /* Vẫn ẩn đường kẻ hr */
     }
-
-    /* Tùy chọn: nếu bạn muốn một đường kẻ mỏng giữa các item thay cho margin-bottom */
-    /* Bạn có thể bỏ margin-bottom trên item và thêm border-bottom cho link */
-    /*
-    .lesson-history-item a {
-        ... các style khác ...
-        border-bottom: 1px solid #e0e0e0;
-    }
-    .lesson-history-item:last-child a {
-        border-bottom: none;
-    }
-    */
 </style>
 
 
 @*
-    var viewDates = ViewBag.ViewDates as Dictionary<int, DateTime>;  Kiểm tra xem danh sách bài học có dữ liệu hay không.
-      Nếu không có bài học nào, hiển thị thông báo.
+    Kiểm tra xem danh sách bài học có dữ liệu hay không.
+    Nếu không có bài học nào, hiển thị thông báo.
 *@
 @if (Model != null && Model.Any())
 {
     @* Lưu ý: "statistics-section" class nằm ở view cha chứa Partial View này *@
     <div class="statistics-section-content">
         @* Thêm một div bao ngoài nếu cần để nhóm nội dung *@
-        <h3>Lịch sử Bài học Gần đây</h3>
+        <h3>Bài học yêu thích</h3>
         <div class="lessons-history-list">
             @*
                 Duyệt qua từng bài học trong danh sách Model.
@@ -142,7 +126,7 @@
 
                         @* Hiển thị Ngày tạo *@
                         <p>
-                            <small>Ngày học: @viewDates[lesson.Id].ToString("dd/MM/yyyy HH:mm")</small>
+                            <small>Ngày đăng: @lesson.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
                         </p>
 
                         @* Các thông tin khác nếu muốn *@

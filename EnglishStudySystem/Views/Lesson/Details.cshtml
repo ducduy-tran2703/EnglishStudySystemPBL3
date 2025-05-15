@@ -1,0 +1,241 @@
+﻿@model EnglishStudySystem.Models.Lesson
+@{
+    ViewBag.Title = Model.Title + " - Chi tiết bài học";
+    var comments = ViewBag.Comments as List<EnglishStudySystem.Models.Comment>;
+    var isSaved = ViewBag.IsSaved as bool? ?? false;
+}
+
+<main class="container py-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Lesson Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-2">@Model.Title</h1>
+                    <p class="text-muted mb-0">Thuộc danh mục: @Model.Category.Name</p>
+                </div>
+                <div>
+                    <button id="btnSaveLesson" class="btn @(isSaved ? "btn-warning" : "btn-outline-warning")">
+                        <i class="fas @(isSaved ? "fa-bookmark" : "fa-bookmark-o")"></i>
+                        @(isSaved ? "Đã lưu" : "Lưu bài học")
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lesson Description -->
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">Mô tả bài học</h3>
+                        <p>@Model.Description</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Video Player -->
+            @if (!string.IsNullOrEmpty(Model.Video_URL))
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">Video bài học</h3>
+                        <div class="ratio ratio-16x9">
+                            <iframe src="@Model.Video_URL" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Comments Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Bình luận</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Comment Form -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="mb-4">
+                            <form id="commentForm" method="post" action="@Url.Action("AddComment", "Lesson")">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="LessonId" value="@Model.Id" />
+                                <div class="form-group mb-3">
+                                    <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success">Gửi bình luận</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-4">
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })" class="text-primary">Đăng nhập</a> để bình luận
+                        </div>
+                    }
+
+                    <!-- Comments List -->
+                    <div id="commentsList">
+                        @if (comments != null && comments.Any())
+                        {
+                            foreach (var comment in comments)
+                            {
+                                <div class="media mb-4 @(comment.IsDeleted ? "opacity-50" : "")">
+                                    <img src="https://via.placeholder.com/50" class="rounded-circle me-3" alt="User">
+                                    <div class="media-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h5 class="mb-0">@comment.User.UserName</h5>
+                                            <small class="text-muted">@comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                        </div>
+                                        <p class="mb-2">@comment.Content</p>
+                                        @if (User.Identity.IsAuthenticated && ViewBag.UserId == comment.UserId)
+                                        {
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-danger btn-delete-comment" data-comment-id="@comment.Id">Xóa</button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">Chưa có bình luận nào.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Thông tin bài học</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-user me-2 text-muted"></i>
+                            <strong>Người tạo:</strong> @Model.CreatedByUserRole
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar me-2 text-muted"></i>
+                            <strong>Ngày tạo:</strong> @Model.CreatedDate.ToString("dd/MM/yyyy")
+                        </li>
+                        @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-user-edit me-2 text-muted"></i>
+                                <strong>Cập nhật bởi:</strong> @Model.UpdatedByUserRole
+                            </li>
+                            <li>
+                                <i class="fas fa-calendar-check me-2 text-muted"></i>
+                                <strong>Ngày cập nhật:</strong> @Model.UpdatedDate?.ToString("dd/MM/yyyy")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Related Lessons -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Bài học cùng danh mục</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        @foreach (var lesson in ViewBag.RelatedLessons as List<EnglishStudySystem.Models.Lesson>)
+                        {
+                            <li class="mb-2">
+                                <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })" class="text-decoration-none">
+                                    <i class="fas fa-book me-2 text-success"></i>@lesson.Title
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Save lesson button click handler
+            $('#btnSaveLesson').click(function() {
+                var $btn = $(this);
+                var isSaved = $btn.hasClass('btn-warning');
+
+                $.post('@Url.Action("ToggleSaveLesson", "Lesson")', {
+                    lessonId: @Model.Id
+                }).done(function(response) {
+                    if (response.success) {
+                        if (isSaved) {
+                            $btn.removeClass('btn-warning').addClass('btn-outline-warning');
+                            $btn.find('i').removeClass('fa-bookmark').addClass('fa-bookmark-o');
+                            $btn.text(' Lưu bài học');
+                        } else {
+                            $btn.removeClass('btn-outline-warning').addClass('btn-warning');
+                            $btn.find('i').removeClass('fa-bookmark-o').addClass('fa-bookmark');
+                            $btn.text(' Đã lưu');
+                        }
+                    }
+                });
+            });
+
+            // Delete comment handler
+            $('.btn-delete-comment').click(function() {
+                if (confirm('Bạn có chắc muốn xóa bình luận này?')) {
+                    var $btn = $(this);
+                    var commentId = $btn.data('comment-id');
+
+                    $.post('@Url.Action("DeleteComment", "Lesson")', {
+                        id: commentId
+                    }).done(function(response) {
+                        if (response.success) {
+                            $btn.closest('.media').addClass('opacity-50');
+                            $btn.remove();
+                        }
+                    });
+                }
+            });
+
+            // Comment form submission
+            $('#commentForm').submit(function(e) {
+                e.preventDefault();
+                var $form = $(this);
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            // Reload comments
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .opacity-50 {
+            opacity: 0.5;
+        }
+
+        #btnSaveLesson i {
+            transition: all 0.3s ease;
+        }
+
+        .media {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            margin-bottom: 15px;
+        }
+    </style>
+}
