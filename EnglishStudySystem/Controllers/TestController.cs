@@ -16,7 +16,6 @@ namespace EnglishStudySystem.Controllers
 
         // GET: Test/Start/5 (5 là testId)
         [Authorize]
-        [Authorize]
         public ActionResult Start(int id)
         {
             string userId = User.Identity.GetUserId();
