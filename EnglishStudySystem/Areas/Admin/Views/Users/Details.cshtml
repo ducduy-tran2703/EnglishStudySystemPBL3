@@ -122,7 +122,7 @@
             }
 
             <!-- Created Courses (for Editors) -->
-            @if (Model.Roles.Contains("Editor"))
+            @if (Model.Roles.Contains("Editor")|| Model.Roles.Contains("Admin"))
             {
                 <div class="mb-4">
                     <h5 class="mb-3 text-warning font-weight-bold border-bottom pb-2">
