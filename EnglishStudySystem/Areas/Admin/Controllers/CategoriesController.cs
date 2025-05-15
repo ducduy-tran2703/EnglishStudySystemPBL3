@@ -8,6 +8,7 @@ using System.Threading.Tasks; // Cần cho async/await
 using System.Web;
 using System.Web.Mvc; // Cần cho Controller, ActionResult, View, HttpNotFound
 using EnglishStudySystem;
+using EnglishStudySystem.Areas.Admin.ViewModel;
 using EnglishStudySystem.Models; // Cần cho ApplicationDbContext, Category
 using Microsoft.AspNet.Identity; // Cần để lấy User ID và UserName của người tạo/cập nhật
 
@@ -95,45 +96,71 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // Để bảo vệ khỏi tấn công overposting, hãy bật các thuộc tính cụ thể mà bạn muốn bind. For
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken] // Bảo vệ chống tấn công CSRF
-        public async Task<ActionResult> Create([Bind(Include = "Name,Description,Price")] Category category) // Chỉ bind các thuộc tính từ form
+        [ValidateAntiForgeryToken]
+        // Nhận ViewModel làm tham số
+        public async Task<ActionResult> Create(CategoryCreateViewModel viewModel) // <-- Nhận ViewModel
         {
-            // Kiểm tra dữ liệu từ form có hợp lệ không (dựa trên các [Required], [StringLength], v.v. trong Model)
+            // Kiểm tra ModelState.IsValid. Lần này, nó chỉ kiểm tra Name, Description, Price
+            // vì đây là các thuộc tính có trong ViewModel và có Data Annotations
             if (ModelState.IsValid)
             {
-                // --- GÁN GIÁ TRỊ CHO CÁC TRƯỜNG THEO DÕI VÀ XÓA MỀM KHI TẠO MỚI ---
-                // Lấy ID và Vai trò của người dùng hiện tại đã đăng nhập
-                string currentUserId = User.Identity.GetUserId();
-                string currentUserName = User.Identity.GetUserName(); // Lấy UserName (thường là Email)
+                // Dữ liệu trong ViewModel hợp lệ, tiến hành tạo đối tượng Entity Model
+                var category = new Category();
 
-                // Lấy vai trò (lấy vai trò đầu tiên hoặc kiểm tra Admin/Editor)
-                // Việc lấy vai trò có thể cần UserManager, hoặc kiểm tra Claims nếu vai trò được lưu trong Claims
-                // Đơn giản nhất là lấy vai trò đầu tiên hoặc dùng Check User.IsInRole()
-                // Để lấy vai trò cụ thể, bạn cần UserManager
+                // Ánh xạ dữ liệu từ ViewModel sang Entity Model
+                category.Name = viewModel.Name;
+                category.Description = viewModel.Description;
+                category.Price = viewModel.Price;
+                // ... ánh xạ các thuộc tính khác từ ViewModel nếu có ...
+
+                // --- GÁN GIÁ TRỊ CHO CÁC TRƯỜNG THEO DÕI VÀ XÓA MỀM VÀO ENTITY MODEL ---
+                // Lấy ID và Vai trò của người dùng hiện tại
+                string currentUserId = User.Identity.GetUserId();
+
+                // Lấy vai trò
                 var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
                 var currentUserRoles = await userManager.GetRolesAsync(currentUserId);
-                string currentUserRole = currentUserRoles.FirstOrDefault(); // Lấy vai trò đầu tiên làm ví dụ
+                string currentUserRole = currentUserRoles.FirstOrDefault();
 
-                category.CreatedByUserId = currentUserId;
-                category.CreatedByUserRole = currentUserRole ?? "Unknown"; // Gán vai trò (dự phòng nếu không có vai trò)
+                // Gán giá trị vào Entity Model (LÚC NÀY category.CreatedByUserId đã được gán giá trị từ currentUserId)
+                category.CreatedByUserId = currentUserId; // <-- Gán giá trị vào Entity Model
+                category.CreatedByUserRole = currentUserRole ?? "Unknown";
                 category.CreatedDate = DateTime.Now;
-                category.UpdatedByUserId = null; // Chưa cập nhật lần nào
+                category.UpdatedByUserId = null;
                 category.UpdatedByUserRole = null;
                 category.UpdatedDate = null;
-                category.IsDeleted = false; // Mặc định khi tạo là chưa xóa
+                category.IsDeleted = false;
                 category.DeletedAt = null;
 
+                // Lưu ý: Nếu bạn muốn các Data Annotations [Required] trên Entity Model
+                // (như CreatedByUserId) được kiểm tra, bạn cần gọi TryValidateModel(category) ở đây
+                // SAU KHI đã gán giá trị cho các trường Audit.
+                // Tuy nhiên, với kịch bản này, thường chỉ kiểm tra validation ở ViewModel là đủ,
+                // và dựa vào constraint NOT NULL ở DB cho CreatedByUserId.
+                // Nếu bạn vẫn muốn kiểm tra, hãy thêm:
+                // if (!TryValidateModel(category))
+                // {
+                //     // Copy errors from Entity Model ModelState back to ViewModel ModelState
+                //     // hoặc xử lý lỗi ở đây. Việc này hơi phức tạp.
+                //     // ModelState.AddModelError("", "Lỗi validation cuối cùng sau khi ánh xạ.");
+                //      // Return View(viewModel);
+                // }
+
+
                 // --- THÊM VÀO DATABASE VÀ LƯU ---
-                db.Categories.Add(category); // Thêm đối tượng danh mục vào DbSet
+                db.Categories.Add(category); // Thêm Entity Model vào DbSet
                 await db.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu bất đồng bộ
 
                 // Chuyển hướng về trang danh sách sau khi tạo thành công
                 return RedirectToAction("Index");
             }
 
-            // Nếu dữ liệu không hợp lệ, hiển thị lại form với dữ liệu đã nhập và thông báo lỗi
-            
-            return View(category);
+            // Nếu ViewModel không hợp lệ, trả về lại View với ViewModel (với các lỗi validation của ViewModel)
+            // Lấy lại categories cho ViewBag nếu cần
+            var categoriesViewBagOnFail = db.Categories.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList();
+            ViewBag.ListCategories = categoriesViewBagOnFail;
+
+            return View(viewModel); // <-- Trả về View với ViewModel
         }
 
 

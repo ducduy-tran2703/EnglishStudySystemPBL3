@@ -39,6 +39,22 @@ namespace EnglishStudySystem.Models
         // Navigation property for the many-to-many relationship with ApplicationUser (Recipients)
         public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
+        // --- THÊM: Thông tin để điều hướng khi click thông báo ---
+
+        [Display(Name = "ID Bình luận liên quan")]
+        // Lưu ID của bình luận TRẢ LỜI (bình luận mới được tạo ra)
+        public int? RelatedCommentId { get; set; }
+
+        [Display(Name = "ID Bài học liên quan")]
+        // Lưu ID của bài học chứa bình luận đó
+        public int? RelatedLessonId { get; set; }
+
+        // Bạn có thể thêm thuộc tính Loại đối tượng liên quan nếu có nhiều loại thông báo
+         [StringLength(50)]
+         public string RelatedEntityType { get; set; } // e.g., "CommentReply"
+
+        // --- Kết thúc THÊM ---
+
         // --- SOFT DELETE PROPERTIES ---
         [Required]
         [Display(Name = "Đã xóa")]
