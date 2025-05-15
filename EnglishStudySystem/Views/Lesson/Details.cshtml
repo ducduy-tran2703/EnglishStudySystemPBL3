@@ -61,13 +61,19 @@
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="LessonId" value="@Model.Id" />
                                 <input type="hidden" name="ParentCommentId" value="" id="parentCommentId" />
-                                <div class="form-group mb-3" style="max-width: 500px;">
-                                    <textarea class="form-control" name="Content" rows="5" placeholder="Viết bình luận của bạn..." required id="commentContent" style="min-height: 100px; resize: vertical;"></textarea>
+                                <div class="form-group mb-3">
+                                    <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required id="commentContent"></textarea>
                                 </div>
                                 <div id="replyingTo" class="mb-2 text-muted" style="display: none;"></div>
                                 <button type="submit" class="btn btn-success me-2">Gửi bình luận</button>
                                 <button type="button" class="btn btn-outline-secondary" id="cancelReply" style="display: none;">Hủy</button>
                             </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-4">
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })" class="text-primary">Đăng nhập</a> để bình luận
                         </div>
                     }
 
@@ -90,6 +96,7 @@
             </div>
         </div>
 
+        <!-- Sidebar -->
         <!-- Sidebar -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm mb-4">
@@ -139,6 +146,7 @@
                     </ul>
                 </div>
             </div>
+
             <!-- Tests Section -->
             <div class="card border-0 shadow-sm mt-4">
                 <div class="card-header bg-white border-bottom py-3">
@@ -163,7 +171,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </main>
 
 @helper RenderComment(EnglishStudySystem.Models.Comment comment, List<EnglishStudySystem.Models.Comment> allComments)
@@ -236,7 +243,6 @@
 
 @section Scripts {
     <style>
-        /* Thêm vào phần style */
         .text-purple {
             color: #6f42c1 !important;
         }
