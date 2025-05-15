@@ -1,0 +1,144 @@
+﻿@*
+    Partial View để hiển thị danh sách lịch sử bài kiểm tra.
+    Model của view này là một danh sách các đối tượng Test.
+    Bạn cần đảm bảo namespace của model Test là chính xác.
+    Giả định model Test có các thuộc tính Id, Title (hoặc Name), và có thể có Lesson.
+    - Mỗi mục bài kiểm tra có thể nhấn vào để chuyển đến action Start trong TestController.
+*@
+@model IEnumerable<EnglishStudySystem.Models.Test> 
+
+<style>
+    /* Định dạng cho tiêu đề Lịch sử Bài kiểm tra */
+    .statistics-section h3 {
+        color: #dc3545; /* Màu đỏ nhẹ nhàng (hoặc màu trung tính) */
+        border-bottom: 2px solid #e9ecef; /* Đường gạch dưới nhẹ */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 1.8em;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    /* Định dạng cho danh sách chứa các bài kiểm tra */
+    .tests-history-list {
+        margin-top: 20px;
+    }
+
+    /* Định dạng cho mỗi mục bài kiểm tra trong danh sách */
+    .test-history-item {
+        background-color: #fff; /* Nền trắng cho mỗi mục */
+        border: 1px solid #e0e0e0; /* Viền nhẹ */
+        border-radius: 8px; /* Bo tròn góc */
+        /* padding: 15px; */ /* Bỏ padding ở đây để áp dụng cho thẻ a bên trong */
+        margin-bottom: 12px; /* Khoảng cách giữa các mục */
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.07); /* Đổ bóng nhẹ */
+        overflow: hidden;
+        position: relative;
+        cursor: pointer; /* Thêm con trỏ dạng hand để biểu thị có thể click */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Hiệu ứng mượt mà khi hover */
+    }
+
+        /* Định dạng cho thẻ a bao quanh nội dung mỗi item để toàn bộ item có thể click */
+        .test-history-item a {
+            display: block; /* Biến thẻ a thành khối để chiếm toàn bộ không gian */
+            padding: 15px; /* Áp dụng padding vào thẻ a */
+            text-decoration: none; /* Bỏ gạch chân mặc định của link */
+            color: inherit; /* Thừa hưởng màu chữ từ cha */
+            transition: background-color 0.2s ease; /* Hiệu ứng màu nền khi hover */
+        }
+
+        /* Hiệu ứng khi di chuột qua mục bài kiểm tra */
+        .test-history-item:hover {
+            transform: translateY(-4px); /* Nhấc mục lên nhiều hơn một chút */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Đổ bóng rõ hơn nhiều */
+        }
+
+        /* Tùy chọn: Đổi màu nền nhẹ khi hover */
+        .test-history-item a:hover {
+            background-color: #f8f9fa; /* Màu xám nhạt cho nền khi hover */
+        }
+
+        /* Định dạng tiêu đề bài kiểm tra (h4) */
+        .test-history-item h4 {
+            color: #333; /* Màu chữ tối cho tiêu đề */
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1.3em;
+        }
+
+        /* Định dạng các thông tin khác (p, small) */
+        .test-history-item p {
+            color: #555; /* Màu chữ xám cho thông tin */
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+            .test-history-item p small {
+                color: #6c757d; /* Màu chữ xám nhạt cho ngày tháng */
+                font-size: 0.9em;
+                display: block;
+                margin-top: 8px;
+            }
+
+    /* Định dạng cho đường kẻ phân cách (hr) */
+    .tests-history-list hr {
+        display: none; /* Ẩn đường kẻ hr */
+    }
+</style>
+
+
+@*
+    Kiểm tra xem danh sách bài kiểm tra có dữ liệu hay không.
+    Nếu không có bài kiểm tra nào, hiển thị thông báo.
+*@
+@if (Model != null && Model.Any())
+{
+    @* Lưu ý: "statistics-section" class nằm ở view cha chứa Partial View này *@
+    <div class="statistics-section-content">
+        <h3>Lịch sử Bài kiểm tra</h3> @* Tiêu đề cho phần này *@
+        <div class="tests-history-list">
+            @*
+                Duyệt qua từng bài kiểm tra trong danh sách Model.
+            *@
+            @foreach (var test in Model)
+            {
+                @*
+                    Bao quanh nội dung của mỗi bài kiểm tra bằng thẻ a để toàn bộ item có thể click
+                    và dẫn đến action Start trong TestController.
+                    Giả định có một Action "Start" trong Controller "Test" nhận ID bài kiểm tra.
+                *@
+                <div class="test-history-item">
+                    <a href="@Url.Action("Start", "Test", new { id = test.Id })">
+                        @* Giả sử model Test có thuộc tính Title hoặc Name *@
+                        <h4>@test.Title</h4> @* <-- Thay bằng @test.Name nếu model dùng Name *@
+
+                        @* Giả sử model Test có thuộc tính lưu ngày tạo hoặc ngày làm bài kiểm tra *@
+                        @* Bạn cần thay CreatedDate bằng thuộc tính phù hợp trong model Test *@
+                        <p><small>Ngày tạo: @test.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small></p>
+
+
+                        @*
+                            Thêm các thông tin khác của bài kiểm tra nếu có (ví dụ: điểm số, trạng thái hoàn thành).
+                            Nếu có trang chi tiết kết quả, hãy thêm link khác nếu cần.
+                        *@
+                    </a> @* Kết thúc thẻ a *@
+                </div>
+                @* hr đã được ẩn bằng CSS, bạn có thể xóa dòng này nếu muốn *@
+                @* <hr /> *@
+            }
+        </div>
+    </div>
+}
+else
+{
+    @* Hiển thị thông báo khi không có bài kiểm tra nào được tìm thấy *@
+    <p>Không tìm thấy lịch sử bài kiểm tra nào.</p>
+}
+
+@*
+    Lưu ý:
+    - Thay thế `@model IEnumerable<EnglishStudySystem.Models.Test>` với namespace chính xác của model Test.
+    - Thay thế `@test.Title`, `@test.Lesson.Title`, `@test.CreatedDate` với tên thuộc tính chính xác trong model Test của bạn.
+    - **Quan trọng:** Đảm bảo rằng bạn có một `TestController` với Action `public ActionResult Start(int id)` được triển khai để xử lý việc bắt đầu bài kiểm tra.
+    - Cân nhắc sửa đổi Action `GetTestHistoryStats` để chỉ lấy bài kiểm tra của người dùng hiện tại.
+*@

@@ -1,0 +1,304 @@
+﻿@model EnglishStudySystem.Models.Lesson
+@{
+    ViewBag.Title = Model.Title + " - Chi tiết bài học";
+    var comments = ViewBag.Comments as List<EnglishStudySystem.Models.Comment>;
+    var isSaved = ViewBag.IsSaved as bool? ?? false;
+}
+
+<main class="container py-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Lesson Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="fw-bold mb-2">@Model.Title</h1>
+                    <p class="text-muted mb-0">Thuộc danh mục: @Model.Category.Name</p>
+                </div>
+                <div>
+                    <button id="btnSaveLesson" class="btn @(isSaved ? "btn-danger" : "btn-outline-danger") position-relative">
+                        <i class="fas fa-heart me-2 @(isSaved ? "text-white" : "text-danger")"></i>
+                        @(isSaved ? "Đã yêu thích" : "Yêu thích")
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lesson Description -->
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">Mô tả bài học</h3>
+                        <p>@Model.Description</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Video Player -->
+            @if (!string.IsNullOrEmpty(Model.Video_URL))
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">Video bài học</h3>
+                        <div class="ratio ratio-16x9">
+                            <iframe src="@Model.Video_URL" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Comments Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Bình luận</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Comment Form -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="mb-4">
+                            <form id="commentForm" method="post" action="@Url.Action("AddComment", "Lesson")">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="LessonId" value="@Model.Id" />
+                                <input type="hidden" name="ParentCommentId" id="parentCommentId" value="" />
+                                <div class="form-group mb-3">
+                                    <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required id="commentContent"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success">Gửi bình luận</button>
+                                <button type="button" class="btn btn-outline-secondary" id="cancelReply" style="display:none;">Hủy phản hồi</button>
+                            </form>
+                        </div>
+                    }
+
+                    <!-- Comments List -->
+                    <div id="commentsList">
+                        @if (comments != null && comments.Any())
+                        {
+                            foreach (var comment in comments.Where(c => c.ParentCommentId == null))
+                            {
+                                @Html.Partial("_CommentPartial", comment)
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">Chưa có bình luận nào.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Thông tin bài học</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-user me-2 text-muted"></i>
+                            <strong>Người tạo:</strong> @ViewBag.CreatorName - @Model.CreatedByUserRole
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar me-2 text-muted"></i>
+                            <strong>Ngày tạo:</strong> @Model.CreatedDate.ToString("dd/MM/yyyy")
+                        </li>
+                        @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-user-edit me-2 text-muted"></i>
+                                <strong>Cập nhật bởi:</strong> @ViewBag.UpdaterName - @Model.CreatedByUserRole
+                            </li>
+                            <li>
+                                <i class="fas fa-calendar-check me-2 text-muted"></i>
+                                <strong>Ngày cập nhật:</strong> @Model.UpdatedDate.GetValueOrDefault().ToString("dd/MM/yyyy")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Related Lessons -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h3 class="h5 mb-0">Bài học cùng danh mục</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        @foreach (var lesson in ViewBag.RelatedLessons as List<EnglishStudySystem.Models.Lesson>)
+                        {
+                            <li class="mb-2">
+                                <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })" class="text-decoration-none">
+                                    <i class="fas fa-book me-2 text-success"></i>@lesson.Title
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Save lesson button click handler
+            $('#btnSaveLesson').click(function() {
+    var $btn = $(this);
+    var isSaved = $btn.hasClass('btn-danger');
+
+    // Thêm hiệu ứng nhấp nháy
+    $btn.find('i').addClass('heart-beat');
+    setTimeout(() => {
+        $btn.find('i').removeClass('heart-beat');
+    }, 500);
+
+    $.post('@Url.Action("ToggleSaveLesson", "Lesson")', {
+        lessonId: @Model.Id
+    }).done(function(response) {
+        if (response.success) {
+            if (isSaved) {
+                $btn.removeClass('btn-danger').addClass('btn-outline-danger');
+                $btn.html('<i class="fas fa-heart me-2 text-danger"></i> Yêu thích');
+            } else {
+                $btn.removeClass('btn-outline-danger').addClass('btn-danger');
+                $btn.html('<i class="fas fa-heart me-2 text-white"></i> Đã yêu thích');
+            }
+        }
+    });
+});
+
+            // Delete comment handler
+            $('.btn-delete-comment').click(function() {
+                if (confirm('Bạn có chắc muốn xóa bình luận này?')) {
+                    var $btn = $(this);
+                    var commentId = $btn.data('comment-id');
+
+                    $.post('@Url.Action("DeleteComment", "Lesson")', {
+                        id: commentId
+                    }).done(function(response) {
+                        if (response.success) {
+                            $btn.closest('.media').addClass('opacity-50');
+                            $btn.remove();
+                        }
+                    });
+                }
+            });
+
+            // Comment form submission
+            $('#commentForm').submit(function(e) {
+                e.preventDefault();
+                var $form = $(this);
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            // Reload comments
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        });
+        // Xử lý nút phản hồi
+        $(document).on('click', '.btn-reply', function () {
+            var commentId = $(this).data('comment-id');
+            $('#parentCommentId').val(commentId);
+            $('#commentContent').focus().attr('placeholder', 'Viết phản hồi của bạn...');
+            $('#cancelReply').show();
+
+            // Cuộn đến form comment
+            $('html, body').animate({
+                scrollTop: $('#commentForm').offset().top - 100
+            }, 300);
+        });
+
+        // Xử lý nút hủy phản hồi
+        $('#cancelReply').click(function () {
+            $('#parentCommentId').val('');
+            $('#commentContent').attr('placeholder', 'Viết bình luận của bạn...');
+            $(this).hide();
+        });
+
+        // Sửa lại form submission
+        $('#commentForm').submit(function (e) {
+            e.preventDefault();
+            var $form = $(this);
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: $form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload(); // Reload trang để hiển thị comment mới
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .opacity-50 {
+            opacity: 0.5;
+        }
+
+        #btnSaveLesson i {
+            transition: all 0.3s ease;
+        }
+
+        .media {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            margin-bottom: 15px;
+        }
+        <style>
+    /* Style cho nút Yêu thích */
+    #btnSaveLesson {
+        transition: all 0.3s ease;
+        padding: 8px 16px;
+    }
+
+    /* Trái tim màu đỏ khi chưa yêu thích */
+    .btn-outline-danger .fa-heart {
+        color: #dc3545 !important;
+    }
+
+    /* Trái tim màu trắng khi đã yêu thích */
+    .btn-danger .fa-heart {
+        color: white !important;
+    }
+
+    /* Khi hover nút chưa yêu thích, trái tim chuyển trắng */
+    .btn-outline-danger:hover .fa-heart {
+        color: white !important;
+    }
+
+    /* Hiệu ứng nhấp nháy khi click */
+    @@keyframes heartBeat {
+        0% { transform: scale(1); }
+        25% { transform: scale(1.1); }
+        50% { transform: scale(1); }
+        75% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .heart-beat {
+        animation: heartBeat 0.5s;
+    }
+        /* Style cho phần phản hồi */
+        .media .border-start {
+            border-left: 3px solid #dee2e6 !important;
+        }
+
+        .btn-reply {
+            margin-right: 5px;
+        }
+    </style>
+}
