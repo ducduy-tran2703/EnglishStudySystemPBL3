@@ -68,9 +68,9 @@ namespace EnglishStudySystem.Controllers
             {
                 return RedirectToAction("Details", "Lesson",new { id = attempt.Test.LessonId });
             }
-
+            int time = attempt.Test.QuestionCount * 1 + 5;
             // Tính thời gian còn lại
-            var timeRemaining = TimeSpan.FromMinutes(1) - (DateTime.Now - attempt.StartTime);
+            var timeRemaining = TimeSpan.FromMinutes(time) - (DateTime.Now - attempt.StartTime);
             ViewBag.TimeRemaining = timeRemaining.TotalSeconds > 0 ? timeRemaining : TimeSpan.Zero;
 
             return View(attempt);
