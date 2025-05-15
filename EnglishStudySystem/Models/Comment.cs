@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -41,5 +42,26 @@ namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với 
         [DataType(DataType.DateTime)]
         [Display(Name = "Ngày xóa")]
         public DateTime? DeletedAt { get; set; }
+
+        // --- THÊM CÁC THUỘC TÍNH NÀY VÀO ĐỊNH NGHĨA LỚP COMMENT ---
+
+        [Display(Name = "Bình luận gốc")]
+        // Thuộc tính khóa ngoại tới chính bảng Comment.
+        // Dùng int? để cho phép giá trị null (đối với các bình luận cấp cao nhất không trả lời ai)
+        public int? ParentCommentId { get; set; }
+
+        // Thuộc tính điều hướng tới bình luận cha (bình luận mà nó trả lời)
+        [ForeignKey("ParentCommentId")]
+        public virtual Comment ParentComment { get; set; }
+
+        // Thuộc tính điều hướng để lấy danh sách các bình luận trả lời bình luận này (bình luận con)
+        public virtual ICollection<Comment> Replies { get; set; }
+
+        public Comment()
+        {
+            Replies = new HashSet<Comment>();
+        }
+
+        // --- KẾT THÚC THÊM ---
     }
 }

@@ -172,6 +172,7 @@
     <Compile Include="Areas\Admin\Controllers\CategoriesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Admin\ViewModel\CategoryCreateViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
@@ -208,6 +209,10 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.cs" />
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
+    <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
+      <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -404,6 +409,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.resx">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.resx">
+      <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

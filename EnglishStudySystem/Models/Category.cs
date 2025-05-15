@@ -41,7 +41,7 @@ namespace EnglishStudySystem.Models
         [Display(Name = "Người tạo")]
         public string CreatedByUserId { get; set; } // Lưu ID của người tạo (string từ ApplicationUser.Id)
 
-        [StringLength(10)]
+        [StringLength(15)]
         [Display(Name = "Vai trò người tạo")]
         public string CreatedByUserRole { get; set; }
 
@@ -53,7 +53,7 @@ namespace EnglishStudySystem.Models
         [Display(Name = "Người cập nhật")]
         public string UpdatedByUserId { get; set; } // Lưu ID của người cập nhật (string từ ApplicationUser.Id)
 
-        [StringLength(10)]
+        [StringLength(15)]
         [Display(Name = "Vai trò người cập nhật")]
         public string UpdatedByUserRole { get; set; }
 

@@ -182,6 +182,13 @@ namespace EnglishStudySystem.Models
                 .HasForeignKey(c => c.LessonId)
                 .WillCascadeOnDelete(true);
 
+            modelBuilder.Entity<Comment>()
+       .HasOptional(c => c.ParentComment) // Một Comment có thể có hoặc không có ParentComment (khóa ngoại ParentCommentId là nullable)
+       .WithMany(c => c.Replies) // Một ParentComment có nhiều Comment con (Replies)
+       .HasForeignKey(c => c.ParentCommentId) // Khóa ngoại là ParentCommentId trong bảng Comment
+       .WillCascadeOnDelete(false); // QUAN TRỌNG: Không xóa các bình luận con nếu bình luận cha bị xóa.
+                                    // Bạn cần xử lý việc này bằng logic ứng dụng (ví dụ: xóa mềm bình luận con hoặc gán ParentCommentId = null).
+
             // Cấu hình quan hệ cho Test (Bài học - Test)
             modelBuilder.Entity<Test>()
                 .HasRequired(t => t.Lesson)
