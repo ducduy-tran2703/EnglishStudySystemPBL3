@@ -16,9 +16,9 @@
                     <p class="text-muted mb-0">Thuộc danh mục: @Model.Category.Name</p>
                 </div>
                 <div>
-                    <button id="btnSaveLesson" class="btn @(isSaved ? "btn-warning" : "btn-outline-warning")">
-                        <i class="fas @(isSaved ? "fa-bookmark" : "fa-bookmark-o")"></i>
-                        @(isSaved ? "Đã lưu" : "Lưu bài học")
+                    <button id="btnSaveLesson" class="btn @(isSaved ? "btn-danger" : "btn-outline-danger") position-relative">
+                        <i class="fas fa-heart me-2 @(isSaved ? "text-white" : "text-danger")"></i>
+                        @(isSaved ? "Đã yêu thích" : "Yêu thích")
                     </button>
                 </div>
             </div>
@@ -117,7 +117,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-2">
                             <i class="fas fa-user me-2 text-muted"></i>
-                            <strong>Người tạo:</strong> @Model.CreatedByUserRole
+                            <strong>Người tạo:</strong> @ViewBag.CreatorName - @Model.CreatedByUserRole
                         </li>
                         <li class="mb-2">
                             <i class="fas fa-calendar me-2 text-muted"></i>
@@ -127,11 +127,11 @@
                         {
                             <li class="mb-2">
                                 <i class="fas fa-user-edit me-2 text-muted"></i>
-                                <strong>Cập nhật bởi:</strong> @Model.UpdatedByUserRole
+                                <strong>Cập nhật bởi:</strong> @ViewBag.UpdaterName - @Model.CreatedByUserRole
                             </li>
                             <li>
                                 <i class="fas fa-calendar-check me-2 text-muted"></i>
-                                <strong>Ngày cập nhật:</strong> @Model.UpdatedDate?.ToString("dd/MM/yyyy")
+                                <strong>Ngày cập nhật:</strong> @Model.UpdatedDate.GetValueOrDefault().ToString("dd/MM/yyyy")
                             </li>
                         }
                     </ul>
@@ -165,25 +165,29 @@
         $(document).ready(function() {
             // Save lesson button click handler
             $('#btnSaveLesson').click(function() {
-                var $btn = $(this);
-                var isSaved = $btn.hasClass('btn-warning');
+    var $btn = $(this);
+    var isSaved = $btn.hasClass('btn-danger');
 
-                $.post('@Url.Action("ToggleSaveLesson", "Lesson")', {
-                    lessonId: @Model.Id
-                }).done(function(response) {
-                    if (response.success) {
-                        if (isSaved) {
-                            $btn.removeClass('btn-warning').addClass('btn-outline-warning');
-                            $btn.find('i').removeClass('fa-bookmark').addClass('fa-bookmark-o');
-                            $btn.text(' Lưu bài học');
-                        } else {
-                            $btn.removeClass('btn-outline-warning').addClass('btn-warning');
-                            $btn.find('i').removeClass('fa-bookmark-o').addClass('fa-bookmark');
-                            $btn.text(' Đã lưu');
-                        }
-                    }
-                });
-            });
+    // Thêm hiệu ứng nhấp nháy
+    $btn.find('i').addClass('heart-beat');
+    setTimeout(() => {
+        $btn.find('i').removeClass('heart-beat');
+    }, 500);
+
+    $.post('@Url.Action("ToggleSaveLesson", "Lesson")', {
+        lessonId: @Model.Id
+    }).done(function(response) {
+        if (response.success) {
+            if (isSaved) {
+                $btn.removeClass('btn-danger').addClass('btn-outline-danger');
+                $btn.html('<i class="fas fa-heart me-2 text-danger"></i> Yêu thích');
+            } else {
+                $btn.removeClass('btn-outline-danger').addClass('btn-danger');
+                $btn.html('<i class="fas fa-heart me-2 text-white"></i> Đã yêu thích');
+            }
+        }
+    });
+});
 
             // Delete comment handler
             $('.btn-delete-comment').click(function() {
@@ -237,5 +241,40 @@
             background-color: #f8f9fa;
             margin-bottom: 15px;
         }
+        <style>
+    /* Style cho nút Yêu thích */
+    #btnSaveLesson {
+        transition: all 0.3s ease;
+        padding: 8px 16px;
+    }
+
+    /* Trái tim màu đỏ khi chưa yêu thích */
+    .btn-outline-danger .fa-heart {
+        color: #dc3545 !important;
+    }
+
+    /* Trái tim màu trắng khi đã yêu thích */
+    .btn-danger .fa-heart {
+        color: white !important;
+    }
+
+    /* Khi hover nút chưa yêu thích, trái tim chuyển trắng */
+    .btn-outline-danger:hover .fa-heart {
+        color: white !important;
+    }
+
+    /* Hiệu ứng nhấp nháy khi click */
+    @@keyframes heartBeat {
+        0% { transform: scale(1); }
+        25% { transform: scale(1.1); }
+        50% { transform: scale(1); }
+        75% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .heart-beat {
+        animation: heartBeat 0.5s;
+    }
+    </style>
     </style>
 }

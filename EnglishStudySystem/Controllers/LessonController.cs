@@ -19,6 +19,19 @@ namespace EnglishStudySystem.Controllers
                 .Include(l => l.Category)
                 .Include(l => l.Comments.Select(c => c.User))
                 .FirstOrDefault(l => l.Id == id);
+            if (lesson != null)
+            {
+                // Lấy thông tin người tạo
+                var creator = _db.Users.Find(lesson.CreatedByUserId);
+                ViewBag.CreatorName = creator?.FullName ?? "Không xác định";
+
+                // Lấy thông tin người cập nhật (nếu có)
+                if (!string.IsNullOrEmpty(lesson.UpdatedByUserId))
+                {
+                    var updater = _db.Users.Find(lesson.UpdatedByUserId);
+                    ViewBag.UpdaterName = updater?.FullName ?? "Không xác định";
+                }
+            }
             var userId = User.Identity.GetUserId();
             if (lesson == null)
             {
