@@ -15,7 +15,7 @@ namespace EnglishStudySystem.Models
         public int QuestionId { get; set; }
 
         [Display(Name = "Đáp án đã chọn")]
-        public int SelectedAnswerId { get; set; } // ID của đáp án mà người dùng đã chọn
+        public int? SelectedAnswerId { get; set; }  // ID của đáp án mà người dùng đã chọn
 
         [Display(Name = "Là đúng?")]
         public bool IsCorrect { get; set; } // true nếu SelectedAnswer là đáp án đúng của Question

@@ -1,0 +1,88 @@
+﻿@model EnglishStudySystem.Models.UserTestAttempt
+@{
+    ViewBag.Title = "Chi tiết bài làm";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["Message"]
+    </div>
+}
+
+<div class="test-result">
+    <h3>Thông tin bài kiểm tra</h3>
+    <dl class="dl-horizontal">
+        <dt>Tên bài kiểm tra:</dt>
+        <dd>@Model.Test.Title</dd>
+
+        <dt>Ngày làm bài:</dt>
+        <dd>@Model.AttemptDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+        <dt>Điểm số:</dt>
+        <dd>
+            <span class="label @(Model.Score >= 80 ? "label-success" : Model.Score >= 50 ? "label-warning" : "label-danger")">
+                @Model.Score/100
+            </span>
+        </dd>
+
+        <dt>Thời gian làm bài:</dt>
+        <dd>@((Model.EndTime - Model.StartTime)?.ToString(@"hh\:mm\:ss"))</dd>
+    </dl>
+</div>
+
+<h3>Chi tiết các câu trả lời</h3>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="5%">#</th>
+            <th width="35%">Câu hỏi</th>
+            <th width="20%">Đáp án bạn chọn</th>
+            <th width="20%">Đáp án đúng</th>
+            <th width="20%">Kết quả</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int questionNumber = 1; }
+        @foreach (var userAnswer in Model.UserAnswers.OrderBy(ua => ua.QuestionId))
+        {
+            var correctAnswer = userAnswer.Question.Answers.FirstOrDefault(a => a.IsCorrect);
+
+            <tr class="@(userAnswer.IsCorrect ? "success" : "danger")">
+                <td>@(questionNumber++)</td>
+                <td>@userAnswer.Question.Content</td>
+                <td>@(userAnswer.SelectedAnswer != null ? userAnswer.SelectedAnswer.Content : "Không có")</td>
+
+                <td>
+                    @if (correctAnswer != null)
+                    {
+                        if (userAnswer.IsCorrect)
+                        {
+                            <span>@correctAnswer.Content</span>
+                        }
+                        else
+                        {
+                            <span class="text-success" style="font-weight:bold">@correctAnswer.Content</span>
+                        }
+                    }
+                </td>
+                <td>
+                    @if (userAnswer.IsCorrect)
+                    {
+                        <span class="text-success"><i class="glyphicon glyphicon-ok"></i> Đúng</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger"><i class="glyphicon glyphicon-remove"></i> Sai</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@ViewBag.UrlBack" class="btn btn-default">
+    <i class="glyphicon glyphicon-arrow-left"></i> Quay lại
+</a>

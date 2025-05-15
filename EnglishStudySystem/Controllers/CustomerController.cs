@@ -66,7 +66,7 @@ namespace EnglishStudySystem.Controllers
             {
                 return HttpNotFound();
             }
-            
+
             // Lấy thông tin bài học nếu cần
             var categories = _context.Categories
             .Where(c => !c.IsDeleted)
@@ -106,38 +106,38 @@ namespace EnglishStudySystem.Controllers
         public ActionResult EditProfile(ProfileViewModel model)
         {
             System.Diagnostics.Debug.WriteLine("Entering POST EditProfile...");
-            
-                var userId = User.Identity.GetUserId();
-                var user = _context.Users.Find(userId);
-                System.Diagnostics.Debug.WriteLine($"1:");        
-                if (user == null)
-                {
-                    TempData["ErrorMessage"] = "User not found.";
-                    return RedirectToAction("Login", "Account");
-                }
-                System.Diagnostics.Debug.WriteLine($"Updating user {userId} with:");
-                System.Diagnostics.Debug.WriteLine($"FullName: {model.FullName}");
-                System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
-                System.Diagnostics.Debug.WriteLine($"PhoneNumber: {model.PhoneNumber}");
-                System.Diagnostics.Debug.WriteLine($"DateOfBirth: {model.DateOfBirth}");
-                user.FullName = model.FullName;
-                user.Email = model.Email;
-                user.PhoneNumber = model.PhoneNumber;
-                user.DateOfBirth = model.DateOfBirth;
 
-                try
-                {
-                    _context.SaveChanges();
-                    TempData["SuccessMessage"] = "Profile updated successfully!";
-                    return RedirectToAction("EditProfile", "Customer");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                    ModelState.AddModelError("", "An error occurred while updating the profile.");
-                    return View(model);
-                }
-            
+            var userId = User.Identity.GetUserId();
+            var user = _context.Users.Find(userId);
+            System.Diagnostics.Debug.WriteLine($"1:");
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("Login", "Account");
+            }
+            System.Diagnostics.Debug.WriteLine($"Updating user {userId} with:");
+            System.Diagnostics.Debug.WriteLine($"FullName: {model.FullName}");
+            System.Diagnostics.Debug.WriteLine($"Email: {model.Email}");
+            System.Diagnostics.Debug.WriteLine($"PhoneNumber: {model.PhoneNumber}");
+            System.Diagnostics.Debug.WriteLine($"DateOfBirth: {model.DateOfBirth}");
+            user.FullName = model.FullName;
+            user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.DateOfBirth = model.DateOfBirth;
+
+            try
+            {
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("EditProfile", "Customer");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                ModelState.AddModelError("", "An error occurred while updating the profile.");
+                return View(model);
+            }
+
             return View(model);
         }
         public ActionResult LearningActivities()
@@ -199,14 +199,20 @@ namespace EnglishStudySystem.Controllers
                     .Select(s => s.Lesson)
                     .Where(l => !l.IsDeleted)
                     .Distinct()
-                    .Take(6)
                     .ToList();
 
                 return PartialView("_FavoriteLessonsStats", favoriteLessons);
             }
         }
-
-
-
+        public ActionResult GetTestHistoryStats()
+        {
+            var userId = User.Identity.GetUserId();
+            using (var _context = new ApplicationDbContext())
+            {
+                var ListTest = _context.Tests
+                    .ToList();
+                return PartialView("_TestHistoryStats", ListTest);
+            }
+        }
     }
 }

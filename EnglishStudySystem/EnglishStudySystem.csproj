@@ -210,6 +210,14 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.cs" />
+    <Compile Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.Designer.cs">
+      <DependentUpon>202505150619388_MakeSelectedAnswerIdNullable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.cs" />
+    <Compile Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.Designer.cs">
+      <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -356,6 +364,10 @@
     <Content Include="Views\Customer\LearningActivities.cshtml" />
     <Content Include="Views\Lesson\Details.cshtml" />
     <Content Include="Views\Customer\_FavoriteLessonsStats.cshtml" />
+    <Content Include="Views\Customer\_TestHistoryStats.cshtml" />
+    <Content Include="Views\Test\TakeTest.cshtml" />
+    <Content Include="Views\Test\Completed.cshtml" />
+    <Content Include="Views\Test\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
@@ -406,6 +418,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.resx">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505150619388_MakeSelectedAnswerIdNullable.resx">
+      <DependentUpon>202505150619388_MakeSelectedAnswerIdNullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505150642325_MakeSelectedAnswerIdNullable1.resx">
+      <DependentUpon>202505150642325_MakeSelectedAnswerIdNullable1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

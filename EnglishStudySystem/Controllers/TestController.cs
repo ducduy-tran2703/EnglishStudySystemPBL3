@@ -1,4 +1,5 @@
 ﻿using EnglishStudySystem.Models;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -6,75 +7,160 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Razor.Tokenizer.Symbols;
-
+using System.Data.Entity;
 namespace EnglishStudySystem.Controllers
 {
     public class TestController : Controller
     {
-        // GET: Test
-        public ActionResult Test()
+        private ApplicationDbContext db = new ApplicationDbContext();
+
+        // GET: Test/Start/5 (5 là testId)
+        [Authorize]
+        [Authorize]
+        public ActionResult Start(int id)
         {
-            return View();
+            string userId = User.Identity.GetUserId();
+
+            // Kiểm tra xem đã có attempt hoàn thành chưa
+            var completedAttempt = db.UserTestAttempts
+                                  .Include(a => a.Test)
+                                  .Include(a => a.UserAnswers.Select(ua => ua.Question))
+                                  .Include(a => a.UserAnswers.Select(ua => ua.SelectedAnswer))
+                                  .FirstOrDefault(a => a.TestId == id && a.UserId == userId && a.IsCompleted);
+
+            if (completedAttempt != null)
+            {
+                TempData["Message"] = "Bạn đã hoàn thành bài kiểm tra này trước đây.";
+                return RedirectToAction("Details", new { id = completedAttempt.Id });
+            }
+
+            var test = db.Tests.Include(t => t.Questions).FirstOrDefault(t => t.Id == id);
+            if (test == null) return HttpNotFound();
+            // Tạo attempt mới
+            var attempt = new UserTestAttempt
+            {
+                UserId = userId,
+                TestId = id,
+                StartTime = DateTime.Now,
+                AttemptDate = DateTime.Now,
+                IsCompleted = false
+            };
+
+            db.UserTestAttempts.Add(attempt);
+            db.SaveChanges();
+
+            return RedirectToAction("TakeTest", new { attemptId = attempt.Id });
         }
-        public ActionResult GetBoughtCoursesStats()
+
+        // GET: Test/TakeTest/5 (5 là attemptId)
+        [Authorize]
+        public ActionResult TakeTest(int attemptId)
         {
-            ApplicationDbContext _context = new ApplicationDbContext();
-            var categories = _context.Categories
-                .Where(c => !c.IsDeleted)
-                .OrderByDescending(c => c.CreatedDate)
-                .Take(6)
-                .ToList();
+            // Lấy UserId trước khi thực hiện truy vấn
+            string userId = User.Identity.GetUserId();
 
-            var userIds = categories.Select(c => c.CreatedByUserId).Distinct().ToList();
+            // Lấy thông tin attempt
+            var attempt = db.UserTestAttempts
+                          .Include(a => a.Test)
+                          .Include(a => a.Test.Questions.Select(q => q.Answers))
+                          .FirstOrDefault(a => a.Id == attemptId && a.UserId == userId); // Sử dụng biến userId đã lấy trước
 
-            var users = _context.Users
-                .Where(u => userIds.Contains(u.Id))
-                .ToDictionary(u => u.Id, u => u.FullName);
-            ViewBag.UserNames = users;
+            if (attempt == null || attempt.IsCompleted)
+            {
+                return RedirectToAction("Completed", new { attemptId = attemptId });
+            }
 
-            return PartialView("_BoughtCoursesStats", categories);
+            // Tính thời gian còn lại
+            var timeRemaining = TimeSpan.FromMinutes(1) - (DateTime.Now - attempt.StartTime);
+            ViewBag.TimeRemaining = timeRemaining.TotalSeconds > 0 ? timeRemaining : TimeSpan.Zero;
+
+            return View(attempt);
         }
-        public ActionResult GetLessonsHistoryStats()
+
+        // POST: Test/SubmitTest
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult SubmitTest(int attemptId, FormCollection form)
         {
-            ApplicationDbContext _context = new ApplicationDbContext();
-            var lessons = _context.Lessons
-                .Where(l => !l.IsDeleted)
-                .OrderByDescending(l => l.CreatedDate)
-                .Take(6)
-                .ToList();
-            return PartialView("_LessonsHistoryStats", lessons);
+            string userId = User.Identity.GetUserId();
+            var attempt = db.UserTestAttempts
+                          .Include(a => a.Test.Questions.Select(q => q.Answers))
+                          .FirstOrDefault(a => a.Id == attemptId && a.UserId == userId);
 
+            if (attempt == null || attempt.IsCompleted)
+            {
+                return RedirectToAction("Completed", new { attemptId = attemptId });
+            }
+
+            int score = 0;
+            int totalQuestions = attempt.Test.Questions.Count;
+
+            // Lưu từng câu trả lời và tính điểm
+            foreach (var question in attempt.Test.Questions)
+            {
+                string answerKey = "answer_" + question.Id;
+                UserAnswer userAnswer;
+
+                if (int.TryParse(form[answerKey], out int selectedAnswerId))
+                {
+                    var selectedAnswer = question.Answers.FirstOrDefault(a => a.Id == selectedAnswerId);
+                    bool isCorrect = selectedAnswer?.IsCorrect ?? false;
+
+                    if (isCorrect) score++;
+
+                    userAnswer = new UserAnswer
+                    {
+                        UserTestAttemptId = attempt.Id,
+                        QuestionId = question.Id,
+                        SelectedAnswerId = selectedAnswerId,
+                        IsCorrect = isCorrect
+                    };
+                }
+                else
+                {
+                    // Người dùng không chọn câu trả lời
+                    userAnswer = new UserAnswer
+                    {
+                        UserTestAttemptId = attempt.Id,
+                        QuestionId = question.Id,
+                        SelectedAnswerId = null, // Không chọn đáp án nào
+                        IsCorrect = false // Không đúng vì không trả lời
+                    };
+                }
+
+                db.UserAnswers.Add(userAnswer);
+            }
+
+            // Cập nhật trạng thái attempt
+            attempt.EndTime = DateTime.Now;
+            attempt.IsCompleted = true;
+            attempt.Score = (int)Math.Round((double)score / totalQuestions * 100);
+            attempt.AttemptDate = DateTime.Now;
+
+            db.SaveChanges();
+
+            return RedirectToAction("Details", new { id = attempt.Id });
         }
-        //public ActionResult SeedLessons()
-        //{
-        //    ApplicationDbContext db = new ApplicationDbContext();
-        //    if (db.Lessons.Any()) // Tránh thêm trùng nếu đã có dữ liệu
-        //        return Content("Dữ liệu đã tồn tại.");
 
-        //    var lessons = new List<Lesson>();
-        //    var random = new Random();
-        //    string userId = "aac1d442-dfc3-4725-8585-332a80f63f37"; // Thay bằng ID người tạo (ApplicationUser.Id)
-        //    string userRole = "Admin";
 
-        //    for (int i = 1; i <= 20; i++)
-        //    {
-        //        lessons.Add(new Lesson
-        //        {
-        //            CategoryId = 1, // ID danh mục (giả sử đã tồn tại)
-        //            Title = $"Bài học số {i}",
-        //            Description = $"Mô tả cho bài học {i}",
-        //            Video_URL = $"https://example.com/video/{i}",
-        //            CreatedByUserId = userId,
-        //            CreatedByUserRole = userRole,
-        //            CreatedDate = DateTime.Now,
-        //            IsDeleted = false
-        //        });
-        //    }
+        // GET: Test/Details/5 (Xem chi tiết bài kiểm tra)
+        [Authorize]
+        public ActionResult Details(int id)
+        {
+            string userId = User.Identity.GetUserId();
+            var attempt = db.UserTestAttempts
+                          .Include(a => a.Test)
+                          .Include(a => a.UserAnswers.Select(ua => ua.Question))
+                          .Include(a => a.UserAnswers.Select(ua => ua.SelectedAnswer))
+                          .FirstOrDefault(a => a.Id == id && a.UserId == userId);
 
-        //    db.Lessons.AddRange(lessons);
-        //    db.SaveChanges();
-
-        //    return Content("Đã thêm 20 bài học thành công.");
-        //}
+            if (attempt == null)
+            {
+                return HttpNotFound();
+            }
+            ViewBag.UrlBack = Request.UrlReferrer?.ToString();
+            return View(attempt);
+        }
     }
 }
