@@ -1,0 +1,81 @@
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.LessonCreateViewModel
+
+@{
+    ViewBag.Title = "Thêm mới Bài học";
+    // Đảm bảo View này sử dụng Layout Admin của bạn
+    // Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml"; // Ví dụ
+}
+
+<h2>@ViewBag.Title</h2>
+
+@* Hiển thị tên danh mục mà bài học sẽ thuộc về *@
+<h4>Danh mục: @ViewBag.CategoryName</h4> 
+<hr />
+
+@using (Html.BeginForm()) // Tạo form gửi dữ liệu lên Action Create (POST)
+{
+    @Html.AntiForgeryToken() // Thêm AntiForgery Token
+
+<div class="form-horizontal">
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    @* Hiển thị tóm tắt lỗi Validation của ViewModel *@
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @* Trường ẩn để truyền CategoryId về Action POST.
+        CategoryId đến từ GET request và được gán vào ViewModel trong Action GET. *@
+    @Html.HiddenFor(model => model.CategoryId)
+
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4 })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    @* --- Trường nhập liệu cho Video_URL --- *@
+    <div class="form-group">
+        @Html.LabelFor(model => model.Video_URL, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Video_URL, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Video_URL, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    @* --- Kết thúc Trường nhập liệu cho Video_URL --- *@
+
+
+    @* --- Nút Submit --- *@
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Thêm mới Bài học" class="btn btn-primary" />
+        </div>
+    </div>
+    @* --- Kết thúc Nút Submit --- *@
+</div>
+}
+
+<hr />
+
+@* --- Liên kết quay lại --- *@
+<div>
+    @* Liên kết quay lại trang Chi tiết Danh mục (truyền ID Danh mục hiện tại) *@
+    @* CategoryId có sẵn trong ViewModel *@
+    @Html.ActionLink("Quay lại Chi tiết Danh mục", "Details", "Categories", new { id = Model.CategoryId }, null)
+</div>
+@* --- Kết thúc Liên kết quay lại --- *@
+
+
+@section Scripts {
+    @* Đảm bảo include script validation của jQuery *@
+    @Scripts.Render("~/bundles/jqueryval")
+    @* Nếu sử dụng trình soạn thảo rich text, include script của nó ở đây *@
+}

@@ -90,7 +90,7 @@ namespace EnglishStudySystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public JsonResult AddComment(Comment model) // Sửa thành model binding thay vì tham số riêng lẻ
+        public JsonResult AddComment(Comment model)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace EnglishStudySystem.Controllers
                 {
                     LessonId = model.LessonId,
                     Content = model.Content,
-                    ParentCommentId = model.ParentCommentId, // Thêm dòng này
+                    ParentCommentId = model.ParentCommentId,
                     UserId = User.Identity.GetUserId(),
                     CreatedDate = DateTime.Now,
                     IsDeleted = false
@@ -107,12 +107,75 @@ namespace EnglishStudySystem.Controllers
                 _db.Comments.Add(comment);
                 _db.SaveChanges();
 
+                // Tạo thông báo nếu đây là phản hồi (reply)
+                if (model.ParentCommentId.HasValue)
+                {
+                    CreateCommentReplyNotification(comment);
+                }
+
                 return Json(new { success = true });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+
+        private void CreateCommentReplyNotification(Comment reply)
+        {
+            try
+            {
+                // Lấy thông tin comment gốc
+                var parentComment = _db.Comments
+                    .Include(c => c.User)
+                    .Include(c => c.Lesson)
+                    .FirstOrDefault(c => c.Id == reply.ParentCommentId);
+
+                if (parentComment == null || parentComment.UserId == reply.UserId)
+                {
+                    return; // Không tạo thông báo nếu tự phản hồi chính mình
+                }
+
+                // Tạo thông báo
+                var notification = new Notification
+                {
+                    Title = "Bạn có phản hồi mới",
+                    Content = "Có người đã phản hồi bình luận của bạn",
+                    CreatedDate = DateTime.Now,
+                    SenderId = reply.UserId,
+                    IsDeleted = false,
+                    RelatedEntityType = "CommentReply",
+                    TargetController = "Lesson",
+                    TargetAction = "Details",
+                    PrimaryRelatedEntityId = parentComment.LessonId, // ID bài học
+                    SecondaryRelatedEntityId = parentComment.Id // ID comment gốc (để scroll tới)
+                };
+
+                _db.Notifications.Add(notification);
+                _db.SaveChanges();
+
+                // Tạo UserNotification liên kết
+                var userNotification = new UserNotification
+                {
+                    UserId = parentComment.UserId, // Người nhận là tác giả comment gốc
+                    NotificationId = notification.Id,
+                    IsRead = false,
+                    IsDeleted = false
+                };
+
+                _db.UserNotifications.Add(userNotification);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Lỗi khi tạo thông báo phản hồi: " + ex.Message);
+            }
+        }
+
+        private string TruncateContent(string content, int maxLength)
+        {
+            if (string.IsNullOrEmpty(content)) return string.Empty;
+            return content.Length <= maxLength ? content : content.Substring(0, maxLength) + "...";
         }
 
         [HttpPost]

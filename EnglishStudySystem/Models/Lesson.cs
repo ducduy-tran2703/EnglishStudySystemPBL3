@@ -36,7 +36,7 @@ namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với 
         [Display(Name = "Người tạo")]
         public string CreatedByUserId { get; set; } // Lưu ID của người tạo (string từ ApplicationUser.Id)
 
-        [StringLength(10)]
+        [StringLength(15)]
         [Display(Name = "Vai trò người tạo")]
         public string CreatedByUserRole { get; set; }
 
