@@ -1,125 +1,288 @@
-﻿
-@model EnglishStudySystem.Models.UserViewModel
+﻿@model EnglishStudySystem.Models.UserViewModel
 @{
-    ViewBag.Title = "Details";
-    Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml";
+    ViewBag.Title = "Chi tiết Người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml"; // Đảm bảo đường dẫn layout đúng
 }
 
-
-<div class="container-fluid py-3">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4><i class="fas fa-user-circle mr-2"></i>Chi tiết người dùng</h4>
+<div class="container-fluid px-4 py-4">
+    @* Thêm py-4 cho padding trên dưới *@
+    <div class="card border-0 shadow-lg rounded-lg overflow-hidden">
+        <!-- Card Header with Gradient Background -->
+        <div class="card-header bg-gradient-success text-white py-3">
+            @* Dùng bg-gradient-success như ListUser *@
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0 font-weight-bold" style="color:White">
+                        <i class="fas fa-user-tag mr-2" style="color:whitesmoke"></i> @* Icon khác một chút *@
+                        Chi tiết: @Model.UserName
+                    </h4>
+                    <small class="font-weight-light">Thông tin chi tiết và hoạt động của người dùng</small>
+                </div>
+                @Html.ActionLink("Quay lại Danh sách", "ListUser", "Users", new { area = "Admin" }, new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
+            </div>
         </div>
 
-        <div class="card-body">
-            <!-- Basic User Information -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-4">Tên đăng nhập:</dt>
-                        <dd class="col-sm-8">@Model.UserName</dd>
-
-                        <dt class="col-sm-4">Email:</dt>
-                        <dd class="col-sm-8">@Model.Email</dd>
-
-                        <dt class="col-sm-4">Họ tên:</dt>
-                        <dd class="col-sm-8">@Model.FullName</dd>
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-4">Vai trò:</dt>
-                        <dd class="col-sm-8">
-                            <span class="badge badge-info">@Model.Roles</span>
-                        </dd>
-
-                        <dt class="col-sm-4">Trạng thái:</dt>
-                        <dd class="col-sm-8">
-                            <span class="badge @(Model.IsActive ? "badge-success" : "badge-secondary")">
-                                @(Model.IsActive ? "Hoạt động" : "Không hoạt động")
-                            </span>
-                        </dd>
-                    </dl>
+        <div class="card-body p-4">
+            @* Tăng padding cho card body *@
+            <!-- Basic User Information Section -->
+            <div class="mb-4 p-4 bg-white border rounded-lg shadow-sm">
+                @* Nền trắng, bo góc, shadow nhẹ *@
+                <h5 class="mb-3 text-success font-weight-bold border-bottom pb-2">
+                    <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                </h5>
+                <div class="row">
+                    <div class="col-lg-6 mb-3">
+                        <strong class="text-muted d-block mb-1"><i class="fas fa-user me-2"></i>Tên đăng nhập:</strong>
+                        <span class="h5 font-weight-normal">@Model.UserName</span>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <strong class="text-muted d-block mb-1"><i class="fas fa-envelope me-2"></i>Email:</strong>
+                        <span class="h5 font-weight-normal">@Model.Email</span>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <strong class="text-muted d-block mb-1"><i class="fas fa-id-card me-2"></i>Họ tên:</strong>
+                        <span class="h5 font-weight-normal">@(string.IsNullOrEmpty(Model.FullName) ? "N/A" : Model.FullName)</span>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <strong class="text-muted d-block mb-1"><i class="fas fa-tags me-2"></i>Vai trò:</strong>
+                        <div>
+                            @if (!string.IsNullOrEmpty(Model.Roles))
+                            {
+                                foreach (var role in Model.Roles.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    string badgeClass = "bg-secondary"; // Mặc định
+                                    if (role.Trim().Equals("Administrator", StringComparison.OrdinalIgnoreCase)) { badgeClass = "bg-danger"; }
+                                    else if (role.Trim().Equals("Editor", StringComparison.OrdinalIgnoreCase)) { badgeClass = "bg-warning text-dark"; }
+                                    else if (role.Trim().Equals("Customer", StringComparison.OrdinalIgnoreCase)) { badgeClass = "bg-primary"; }
+                                    <span class="badge @badgeClass me-1 px-2 py-1 rounded-pill">@role.Trim()</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-dark border px-2 py-1 rounded-pill">Chưa có vai trò</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <strong class="text-muted d-block mb-1"><i class="fas fa-toggle-on me-2"></i>Trạng thái kích hoạt:</strong>
+                        <span class="badge @(Model.IsActive ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
+                            @(Model.IsActive ? "Đã kích hoạt" : "Chưa kích hoạt / Bị khóa")
+                        </span>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <strong class="text-muted d-block mb-1"><i class="fas fa-shield-alt me-2"></i>Trạng thái tài khoản:</strong>
+                        <span class="badge bg-light text-dark border p-2 rounded-pill">@Model.AccountStatus.ToString()</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Purchased Categories (for Customers) -->
-            @if (Model.PurchasedCategories != null && Model.PurchasedCategories.Any())
+            <!-- Purchased Courses (for Customers) -->
+            @if (Model.Roles.Contains("Customer"))
             {
                 <div class="mb-4">
-                    <h5 class="border-bottom pb-2">
-                        <i class="fas fa-shopping-cart mr-2"></i>Danh mục đã mua
+                    <h5 class="mb-3 text-primary font-weight-bold border-bottom pb-2">
+                        <i class="fas fa-shopping-bag me-2"></i>Khóa học đã mua (@(Model.PurchasedCategories?.Count ?? 0))
                     </h5>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Tên danh mục</th>
-                                    <th>Mô tả</th>
-                                    <th>Giá</th>
-                                    <th>Ngày mua</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var category in Model.PurchasedCategories)
-                                {
+                    @if (Model.PurchasedCategories != null && Model.PurchasedCategories.Any())
+                    {
+                        <div class="table-responsive rounded-lg shadow-sm">
+                            <table class="table table-hover mb-0 user-courses-table">
+                                <thead class="thead-light">
+                                    @* Dùng thead-light như ListUser *@
                                     <tr>
-                                        <td>@category.Name</td>
-                                        <td>@category.Description</td>
-                                        <td>@category.Price đ</td>
-                                        <td>@category.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                        <th style="width: 35%;">Tên khóa học</th>
+                                        <th style="width: 35%;">Mô tả</th>
+                                        <th style="width: 15%;" class="text-end">Giá</th>
+                                        <th style="width: 15%;" class="text-center">Ngày tạo KH</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model.PurchasedCategories)
+                                    {
+                                        <tr class="align-middle">
+                                            <td>
+                                                @Html.ActionLink(category.Name, "Details", "Categories", new { area = "Admin", id = category.Id }, new { @class = "text-decoration-none font-weight-bold" })
+                                            </td>
+                                            <td><small class="text-muted">@(category.Description != null && category.Description.Length > 70 ? category.Description.Substring(0, 70) + "..." : category.Description)</small></td>
+                                            <td class="text-end font-weight-bold">@category.Price?.ToString("N0") đ</td>
+                                            <td class="text-center"><small>@category.CreatedDate.ToString("dd/MM/yyyy")</small></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light text-center border shadow-sm" role="alert">
+                            <i class="fas fa-info-circle me-2 text-muted"></i>Người dùng này chưa mua khóa học nào.
+                        </div>
+                    }
                 </div>
             }
 
-            <!-- Created Categories (for Editors) -->
-            @if (Model.Categories != null && Model.Categories.Any())
+            <!-- Created Courses (for Editors) -->
+            @if (Model.Roles.Contains("Editor"))
             {
                 <div class="mb-4">
-                    <h5 class="border-bottom pb-2">
-                        <i class="fas fa-folder-plus mr-2"></i>Danh mục đã tạo
+                    <h5 class="mb-3 text-warning font-weight-bold border-bottom pb-2">
+                        @* Màu khác cho Editor *@
+                        <i class="fas fa-edit me-2"></i>Khóa học đã tạo (@(Model.Categories?.Count ?? 0))
                     </h5>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Tên danh mục</th>
-                                    <th>Mô tả</th>
-                                    <th>Giá</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var category in Model.Categories)
-                                {
+                    @if (Model.Categories != null && Model.Categories.Any())
+                    {
+                        <div class="table-responsive rounded-lg shadow-sm">
+                            <table class="table table-hover mb-0 user-courses-table">
+                                <thead class="thead-light">
                                     <tr>
-                                        <td>@category.Name</td>
-                                        <td>@category.Description</td>
-                                        <td>@category.Price đ</td>
-                                        <td>@category.CreatedDate.ToString("dd/MM/yyyy")</td>
-                                        @*<td>
-                                            <span class="badge @(category.IsActive ? "badge-success" : "badge-warning")">
-                                                @(category.IsActive ? "Hoạt động" : "Tạm ẩn")
-                                            </span>
-                                        </td>*@
+                                        <th style="width: 30%;">Tên khóa học</th>
+                                        <th style="width: 30%;">Mô tả</th>
+                                        <th style="width: 15%;" class="text-end">Giá</th>
+                                        <th style="width: 15%;" class="text-center">Ngày tạo</th>
+                                        <th style="width: 10%;" class="text-center">Trạng thái</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <tr class="align-middle">
+                                            <td>
+                                                @Html.ActionLink(category.Name, "Details", "Categories", new { area = "Admin", id = category.Id }, new { @class = "text-decoration-none font-weight-bold" })
+                                            </td>
+                                            <td><small class="text-muted">@(category.Description != null && category.Description.Length > 70 ? category.Description.Substring(0, 70) + "..." : category.Description)</small></td>
+                                            <td class="text-end font-weight-bold">@category.Price?.ToString("N0") đ</td>
+                                            <td class="text-center"><small>@category.CreatedDate.ToString("dd/MM/yyyy")</small></td>
+                                            
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light text-center border shadow-sm" role="alert">
+                            <i class="fas fa-info-circle me-2 text-muted"></i>Người dùng này chưa tạo khóa học nào.
+                        </div>
+                    }
                 </div>
             }
-
-            <!-- Back Button -->
-            <div class="mt-4">
-                @Html.ActionLink("Quay lại", "ListUser", null, new { @class = "btn btn-secondary" })
-            </div>
+        </div>
+        <div class="card-footer bg-light text-end py-3">
+            @* Thêm padding cho footer *@
+            @Html.ActionLink("Quay lại Danh sách", "ListUser", "Users", new { area = "Admin" }, new { @class = "btn btn-outline-secondary shadow-sm" })
+            @* Bạn có thể thêm nút Edit người dùng ở đây nếu cần *@
+            @* @Html.ActionLink("Chỉnh sửa", "Edit", "Users", new { area = "Admin", id = Model.Id }, new { @class = "btn btn-success ms-2 shadow-sm" }) *@
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        body {
+            background-color: #f0f2f5; /* Màu nền nhẹ hơn cho toàn trang */
+        }
+
+        .card {
+            border-radius: .75rem; /* Bo góc nhiều hơn */
+        }
+
+        .card-header.bg-gradient-success { /* Sử dụng lại gradient từ ListUser */
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+        /* Điều chỉnh độ đậm chung */
+        .font-weight-light {
+            font-weight: 300 !important;
+        }
+
+        /* Thông tin cơ bản */
+        .bg-white.border.rounded-lg.shadow-sm {
+            background-color: #fff !important;
+        }
+
+        .text-muted.d-block.mb-1 { /* Nhãn thông tin */
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .h5.font-weight-normal { /* Giá trị thông tin */
+            font-size: 1rem;
+            color: #343a40;
+        }
+
+        .badge.rounded-pill {
+            font-size: 0.8rem;
+        }
+
+        .badge-success-light { /* Giống ListUser */
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #1f7a3c;
+        }
+
+        .badge-secondary-light { /* Giống ListUser */
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #545b62;
+        }
+
+
+        /* Tiêu đề các mục khóa học */
+        .mb-3.text-primary.font-weight-bold,
+        .mb-3.text-warning.font-weight-bold {
+            font-size: 1.1rem;
+        }
+
+        /* Bảng khóa học */
+        .user-courses-table thead.thead-light th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom-width: 1px;
+            border-top: none;
+        }
+
+        .user-courses-table td {
+            font-size: 0.9rem;
+        }
+
+        .user-courses-table .text-decoration-none {
+            color: #0d6efd; /* Màu link mặc định của Bootstrap */
+        }
+
+            .user-courses-table .text-decoration-none:hover {
+                text-decoration: underline !important;
+            }
+
+        .btn-outline-primary.py-0, .btn-outline-info.py-0 { /* Nút xem chi tiết khóa học */
+            padding-top: .2rem !important;
+            padding-bottom: .2rem !important;
+            font-size: 0.75rem;
+        }
+
+        .alert-light.text-center.border.shadow-sm { /* Thông báo chưa có khóa học */
+            background-color: #fcfcfd !important;
+        }
+
+        /* Nút bấm ở footer */
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #6c757d;
+                color: #fff;
+            }
+
+        .btn-success { /* Nút chỉnh sửa (ví dụ) */
+            background-color: #198754;
+            border-color: #198754;
+        }
+    </style>
+}
