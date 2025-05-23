@@ -24,7 +24,7 @@ secondaryId = item.Notification.SecondaryRelatedEntityId })">
                 <strong>@item.Notification.Title</strong>
                 @{
                     var content = item.Notification.Content;
-                    var maxLength = 50;
+                    var maxLength = 100;
                     var truncatedContent = "";
 
                     if (string.IsNullOrEmpty(content))

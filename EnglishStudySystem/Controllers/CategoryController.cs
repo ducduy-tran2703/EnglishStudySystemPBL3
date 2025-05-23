@@ -55,5 +55,6 @@ namespace EnglishStudySystem.Controllers
             ViewBag.Lessons = lessons;
             return View(category);
         }
+
     }
 }

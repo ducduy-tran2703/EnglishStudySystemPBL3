@@ -104,7 +104,7 @@
                                                 @Html.ActionLink(category.Name, "Details", "Categories", new { area = "Admin", id = category.Id }, new { @class = "text-decoration-none font-weight-bold" })
                                             </td>
                                             <td><small class="text-muted">@(category.Description != null && category.Description.Length > 70 ? category.Description.Substring(0, 70) + "..." : category.Description)</small></td>
-                                            <td class="text-end font-weight-bold">@category.Price?.ToString("N0") đ</td>
+                                            <td class="text-end font-weight-bold">@category.Price$</td>
                                             <td class="text-center"><small>@category.CreatedDate.ToString("dd/MM/yyyy")</small></td>
                                         </tr>
                                     }
@@ -150,7 +150,7 @@
                                                 @Html.ActionLink(category.Name, "Details", "Categories", new { area = "Admin", id = category.Id }, new { @class = "text-decoration-none font-weight-bold" })
                                             </td>
                                             <td><small class="text-muted">@(category.Description != null && category.Description.Length > 70 ? category.Description.Substring(0, 70) + "..." : category.Description)</small></td>
-                                            <td class="text-end font-weight-bold">@category.Price?.ToString("N0") đ</td>
+                                            <td class="text-end font-weight-bold">@category.Price$</td>
                                             <td class="text-center"><small>@category.CreatedDate.ToString("dd/MM/yyyy")</small></td>
                                             
                                         </tr>
