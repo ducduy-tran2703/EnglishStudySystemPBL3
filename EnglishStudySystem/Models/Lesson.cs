@@ -30,11 +30,17 @@ namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với 
         [Display(Name = "URL Video")]
         public string Video_URL { get; set; } // Tương ứng với Video_URL
 
+        // Mặc định là false (không cho học thử)
+        [Display(Name = "Cho phép học thử miễn phí")] // Hiển thị trong UI
+        public bool IsFreeTrial { get; set; } = false;
+
         // --- THÔNG TIN THEO DÕI (AUDIT FIELDS) ---
         // Các trường CreatedBy, UpdatedBy nên là string để khớp với Id của ApplicationUser (GUID).
-        [Required]
         [Display(Name = "Người tạo")]
         public string CreatedByUserId { get; set; } // Lưu ID của người tạo (string từ ApplicationUser.Id)
+
+        [ForeignKey("CreatedByUserId")] // Chỉ định khóa ngoại
+        public virtual ApplicationUser CreatedByUser { get; set; }
 
         [StringLength(15)]
         [Display(Name = "Vai trò người tạo")]
@@ -48,7 +54,10 @@ namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với 
         [Display(Name = "Người cập nhật")]
         public string UpdatedByUserId { get; set; } // Lưu ID của người cập nhật (string từ ApplicationUser.Id)
 
-        [StringLength(10)]
+         [ForeignKey("UpdatedByUserId")]
+         public virtual ApplicationUser UpdatedByUser { get; set; }
+
+        [StringLength(15)]
         [Display(Name = "Vai trò người cập nhật")]
         public string UpdatedByUserRole { get; set; }
 

@@ -246,6 +246,18 @@
     <Compile Include="Migrations\202505151739118_UpdateMaxLengthOfUserRoleInLesson.Designer.cs">
       <DependentUpon>202505151739118_UpdateMaxLengthOfUserRoleInLesson.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505151838235_update.cs" />
+    <Compile Include="Migrations\202505151838235_update.Designer.cs">
+      <DependentUpon>202505151838235_update.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505171345134_UpdateConstrainstDB.cs" />
+    <Compile Include="Migrations\202505171345134_UpdateConstrainstDB.Designer.cs">
+      <DependentUpon>202505171345134_UpdateConstrainstDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.cs" />
+    <Compile Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.Designer.cs">
+      <DependentUpon>202505230907418_UpdateClass_IsfreeTrial.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -279,6 +291,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505151739118_UpdateMaxLengthOfUserRoleInLesson.resx">
       <DependentUpon>202505151739118_UpdateMaxLengthOfUserRoleInLesson.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505151838235_update.resx">
+      <DependentUpon>202505151838235_update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505171345134_UpdateConstrainstDB.resx">
+      <DependentUpon>202505171345134_UpdateConstrainstDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.resx">
+      <DependentUpon>202505230907418_UpdateClass_IsfreeTrial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

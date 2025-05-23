@@ -19,6 +19,9 @@ namespace EnglishStudySystem.Models
         public DateTime? DateOfBirth { get; set; }
         public bool IsActive { get; set; } = true; // Mặc định là kích hoạt
         public UserAccountStatus AccountStatus { get; set; } = UserAccountStatus.Normal; // Trạng thái tài khoản (Normal/VIP)
+        public bool CanManageUsers { get; set; }
+        public bool CanManageCategories { get; set; }
+        public bool CanManageNotifications { get; set; }
 
         // Thuộc tính điều hướng (Navigation properties)
         public virtual ICollection<SavedLesson> SavedLessons { get; set; }
@@ -26,12 +29,11 @@ namespace EnglishStudySystem.Models
         public virtual ICollection<Notification> SentNotifications { get; set; } // Thông báo được gửi bởi người dùng này
         public virtual ICollection<UserNotification> UserNotifications { get; set; } // Thông báo mà người dùng này nhận được (qua bảng trung gian)
         public virtual ICollection<Comment> Comments { get; set; } // <-- Thuộc tính này đã có sẵn và được giữ nguyên
-
         public virtual ICollection<UserPermission> UserPermissions { get; set; }
         // Nếu cần thêm các thuộc tính cho Admin/Editor, có thể thêm ở đây
-        // Ví dụ: Public bool CanManageUsers { get; set; }
-        // Public bool CanManageLessons { get; set; }
-
+        public virtual ICollection<UserTestAttempt> UserTestAttempts{ get; set; }
+        //public virtual ICollection<Category> Categories { get; set; } // Danh muc tao boi nguoi dung nay
+        //public virtual ICollection<Lesson> Lessons { get; set; } // Bai hoc duoc nguoi dung nay tao ra
         public ApplicationUser()
         {
             // Khởi tạo các collections để tránh lỗi null reference
@@ -41,6 +43,9 @@ namespace EnglishStudySystem.Models
             UserNotifications = new HashSet<UserNotification>();
             Comments = new HashSet<Comment>(); // <-- Đảm bảo được khởi tạo tại đây
             UserPermissions = new HashSet<UserPermission>();
+            UserTestAttempts = new HashSet<UserTestAttempt>();
+            //Categories = new HashSet<Category>();
+            //Lessons = new HashSet<Lesson>();
         }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
@@ -174,7 +179,7 @@ namespace EnglishStudySystem.Models
                 .HasRequired(c => c.User)
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.UserId)
-                .WillCascadeOnDelete(false); // Không xóa tự động nếu người dùng bị xóa
+                .WillCascadeOnDelete(true); //  xóa tự động nếu người dùng bị xóa
 
             modelBuilder.Entity<Comment>()
                 .HasRequired(c => c.Lesson)
@@ -215,12 +220,12 @@ namespace EnglishStudySystem.Models
                 .HasRequired(p => p.User)
                 .WithMany() // Có thể thêm ICollection<Payment> trong ApplicationUser nếu cần điều hướng ngược lại
                 .HasForeignKey(p => p.UserId)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             // Cấu hình quan hệ cho UserTestAttempt (Người dùng - Test)
             modelBuilder.Entity<UserTestAttempt>()
                 .HasRequired(uta => uta.User)
-                .WithMany() // Có thể thêm ICollection<UserTestAttempt> trong ApplicationUser
+                .WithMany(u => u.UserTestAttempts) // Có thể thêm ICollection<UserTestAttempt> trong ApplicationUser
                 .HasForeignKey(uta => uta.UserId)
                 .WillCascadeOnDelete(true);
 
@@ -241,7 +246,7 @@ namespace EnglishStudySystem.Models
                 .HasRequired(ua => ua.Question)
                 .WithMany() // Có thể thêm ICollection<UserAnswer> trong Question
                 .HasForeignKey(ua => ua.QuestionId)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<UserAnswer>()
                 .HasRequired(ua => ua.SelectedAnswer)
@@ -285,6 +290,29 @@ namespace EnglishStudySystem.Models
                 .HasForeignKey(un => un.UserId) // Khóa ngoại là UserId
                 .WillCascadeOnDelete(false); // Quan trọng: Không xóa UserNotification nếu User bị xóa (để tránh xóa User)
 
+            modelBuilder.Entity<Category>()
+                .HasOptional(c => c.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.CreatedByUserId)
+                .WillCascadeOnDelete(false); // Không xóa Category nếu người tạo bị xóa
+
+            modelBuilder.Entity<Category>()
+                .HasOptional(c => c.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.UpdatedByUserId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Lesson>()
+                .HasOptional(l => l.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(l => l.CreatedByUserId)
+                .WillCascadeOnDelete(false); // Không xóa Lesson nếu người tạo bị xóa
+
+            modelBuilder.Entity<Lesson>()
+                .HasOptional(l => l.UpdatedByUser)  
+                .WithMany()
+                .HasForeignKey (l => l.UpdatedByUserId)
+                .WillCascadeOnDelete(false); // Không xóa Lesson nếu người cập nhật bị xóa
             // Lưu ý: Dòng này có vẻ không đúng nếu UserViewModel chỉ là một ViewModel để hiển thị.
             // Dbset chỉ nên dùng cho các Entity Model ánh xạ tới bảng trong database.
             // Nếu UserViewModel không phải là một Entity Model, hãy xóa dòng này.

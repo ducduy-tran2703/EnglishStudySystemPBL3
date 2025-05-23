@@ -37,9 +37,11 @@ namespace EnglishStudySystem.Models
 
         // --- THÔNG TIN THEO DÕI (AUDIT FIELDS) ---
         // Các trường CreatedBy, UpdatedBy nên là string để khớp với Id của ApplicationUser (GUID).
-        [Required]
         [Display(Name = "Người tạo")]
         public string CreatedByUserId { get; set; } // Lưu ID của người tạo (string từ ApplicationUser.Id)
+
+        [ForeignKey("CreatedByUserId")] // Chỉ định khóa ngoại
+        public virtual ApplicationUser CreatedByUser { get; set; }
 
         [StringLength(15)]
         [Display(Name = "Vai trò người tạo")]
@@ -52,6 +54,9 @@ namespace EnglishStudySystem.Models
 
         [Display(Name = "Người cập nhật")]
         public string UpdatedByUserId { get; set; } // Lưu ID của người cập nhật (string từ ApplicationUser.Id)
+
+        [ForeignKey("UpdatedByUserId")]
+        public virtual ApplicationUser UpdatedByUser { get; set; }
 
         [StringLength(15)]
         [Display(Name = "Vai trò người cập nhật")]
