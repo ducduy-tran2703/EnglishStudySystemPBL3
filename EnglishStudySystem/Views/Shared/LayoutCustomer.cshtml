@@ -63,13 +63,7 @@
                     </a>
 
                     <div class="dropdown me-3" data-bs-toggle="tooltip" title="Thông báo">
-                        <a class="nav-link" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell fs-4"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                            @Html.AntiForgeryToken()
-                            @Html.Action("List", "Notification")
-                        </ul>
+                        @Html.Action("NotificationBell", "Notification")
                     </div>
 
                 <!-- User Profile Dropdown -->
