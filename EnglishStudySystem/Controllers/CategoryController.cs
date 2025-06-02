@@ -76,6 +76,15 @@ namespace EnglishStudySystem.Controllers
 
             return View(category);
         }
+        [ChildActionOnly]
+        public ActionResult List()
+        {
+            var categories = _context.Categories
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.Name)
+                .ToList();
+            return PartialView("_CategoryDropdownPartial", categories);
+        }
 
     }
 }

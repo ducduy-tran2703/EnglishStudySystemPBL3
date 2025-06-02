@@ -32,6 +32,24 @@ namespace EnglishStudySystem.Controllers
                 return PartialView("_NotificationDropdownPartial", userNotifications);
             }
         }
+        [ChildActionOnly]
+        public ActionResult NotificationBell()
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                var currentUserId = User.Identity.GetUserId();
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return PartialView("_NotificationBellPartial", 0);
+                }
+                // Lấy số lượng thông báo chưa đọc
+                var unreadCount = db.UserNotifications
+                                    .Count(un => un.UserId == currentUserId && !un.IsRead);
+                ViewBag.UnreadCount = (int)unreadCount;
+                return PartialView("_NotificationBellPartial");
+            }
+
+        }
 
         public ActionResult MarkAsRead(int notification_id,string NAction,string NController,string area ,int id,string secondaryId)
         {

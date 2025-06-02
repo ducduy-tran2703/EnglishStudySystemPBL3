@@ -429,6 +429,8 @@
     <Content Include="Views\Test\Completed.cshtml" />
     <Content Include="Views\Test\Details.cshtml" />
     <Content Include="Views\Shared\_CommentPartial.cshtml" />
+    <Content Include="Views\Category\_CategoryDropdownPartial.cshtml" />
+    <Content Include="Views\Notification\_NotificationBellPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
