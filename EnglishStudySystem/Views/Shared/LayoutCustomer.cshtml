@@ -35,18 +35,9 @@
                             <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" data-bs-toggle="dropdown">
                                 <i class="fas fa-list me-1"></i> Danh mục
                             </a>
-                            <ul class="dropdown-menu" id="CategoryList">
-                                @if (ViewBag.ListCategories != null)
-                                {
-                                    foreach (var category in (List<EnglishStudySystem.Models.Category>)ViewBag.ListCategories)
-                                    {
-                                        <li>
-                                            <a href="@Url.Action("Details", "Category", new { id = category.Id })">
-                                                @category.Name
-                                            </a>
-                                        </li>
-                                    }
-                                }
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                                @Html.AntiForgeryToken()
+                                @Html.Action("List", "Category")
                             </ul>
                         </div>
                     </div>
