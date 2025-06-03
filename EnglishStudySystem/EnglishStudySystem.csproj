@@ -222,6 +222,8 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\FavoriteLessonViewModel.cs" />
+    <Compile Include="ViewModel\LessonHistoryViewModel.cs" />
     <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
     <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
       <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
@@ -274,6 +276,7 @@
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\SavedLesson.cs" />
     <Compile Include="Models\Test.cs" />
+    <Compile Include="Models\TestHistoryViewModel.cs" />
     <Compile Include="Models\UserAnswer.cs" />
     <Compile Include="Models\UserNotification.cs" />
     <Compile Include="Models\UserPermission.cs" />
