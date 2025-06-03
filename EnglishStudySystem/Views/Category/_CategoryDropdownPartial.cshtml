@@ -1,0 +1,18 @@
+﻿
+@model IEnumerable<EnglishStudySystem.Models.Category>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var category in Model)
+    {
+        <li>
+            <a class="dropdown-item" href="@Url.Action("Details", "Category", new { id = category.Id })">
+                @category.Name
+            </a>
+        </li>
+    }
+}
+else
+{
+    <li><a class="dropdown-item" href="#">Không có danh mục nào</a></li>
+}

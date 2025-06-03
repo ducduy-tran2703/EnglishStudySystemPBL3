@@ -44,7 +44,7 @@ namespace EnglishStudySystem.Controllers
                 string result = _momoService.CheckPaymentMOMO(orderID);
                 if (result == "SuccessPayMent")
                 {
-                    SavePaymentToDatabase(amount, orderID, categoryId);
+                    SavePaymentToDatabase(amount, orderID, categoryId,"Completed");
 
                     // Lấy thông tin khóa học
                     var category = _db.Categories.Find(categoryId);
@@ -63,6 +63,7 @@ namespace EnglishStudySystem.Controllers
                 }
                 else
                 {
+                    SavePaymentToDatabase(amount, orderID, categoryId, "Rejected");
                     // Lấy thông tin khóa học
                     var category = _db.Categories.Find(categoryId);
                     string courseName = category?.Name ?? "khóa học";
@@ -85,7 +86,7 @@ namespace EnglishStudySystem.Controllers
             }
         }
 
-        private void SavePaymentToDatabase(decimal amount, string orderID, int categoryId)
+        private void SavePaymentToDatabase(decimal amount, string orderID, int categoryId,string status)
         {
             try
             {
@@ -95,15 +96,14 @@ namespace EnglishStudySystem.Controllers
                     System.Diagnostics.Debug.WriteLine("Lỗi: UserId null");
                     return;
                 }
-
                 var payment = new Payment
                 {
                     Amount = amount,
                     PaymentDate = DateTime.Now,
-                    Status = "Completed",
+                    Status = status,
                     TransactionId = orderID,
                     PaymentMethod = "MOMOPAYMENT",
-                    Description = "Đã thanh toán khóa học",
+                    Description = "Hoàn tất xử lý",
                     UserId = userId,
                     CategoryId = categoryId
                 };

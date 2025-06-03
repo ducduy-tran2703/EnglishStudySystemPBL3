@@ -31,6 +31,7 @@ namespace EnglishStudySystem.Controllers
                 return HttpNotFound();
             }
 
+            // Sắp xếp bài học: ưu tiên IsFreeTrial = true, sau đó theo CreatedDate
             var lessons = _context.Lessons
                 .Where(l => l.CategoryId == id && !l.IsDeleted)
                 .OrderBy(l => l.CreatedDate)
@@ -72,7 +73,17 @@ namespace EnglishStudySystem.Controllers
             ViewBag.ListCategories = categories;
             ViewBag.DaMua = daMua;
             ViewBag.Lessons = lessons;
+
             return View(category);
+        }
+        [ChildActionOnly]
+        public ActionResult List()
+        {
+            var categories = _context.Categories
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.Name)
+                .ToList();
+            return PartialView("_CategoryDropdownPartial", categories);
         }
 
     }
