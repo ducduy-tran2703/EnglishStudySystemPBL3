@@ -39,7 +39,8 @@
                             <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
                                 @if (category.Price.HasValue && category.Price > 0)
                                 {
-                                    <text>@string.Format("{0:C0}", category.Price.Value)</text>
+                                    // Thay đổi CultureInfo để định dạng tiền tệ theo USD
+                                    <text>@string.Format(new System.Globalization.CultureInfo("en-US"), "{0:C0}", category.Price.Value)</text>
                                 }
                                 else
                                 {

@@ -19,7 +19,8 @@
             <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3 d-flex align-items-center" style="font-size: 1rem; height: 40px;">
                 @if (Model.Price.HasValue && Model.Price > 0)
                 {
-                    <text>@string.Format("{0:C0}", Model.Price.Value)</text>
+                    // Thay đổi CultureInfo để định dạng tiền tệ theo USD
+                    <text>@string.Format(new System.Globalization.CultureInfo("en-US"), "{0:C0}", Model.Price.Value)</text>
                 }
                 else
                 {
