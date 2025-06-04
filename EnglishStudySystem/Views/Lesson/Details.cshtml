@@ -56,13 +56,13 @@
                     <!-- Comment Form -->
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <div class="mb-4">
-                            <form id="commentForm" method="post" action="@Url.Action("AddComment", "Lesson")">
+                        <div class="mb-4 w-100">
+                            <form id="commentForm" method="post" action="@Url.Action("AddComment", "Lesson")" class="w-100">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="LessonId" value="@Model.Id" />
                                 <input type="hidden" name="ParentCommentId" value="" id="parentCommentId" />
-                                <div class="form-group mb-3">
-                                    <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required id="commentContent"></textarea>
+                                <div class="form-group mb-3 w-100">
+                                    <textarea class="form-control w-100" name="Content" rows="3" placeholder="Viết bình luận của bạn..." required id="commentContent"></textarea>
                                 </div>
                                 <div id="replyingTo" class="mb-2 text-muted" style="display: none;"></div>
                                 <button type="submit" class="btn btn-success me-2">Gửi bình luận</button>
@@ -97,7 +97,6 @@
         </div>
 
         <!-- Sidebar -->
-        <!-- Sidebar -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-bottom py-3">
@@ -107,7 +106,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-2">
                             <i class="fas fa-user me-2 text-muted"></i>
-                            <strong>Người tạo:</strong> @ViewBag.CreatorName - @Model.CreatedByUserRole
+                            <strong>Người tạo:</strong> @ViewBag.CreatorName 
                         </li>
                         <li class="mb-2">
                             <i class="fas fa-calendar me-2 text-muted"></i>
@@ -117,7 +116,7 @@
                         {
                             <li class="mb-2">
                                 <i class="fas fa-user-edit me-2 text-muted"></i>
-                                <strong>Cập nhật bởi:</strong> @ViewBag.UpdaterName - @Model.CreatedByUserRole
+                                <strong>Cập nhật bởi:</strong> @ViewBag.UpdaterName 
                             </li>
                             <li>
                                 <i class="fas fa-calendar-check me-2 text-muted"></i>
@@ -171,7 +170,34 @@
                 </div>
             </div>
         </div>
+    </div>
 </main>
+
+<!-- Modal xác nhận xóa comment -->
+<div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="delete-icon-container mb-3">
+                    <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="modal-title mb-3" id="deleteCommentModalLabel">Xác nhận xóa bình luận</h5>
+                <p class="text-muted mb-4">Bạn có chắc chắn muốn xóa bình luận này? Hành động này không thể hoàn tác.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </button>
+                    <button type="button" class="btn btn-danger px-4" id="confirmDeleteComment">
+                        <i class="fas fa-trash-alt me-2"></i>Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @helper RenderComment(EnglishStudySystem.Models.Comment comment, List<EnglishStudySystem.Models.Comment> allComments)
 {
@@ -257,6 +283,7 @@
             font-weight: 500;
             padding: 0.25em 0.4em;
         }
+
         .media {
             padding: 12px;
             border-radius: 8px;
@@ -282,12 +309,6 @@
             padding-left: 1.5rem !important;
         }
 
-        .badge {
-            font-size: 0.7rem;
-            font-weight: 500;
-            padding: 0.25em 0.4em;
-        }
-
         .bg-primary {
             background-color: #0d6efd !important;
         }
@@ -300,15 +321,229 @@
         .opacity-50 {
             opacity: 0.5;
         }
+
+        /* CSS cải thiện cho textarea bình luận */
+        #commentForm {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #commentForm .form-group {
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0;
+        }
+
+        #commentContent {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            resize: vertical;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .mb-4.w-100 {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        #commentForm .btn {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-body {
+            overflow: hidden;
+        }
+
+        #replyingTo {
+            background-color: #e3f2fd;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border-left: 3px solid #2196f3;
+        }
+
+        #commentForm .d-flex {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Style cho nút Yêu thích */
+        #btnSaveLesson {
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+        }
+
+        #btnSaveLesson i {
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger .fa-heart {
+            color: #dc3545 !important;
+        }
+
+        .btn-danger .fa-heart {
+            color: white !important;
+        }
+
+        .btn-outline-danger:hover .fa-heart {
+            color: white !important;
+        }
+
+        @@keyframes heartBeat {
+            0% {
+                transform: scale(1);
+            }
+
+            25% {
+                transform: scale(1.1);
+            }
+
+            50% {
+                transform: scale(1);
+            }
+
+            75% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .heart-beat {
+            animation: heartBeat 0.5s;
+        }
+
+        /* CSS cho modal xác nhận xóa */
+        .delete-modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            animation: slideDownIn 0.4s ease-out;
+        }
+
+        @@keyframes slideDownIn {
+            0% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.fade:not(.show) .modal-dialog {
+            transform: translateY(-100px);
+        }
+
+        .delete-icon-container {
+            position: relative;
+        }
+
+        .delete-icon-container i {
+            animation: bounce 2s infinite;
+        }
+
+        @@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #c82333, #a71e2a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #5a6268, #495057);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            #commentContent {
+                font-size: 16px !important;
+                padding: 0.75rem;
+            }
+
+            #commentForm .btn {
+                width: auto;
+                margin-right: 0.25rem;
+                margin-bottom: 0.25rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .modal-dialog {
+                margin: 1rem;
+            }
+
+            .delete-modal-content {
+                border-radius: 10px;
+            }
+
+            .modal-body {
+                padding: 2rem 1.5rem;
+            }
+
+            .delete-icon-container i {
+                font-size: 2.5rem;
+            }
+        }
     </style>
+
     <script>
         $(document).ready(function() {
+            var commentIdToDelete = null;
+
             // Save lesson button click handler
             $('#btnSaveLesson').click(function() {
                 var $btn = $(this);
                 var isSaved = $btn.hasClass('btn-danger');
 
-                // Thêm hiệu ứng nhấp nháy
                 $btn.find('i').addClass('heart-beat');
                 setTimeout(() => {
                     $btn.find('i').removeClass('heart-beat');
@@ -329,21 +564,54 @@
                 });
             });
 
-            // Delete comment handler
-            $('.btn-delete-comment').click(function() {
-                if (confirm('Bạn có chắc muốn xóa bình luận này?')) {
+            // Xử lý click nút xóa comment - Hiển thị modal
+            $(document).on('click', '.btn-delete-comment', function() {
+                commentIdToDelete = $(this).data('comment-id');
+
+                // Hiển thị modal xác nhận
+                var deleteModal = new bootstrap.Modal(document.getElementById('deleteCommentModal'));
+                deleteModal.show();
+            });
+
+            // Xử lý xác nhận xóa
+            $('#confirmDeleteComment').click(function() {
+                if (commentIdToDelete) {
                     var $btn = $(this);
-                    var commentId = $btn.data('comment-id');
+                    var originalText = $btn.html();
+                    $btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang xóa...');
+                    $btn.prop('disabled', true);
 
                     $.post('@Url.Action("DeleteComment", "Lesson")', {
-                        id: commentId
+                        id: commentIdToDelete
                     }).done(function(response) {
                         if (response.success) {
-                            $btn.closest('.media').addClass('opacity-50');
-                            $btn.remove();
+                            $('#deleteCommentModal').modal('hide');
+
+                            var $commentElement = $('#comment-' + commentIdToDelete);
+                            $commentElement.fadeOut(300, function() {
+                                $(this).addClass('opacity-50').fadeIn(300);
+                                $(this).find('.btn-delete-comment').remove();
+                            });
+
+                            showSuccessToast('Bình luận đã được xóa thành công!');
+                        } else {
+                            showErrorToast('Có lỗi xảy ra: ' + response.message);
                         }
+                    }).fail(function() {
+                        showErrorToast('Có lỗi xảy ra khi xóa bình luận');
+                    }).always(function() {
+                        $btn.html(originalText);
+                        $btn.prop('disabled', false);
+                        commentIdToDelete = null;
                     });
                 }
+            });
+
+            // Reset modal khi đóng
+            $('#deleteCommentModal').on('hidden.bs.modal', function() {
+                commentIdToDelete = null;
+                $('#confirmDeleteComment').html('<i class="fas fa-trash-alt me-2"></i>Xóa');
+                $('#confirmDeleteComment').prop('disabled', false);
             });
 
             // Comment form submission
@@ -357,7 +625,7 @@
                     data: $form.serialize(),
                     success: function (response) {
                         if (response.success) {
-                            location.reload(); // Reload trang để hiển thị comment mới
+                            location.reload();
                         } else {
                             alert('Có lỗi xảy ra: ' + response.message);
                         }
@@ -391,83 +659,53 @@
                 $('#commentContent').attr('placeholder', 'Viết bình luận của bạn...').focus();
             });
         });
+
+        // Hàm hiển thị toast thông báo thành công
+        function showSuccessToast(message) {
+            var toast = `
+                <div class="toast align-items-center text-white bg-success border-0 position-fixed"
+                     style="top: 20px; right: 20px; z-index: 9999;" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-check-circle me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(toast);
+            var toastElement = $('.toast').last()[0];
+            var bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            bsToast.show();
+
+            $(toastElement).on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+
+        // Hàm hiển thị toast thông báo lỗi
+        function showErrorToast(message) {
+            var toast = `
+                <div class="toast align-items-center text-white bg-danger border-0 position-fixed"
+                     style="top: 20px; right: 20px; z-index: 9999;" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-exclamation-circle me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(toast);
+            var toastElement = $('.toast').last()[0];
+            var bsToast = new bootstrap.Toast(toastElement, { delay: 5000 });
+            bsToast.show();
+
+            $(toastElement).on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
     </script>
-
-    <style>
-        .opacity-50 {
-            opacity: 0.5;
-        }
-
-        #btnSaveLesson i {
-            transition: all 0.3s ease;
-        }
-
-        .media {
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            margin-bottom: 15px;
-        }
-
-            .media .media {
-                background-color: #f0f2f5;
-                margin-top: 10px;
-            }
-
-        .border-start {
-            border-left: 3px solid #dee2e6 !important;
-        }
-
-        .ps-4 {
-            padding-left: 1.5rem !important;
-        }
-
-        /* Style cho nút Yêu thích */
-        #btnSaveLesson {
-            transition: all 0.3s ease;
-            padding: 8px 16px;
-        }
-
-        /* Trái tim màu đỏ khi chưa yêu thích */
-        .btn-outline-danger .fa-heart {
-            color: #dc3545 !important;
-        }
-
-        /* Trái tim màu trắng khi đã yêu thích */
-        .btn-danger .fa-heart {
-            color: white !important;
-        }
-
-        /* Khi hover nút chưa yêu thích, trái tim chuyển trắng */
-        .btn-outline-danger:hover .fa-heart {
-            color: white !important;
-        }
-
-        /* Hiệu ứng nhấp nháy khi click */
-        @@keyframes heartBeat {
-            0% {
-                transform: scale(1);
-            }
-
-            25% {
-                transform: scale(1.1);
-            }
-
-            50% {
-                transform: scale(1);
-            }
-
-            75% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .heart-beat {
-            animation: heartBeat 0.5s;
-        }
-    </style>
 }

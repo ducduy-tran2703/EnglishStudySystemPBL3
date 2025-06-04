@@ -1,0 +1,287 @@
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.LessonEditViewModel
+
+@{
+    ViewBag.Title = "Chỉnh sửa Bài học";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white mb-0" style="background: linear-gradient(135deg, #2c3e50, #3498db); padding: 10px 20px; border-radius: 8px;">
+            <i class="fas fa-edit me-2"></i>@ViewBag.Title
+        </h2>
+        <div>
+            @Html.ActionLink("Quay lại", "Details", "Categories", new { id = Model.CategoryId }, new { @class = "btn btn-primary" })
+        </div>
+    </div>
+
+    <div class="card shadow-sm" style="border: none; border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
+            <h4 class="mb-0">
+                <i class="fas fa-book me-2"></i>Thông tin bài học - Danh mục: @Model.CategoryName
+            </h4>
+        </div>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.CategoryId)
+
+            <div class="card-body" style="background-color: #f8f9fa;">
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "form-label fw-bold", style = "color: #3498db;" })
+                            <div class="input-group">
+                                <span class="input-group-text text-white" style="background-color: #3498db;">
+                                    <i class="fas fa-heading"></i>
+                                </span>
+                                @Html.EditorFor(model => model.Title, new
+                                {
+                                    htmlAttributes = new
+                                    {
+                                        @class = "form-control",
+                                        style = "border-left: none;"
+                                    }
+                                })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "form-label fw-bold", style = "color: #3498db;" })
+                    <div class="input-group">
+                        <span class="input-group-text text-white align-items-start pt-2" style="background-color: #3498db;">
+                            <i class="fas fa-align-left"></i>
+                        </span>
+                        @Html.TextAreaFor(model => model.Description, new
+                        {
+                            @class = "form-control",
+                            rows = 5,
+                            style = "min-height: 150px; resize: vertical; border-left: none;"
+                        })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="form-group mb-4">
+                    @Html.LabelFor(model => model.Video_URL, htmlAttributes: new { @class = "form-label fw-bold", style = "color: #3498db;" })
+                    <div class="input-group">
+                        <span class="input-group-text text-white" style="background-color: #3498db;">
+                            <i class="fas fa-video"></i>
+                        </span>
+                        @Html.EditorFor(model => model.Video_URL, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control",
+                                style = "border-left: none;"
+                            }
+                        })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Video_URL, "", new { @class = "text-danger small" })
+                    <small class="text-muted">Ví dụ: https://www.youtube.com/embed/VIDEO_ID</small>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success px-4 py-2">
+                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary ms-2 px-4 py-2">
+                        <i class="fas fa-undo me-2"></i>Nhập lại
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Phần thông tin audit -->
+    <div class="card shadow-sm mt-4" style="border: none; border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
+            <h4 class="mb-0">
+                <i class="fas fa-history me-2"></i>Thông tin theo dõi
+            </h4>
+        </div>
+        <div class="card-body" style="background-color: #f8f9fa;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-item mb-2">
+                        <span class="text-muted">Người tạo:</span>
+                        <span class="fw-bold">@Model.CreatedByUserId</span>
+                        <span class="badge" style="background-color: #3498db;">@Model.CreatedByUserRole</span>
+                    </div>
+                    <div class="info-item mb-2">
+                        <span class="text-muted">Ngày tạo:</span>
+                        <span class="fw-bold">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+                {
+                    <div class="col-md-6">
+                        <div class="info-item mb-2">
+                            <span class="text-muted">Người cập nhật:</span>
+                            <span class="fw-bold">@Model.UpdatedByUserId</span>
+                            <span class="badge" style="background-color: #3498db;">@Model.UpdatedByUserRole</span>
+                        </div>
+                        <div class="info-item mb-2">
+                            <span class="text-muted">Ngày cập nhật:</span>
+                            <span class="fw-bold">@Model.UpdatedDate?.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Phần quản lý bài kiểm tra -->
+    <div class="card shadow-sm mt-4" style="border: none; border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-tasks me-2"></i>Bài kiểm tra của bài học
+                </h4>
+                @Html.ActionLink("Thêm mới Bài kiểm tra", "Create", "Tests", new { lessonId = Model.Id }, new { @class = "btn btn-success btn-sm" })
+            </div>
+        </div>
+        <div class="card-body p-0" style="background-color: #f8f9fa;">
+            @if (Model.Tests != null && Model.Tests.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="text-white" style="background-color: #3498db;">
+                            <tr>
+                                <th width="40%">Tiêu đề</th>
+                                <th width="30%">Số câu hỏi</th>
+                                <th width="30%">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var test in Model.Tests.OrderBy(t => t.Id))
+                            {
+                                <tr style="background-color: white;">
+                                    <td>
+                                        <strong>@test.Title</strong>
+                                    </td>
+                                    <td>
+                                        @test.QuestionCount
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            @Html.ActionLink("Chi tiết", "Details", "Tests", new { id = test.Id }, new { @class = "btn btn-sm btn-info" })
+                                            @Html.ActionLink("Sửa", "Edit", "Tests", new { id = test.Id }, new { @class = "btn btn-sm btn-warning text-white" })
+
+                                            @using (Html.BeginForm("SoftDelete", "Tests", new { id = test.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài kiểm tra này?');">
+                                                    <i class="fas fa-trash-alt me-1"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-center">
+                    <p class="text-muted mb-4">Chưa có bài kiểm tra nào cho bài học này.</p>
+                    @Html.ActionLink("Thêm mới Bài kiểm tra", "Create", "Tests", new { lessonId = Model.Id }, new { @class = "btn btn-success" })
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group-text {
+            min-width: 40px;
+            justify-content: center;
+        }
+
+        .info-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+
+        .btn-info {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #f39c12;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+            .table tbody tr:hover {
+                background-color: rgba(52, 152, 219, 0.1) !important;
+            }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

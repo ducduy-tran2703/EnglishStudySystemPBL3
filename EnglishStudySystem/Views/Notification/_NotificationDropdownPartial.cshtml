@@ -17,21 +17,14 @@
     {
         var liClass = item.IsRead ? "read-notification" : "unread-notification";
         var notificationId = item.Id;
-
-        // Xây dựng URL từ các thuộc tính trong Notification
-        var url = Url.Action(item.Notification.TargetAction, item.Notification.TargetController, new
-        {
-            area = item.Notification.TargetArea,
-            primaryId = item.Notification.PrimaryRelatedEntityId,
-            secondaryId = item.Notification.SecondaryRelatedEntityId
-        });
-
         <li class="@liClass">
-            <a class="dropdown-item notification-link" href="@url" data-notification-id="@notificationId">
+            <a class="dropdown-item notification-link" href="@Url.Action("MarkAsRead", "Notification", new { notification_id = notificationId,NAction = item.Notification.TargetAction,NController =item.Notification.TargetController,area = item.Notification.TargetArea,
+id = item.Notification.PrimaryRelatedEntityId,
+secondaryId = item.Notification.SecondaryRelatedEntityId })">
                 <strong>@item.Notification.Title</strong>
                 @{
                     var content = item.Notification.Content;
-                    var maxLength = 50;
+                    var maxLength = 100;
                     var truncatedContent = "";
 
                     if (string.IsNullOrEmpty(content))

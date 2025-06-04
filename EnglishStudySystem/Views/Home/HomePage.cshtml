@@ -3,9 +3,9 @@
     ViewBag.Title = "Trang chủ - English Study";
 }
 <main class="container py-4">
-    <!-- Header Section - Đổi tiêu đề thành "Bạn Muốn Gì Hôm Nay" -->
+    <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">Bạn Muốn Gì Hôm Nay</h2> <!-- Đã bỏ text-success để mặc định màu đen -->
+        <h2 class="fw-bold mb-0">Bạn Muốn Gì Hôm Nay</h2>
         <div class="dropdown">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
                 <i class="fas fa-sort me-1"></i> Sắp xếp
@@ -15,7 +15,6 @@
                 <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "oldest" })">Cũ nhất</a></li>
                 <li><a class="dropdown-item" href="@Url.Action("HomePage", "Home", new { sortOrder = "name" })">A-Z</a></li>
             </ul>
-
         </div>
     </div>
 
@@ -24,22 +23,19 @@
         @foreach (var category in Model)
         {
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
+                <div class="card h-100 border-0 shadow-sm d-flex flex-column">
+                    <!-- Card Body -->
+                    <div class="card-body d-flex flex-column">
+                        <!-- Phần header với title và giá -->
                         <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <!-- Đổi màu tiêu đề danh mục thành đen -->
-                                <h3 class="h5 fw-bold mb-1">@category.Name</h3> <!-- Đã bỏ text-success -->
-                                @if (!string.IsNullOrEmpty(category.Description))
-                                {
-                                    <p class="text-muted small mb-2">@category.Description</p>
-                                }
+                            <div class="flex-grow-1">
+                                <h3 class="h5 fw-bold mb-1 card-title-fixed">@category.Name</h3>
                             </div>
-                            <!-- Đổi màu giá tiền thành vàng -->
-                            <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3">
+                            <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3 ms-2">
                                 @if (category.Price.HasValue && category.Price > 0)
                                 {
-                                    <text>@string.Format("{0:C0}", category.Price.Value)</text>
+                                    // Thay đổi CultureInfo để định dạng tiền tệ theo USD
+                                    <text>@string.Format(new System.Globalization.CultureInfo("en-US"), "{0:C0}", category.Price.Value)</text>
                                 }
                                 else
                                 {
@@ -48,16 +44,38 @@
                             </span>
                         </div>
 
-                        <div class="d-flex flex-wrap gap-2 mb-3">
-                            <span class="badge bg-success bg-opacity-10 text-success py-1 px-2">
-                                <i class="fas @GetCategoryIcon(category.Name) me-1"></i>
-                                @GetCategoryTag(category.Name)
-                            </span>
+                        <!-- Phần mô tả với chiều cao cố định -->
+                        <div class="card-description-container mb-3">
+                            @if (!string.IsNullOrEmpty(category.Description))
+                            {
+                                <p class="text-muted small mb-0">@category.Description</p>
+                            }
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
+                        <!-- Hiển thị Tổng hợp và số lượng bài học, bài kiểm tra -->
+                        <div>
+                            <!-- Badge Tổng hợp nằm phía trên -->
+                            <div>
+                                <span class="badge bg-success bg-opacity-10 text-success py-1 px-2 larger-text">
+                                    <i class="fas fa-layer-group me-1"></i> Tổng hợp
+                                </span>
+                            </div>
+                            <!-- Số lượng bài học và bài kiểm tra -->
+                            <div>
+                                <span class="badge bg-primary bg-opacity-10 text-primary py-1 px-2 me-2">
+                                    <i class="fas fa-book me-1"></i> @category.Lessons.Count() bài học
+                                </span>
+                                <span class="badge bg-info bg-opacity-10 text-info py-1 px-2">
+                                    <i class="fas fa-clipboard-check me-1"></i>
+                                    @(category.Lessons.Sum(l => l.Tests.Count)) bài kiểm tra
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Phần User info và nút - luôn ở dưới cùng -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
+                                <div class="avatar-sm bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2">
                                     <i class="fas fa-user text-success"></i>
                                 </div>
                                 <div class="fw-semibold">
@@ -67,7 +85,7 @@
                                             ? userNames[category.CreatedByUserId]
                                             : "System";
                                     }
-                                    @userName - @(category.CreatedByUserRole ?? "Admin")
+                                    @userName
                                 </div>
                             </div>
                             <a href="@Url.Action("Details", "Category", new { id = category.Id })"
@@ -76,6 +94,8 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Card Footer -->
                     <div class="card-footer bg-transparent border-top py-2">
                         <small class="text-success">
                             <i class="far fa-clock me-1"></i>
@@ -105,24 +125,65 @@
         background-color: rgba(255, 193, 7, 0.1) !important;
         border: 1px solid rgba(255, 193, 7, 0.2);
     }
+
+    /* Custom màu cho badge bài học */
+    .badge.bg-primary {
+        color: #007bff !important;
+        background-color: rgba(0, 123, 255, 0.1) !important;
+        border: 1px solid rgba(0, 123, 255, 0.2);
+    }
+
+    /* Custom màu cho badge bài kiểm tra */
+    .badge.bg-info {
+        color: #17a2b8 !important;
+        background-color: rgba(23, 162, 184, 0.1) !important;
+        border: 1px solid rgba(23, 162, 184, 0.2);
+    }
+
+    /* Đảm bảo tất cả card có cùng chiều cao và layout nhất quán */
+    .card {
+        min-height: 280px; /* Chiều cao tối thiểu cho card */
+    }
+
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    /* Cố định chiều cao cho title để badge nằm ngang hàng */
+    .card-title-fixed {
+        min-height: 48px; /* Đủ chỗ cho 2 dòng title */
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Cố định chiều cao cho phần mô tả */
+    .card-description-container {
+        min-height: 20px; /* Đủ chỗ cho 2 dòng mô tả */
+    }
+
+        .card-description-container p {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+    .larger-text {
+        font-size: 1em; /* Đã điều chỉnh lại để chữ "Tổng hợp" to hơn theo yêu cầu trước */
+    }
+
+        .larger-text i {
+            font-size: 0.6em; /* Điều chỉnh icon để không bị to theo text (0.667 = 1/1.5) */
+        }
+
+    /* Xóa khoảng cách giữa Tổng hợp và các badge bên dưới */
+    .mb-3 > div + div {
+        margin-top: 0 !important;
+    }
 </style>
-
-@functions {
-    public string GetCategoryIcon(string categoryName)
-    {
-        if (categoryName.Contains("Giao tiếp")) return "fa-comments";
-        if (categoryName.Contains("Ngữ pháp")) return "fa-pen-fancy";
-        if (categoryName.Contains("Từ vựng")) return "fa-spell-check";
-        if (categoryName.Contains("Luyện nghe")) return "fa-headphones";
-        return "fa-book";
-    }
-
-    public string GetCategoryTag(string categoryName)
-    {
-        if (categoryName.Contains("Giao tiếp")) return "Giao tiếp";
-        if (categoryName.Contains("Ngữ pháp")) return "Ngữ pháp";
-        if (categoryName.Contains("Từ vựng")) return "Từ vựng";
-        if (categoryName.Contains("Luyện nghe")) return "Luyện nghe";
-        return "Tổng hợp";
-    }
-}

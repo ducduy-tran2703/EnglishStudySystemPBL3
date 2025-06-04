@@ -1,0 +1,155 @@
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.LessonCreateViewModel
+
+@{
+    ViewBag.Title = "Thêm mới Bài học";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white mb-0" style="background: linear-gradient(135deg, #2c3e50, #3498db); padding: 10px 20px; border-radius: 8px;">
+            <i class="fas fa-plus-circle me-2"></i>@ViewBag.Title
+        </h2>
+        <div>
+            @Html.ActionLink("Quay lại", "Details", "Categories", new { id = Model.CategoryId }, new { @class = "btn btn-primary" })
+        </div>
+    </div>
+
+    <div class="card shadow-sm" style="border: none; border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
+            <h4 class="mb-0">
+                <i class="fas fa-book me-2"></i>Thông tin bài học - Danh mục: @ViewBag.CategoryName
+            </h4>
+        </div>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.CategoryId)
+
+            <div class="card-body" style="background-color: #f8f9fa;">
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "form-label fw-bold", style = "color: #3498db;" })
+                            <div class="input-group">
+                                <span class="input-group-text text-white" style="background-color: #3498db;">
+                                    <i class="fas fa-heading"></i>
+                                </span>
+                                @Html.EditorFor(model => model.Title, new
+                                {
+                                    htmlAttributes = new
+                                    {
+                                        @class = "form-control",
+                                        placeholder = "Nhập tiêu đề bài học",
+                                        style = "border-left: none;"
+                                    }
+                                })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "form-label fw-bold", style = "color: #3498db;" })
+                    <div class="input-group">
+                        <span class="input-group-text text-white align-items-start pt-2" style="background-color: #3498db;">
+                            <i class="fas fa-align-left"></i>
+                        </span>
+                        @Html.TextAreaFor(model => model.Description, new
+                        {
+                            @class = "form-control",
+                            rows = 5,
+                            placeholder = "Nhập mô tả bài học",
+                            style = "min-height: 150px; resize: vertical; border-left: none;"
+                        })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="form-group mb-4">
+                    @Html.LabelFor(model => model.Video_URL, htmlAttributes: new { @class = "form-label fw-bold", style = "color: #3498db;" })
+                    <div class="input-group">
+                        <span class="input-group-text text-white" style="background-color: #3498db;">
+                            <i class="fas fa-video"></i>
+                        </span>
+                        @Html.EditorFor(model => model.Video_URL, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control",
+                                placeholder = "Nhập URL video bài học",
+                                style = "border-left: none;"
+                            }
+                        })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Video_URL, "", new { @class = "text-danger small" })
+                    <small class="text-muted">Ví dụ: https://www.youtube.com/embed/VIDEO_ID</small>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success px-4 py-2">
+                        <i class="fas fa-save me-2"></i>Thêm mới
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary ms-2 px-4 py-2">
+                        <i class="fas fa-undo me-2"></i>Nhập lại
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group-text {
+            min-width: 40px;
+            justify-content: center;
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 8px;
+            border: none;
+        }
+    </style>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,15 @@
+﻿<div class="dropdown me-3" data-bs-toggle="tooltip" title="Thông báo">
+    <a class="nav-link position-relative" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
+        <i class="fas fa-bell fs-4"></i>
+        @if (ViewBag.UnreadCount != null && (int)ViewBag.UnreadCount > 0)
+        {
+            <span class="notification-badge bg-danger text-white">
+                @ViewBag.UnreadCount
+            </span>
+        }
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+        @Html.AntiForgeryToken()
+        @Html.Action("List", "Notification")
+    </ul>
+</div>

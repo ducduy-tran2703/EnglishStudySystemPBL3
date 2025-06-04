@@ -44,7 +44,7 @@ namespace EnglishStudySystem.Controllers
                 string result = _momoService.CheckPaymentMOMO(orderID);
                 if (result == "SuccessPayMent")
                 {
-                    SavePaymentToDatabase(amount, orderID, categoryId);
+                    SavePaymentToDatabase(amount, orderID, categoryId,"Completed");
 
                     // Lấy thông tin khóa học
                     var category = _db.Categories.Find(categoryId);
@@ -54,7 +54,7 @@ namespace EnglishStudySystem.Controllers
                     CreateNotification(
                         $"Thanh toán thành công khóa học ",
                         $"Bạn đã thanh toán thành công khóa học {courseName} với số tiền ${amount.ToString()}",
-                        true
+                        true, categoryId
                     );
 
                     Session.Remove("MomoOrderID");
@@ -63,6 +63,7 @@ namespace EnglishStudySystem.Controllers
                 }
                 else
                 {
+                    SavePaymentToDatabase(amount, orderID, categoryId, "Rejected");
                     // Lấy thông tin khóa học
                     var category = _db.Categories.Find(categoryId);
                     string courseName = category?.Name ?? "khóa học";
@@ -71,7 +72,7 @@ namespace EnglishStudySystem.Controllers
                     CreateNotification(
                         $"Thanh toán thất bại khóa học",
                         $"Thanh toán khóa học {courseName} với số tiền ${amount.ToString()} không thành công",
-                        false
+                        false, categoryId
                     );
 
                     Session.Remove("MomoOrderID");
@@ -85,7 +86,7 @@ namespace EnglishStudySystem.Controllers
             }
         }
 
-        private void SavePaymentToDatabase(decimal amount, string orderID, int categoryId)
+        private void SavePaymentToDatabase(decimal amount, string orderID, int categoryId,string status)
         {
             try
             {
@@ -95,15 +96,14 @@ namespace EnglishStudySystem.Controllers
                     System.Diagnostics.Debug.WriteLine("Lỗi: UserId null");
                     return;
                 }
-
                 var payment = new Payment
                 {
                     Amount = amount,
                     PaymentDate = DateTime.Now,
-                    Status = "Completed",
+                    Status = status,
                     TransactionId = orderID,
                     PaymentMethod = "MOMOPAYMENT",
-                    Description = "Đã thanh toán khóa học",
+                    Description = "Hoàn tất xử lý",
                     UserId = userId,
                     CategoryId = categoryId
                 };
@@ -119,7 +119,7 @@ namespace EnglishStudySystem.Controllers
             }
         }
 
-        private void CreateNotification(string title, string content, bool isSuccess)
+        private void CreateNotification(string title, string content, bool isSuccess, int categoryId)
         {
             try
             {
@@ -136,8 +136,12 @@ namespace EnglishStudySystem.Controllers
                     Title = title,
                     Content = content,
                     CreatedDate = DateTime.Now,
-                    SenderId = userId, // Có thể thay bằng ID admin nếu cần
-                    IsDeleted = false
+                    SenderId = "8c442efe-67d7-4ec6-a238-6adb7700b15b",
+                    IsDeleted = false,
+                    RelatedEntityType = "Payment",
+                    TargetController = "Category",
+                    TargetAction = "Details",
+                    PrimaryRelatedEntityId = categoryId,
                 };
 
                 _db.Notifications.Add(notification);

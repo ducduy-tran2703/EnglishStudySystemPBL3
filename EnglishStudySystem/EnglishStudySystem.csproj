@@ -171,17 +171,17 @@
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\CategoriesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Admin\Controllers\LessonsController.cs" />
     <Compile Include="Areas\Admin\Controllers\SharedController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
     <Compile Include="Areas\Admin\ViewModel\CategoryDetailsWithLessonsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\EditorStatItemViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\LessonCreateViewModel.cs" />
+    <Compile Include="Areas\Admin\ViewModel\LessonEditViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\LessonStatsViewModel.cs" />
-
     <Compile Include="Areas\Admin\ViewModel\QuickStatsViewModel.cs" />
-
     <Compile Include="Areas\Admin\ViewModel\CategoryCreateViewModel.cs" />
-
     <Compile Include="Areas\Admin\ViewModel\RegisterEditorViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\RevenueStatsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\UserStatsViewModel.cs" />
@@ -222,6 +222,8 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\FavoriteLessonViewModel.cs" />
+    <Compile Include="ViewModel\LessonHistoryViewModel.cs" />
     <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
     <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
       <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
@@ -242,6 +244,22 @@
     <Compile Include="Migrations\202505151556214_NotificationUpdate.Designer.cs">
       <DependentUpon>202505151556214_NotificationUpdate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505151739118_UpdateMaxLengthOfUserRoleInLesson.cs" />
+    <Compile Include="Migrations\202505151739118_UpdateMaxLengthOfUserRoleInLesson.Designer.cs">
+      <DependentUpon>202505151739118_UpdateMaxLengthOfUserRoleInLesson.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505151838235_update.cs" />
+    <Compile Include="Migrations\202505151838235_update.Designer.cs">
+      <DependentUpon>202505151838235_update.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505171345134_UpdateConstrainstDB.cs" />
+    <Compile Include="Migrations\202505171345134_UpdateConstrainstDB.Designer.cs">
+      <DependentUpon>202505171345134_UpdateConstrainstDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.cs" />
+    <Compile Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.Designer.cs">
+      <DependentUpon>202505230907418_UpdateClass_IsfreeTrial.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -258,6 +276,7 @@
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\SavedLesson.cs" />
     <Compile Include="Models\Test.cs" />
+    <Compile Include="Models\TestHistoryViewModel.cs" />
     <Compile Include="Models\UserAnswer.cs" />
     <Compile Include="Models\UserNotification.cs" />
     <Compile Include="Models\UserPermission.cs" />
@@ -272,6 +291,18 @@
     <Compile Include="ViewModel\HomeIndexViewModel.cs" />
     <EmbeddedResource Include="Migrations\202505151556214_NotificationUpdate.resx">
       <DependentUpon>202505151556214_NotificationUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505151739118_UpdateMaxLengthOfUserRoleInLesson.resx">
+      <DependentUpon>202505151739118_UpdateMaxLengthOfUserRoleInLesson.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505151838235_update.resx">
+      <DependentUpon>202505151838235_update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505171345134_UpdateConstrainstDB.resx">
+      <DependentUpon>202505171345134_UpdateConstrainstDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.resx">
+      <DependentUpon>202505230907418_UpdateClass_IsfreeTrial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +363,9 @@
     <Content Include="Areas\Admin\Views\Users\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\Home\Dashboard.cshtml" />
     <Content Include="Areas\Admin\Views\Shared\_QuickStats.cshtml" />
+    <Content Include="Areas\Admin\Views\Lessons\Create.cshtml" />
+    <Content Include="Areas\Admin\Views\Lessons\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Lessons\Details.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -398,6 +432,8 @@
     <Content Include="Views\Test\Completed.cshtml" />
     <Content Include="Views\Test\Details.cshtml" />
     <Content Include="Views\Shared\_CommentPartial.cshtml" />
+    <Content Include="Views\Category\_CategoryDropdownPartial.cshtml" />
+    <Content Include="Views\Notification\_NotificationBellPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
