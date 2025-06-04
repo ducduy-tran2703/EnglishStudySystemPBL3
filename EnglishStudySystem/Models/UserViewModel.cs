@@ -25,10 +25,14 @@ namespace EnglishStudySystem.Models
 
         [Display(Name = "Vai trò")]
         public string Roles { get; set; }
+        public bool CanManageUsers;
+        public bool CanManageCategories;
+        public bool CanManageNotifications;
         [Display(Name = "Các bài viết đã tạo")]
         public List<Category> Categories { get; set; } = new List<Category>();
         [Display(Name = "Các bài viết đã mua")]
         public List<Category> PurchasedCategories { get; set; } = new List<Category>();
+        
 
     }
 }

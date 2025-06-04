@@ -12,6 +12,7 @@ using EnglishStudySystem.Areas.Admin.ViewModel;
 using Microsoft.Owin.Logging;
 using System.Security.Claims;
 using System.Net;
+using Microsoft.AspNet.Identity;
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
@@ -43,6 +44,17 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // GET: Admin/Users
         public async Task<ActionResult> ListUser()
         {
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id); 
+            bool isAdmin = userRoles[0].Contains("Admin");
+            ViewBag.IsAdmin = isAdmin;
+            ViewBag.User_now = user_now;
+            System.Diagnostics.Debug.WriteLine($"Admin Roles: {string.Join(", ", userRoles)}"); // Hiển thị tất cả các vai trò người dùng có
+            System.Diagnostics.Debug.WriteLine($"Admin Roles: {isAdmin}");
             // Lấy TẤT CẢ user từ database
             var allUsersFromDb = await _userManager.Users.ToListAsync();
             System.Diagnostics.Debug.WriteLine($"Total users fetched from DB: {allUsersFromDb.Count}"); // Ghi log số lượng
@@ -64,6 +76,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                             Email = user.Email,
                             FullName = user.FullName,
                             IsActive = user.IsActive,
+                            CanManageUsers = user.CanManageUsers,
+                            CanManageCategories = user.CanManageCategories,
+                            CanManageNotifications = user.CanManageNotifications,
                             // AccountStatus = user.AccountStatus, // Đảm bảo ApplicationUser có thuộc tính này
                             Roles = string.Join(", ", roles)
                         });
@@ -90,13 +105,13 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             {
                 return HttpNotFound();
             }
-
-            // Get roles of the user asynchronously
-            var roles = await _userManager.GetRolesAsync(user.Id);
+        // Get roles of the user asynchronously
+        var roles = await _userManager.GetRolesAsync(user.Id);
 
             // UserViewModel của bạn (từ EnglishStudySystem.Models)
             // đã tự khởi tạo Categories và PurchasedCategories thành List<Category> rỗng
             // trong constructor của nó.
+
             var userViewModel = new UserViewModel // UserViewModel từ namespace Models hoặc Admin.ViewModel
             {
                 Id = user.Id,
@@ -104,7 +119,10 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 Email = user.Email,
                 FullName = user.FullName,           // Đảm bảo ApplicationUser có FullName
                 IsActive = user.IsActive,
-                AccountStatus = user.AccountStatus, // Đảm bảo ApplicationUser có AccountStatus và kiểu khớp
+                AccountStatus = user.AccountStatus,
+                CanManageCategories = user.CanManageCategories,
+                CanManageNotifications = user.CanManageNotifications,
+                CanManageUsers = user.CanManageUsers,
                 Roles = string.Join(", ", roles)
                 // Categories và PurchasedCategories sẽ được điền bên dưới
             };
@@ -247,6 +265,15 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         public async Task<ActionResult> ListDeletedAccount()
         {
 
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            bool isAdmin = userRoles[0].Contains("Admin");
+            ViewBag.IsAdmin = isAdmin;
+            ViewBag.User_now = user_now;
             var usersWithRoles = await _userManager.Users.ToListAsync();
 
             var userViewModels = new List<UserViewModel>();
@@ -367,6 +394,81 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             //return RedirectToAction("Delete", new { id });
         }
-        
-    }
+        [HttpPost]
+        [ActionName("LockUserManager")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LockUserManager(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.CanManageUsers = !user.CanManageUsers;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "User", "LockUserManager"));
+            }
+
+            return RedirectToAction("ListUser");
+        }
+
+        [HttpPost]
+        [ActionName("LockCategoryManager")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LockCategoryManager(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.CanManageCategories = !user.CanManageCategories;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "User", "LockCategoryManager"));
+            }
+
+            return RedirectToAction("ListUser");
+        }
+
+        [HttpPost]
+        [ActionName("LockNotificationManager")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LockNotificationManager(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.CanManageNotifications = !user.CanManageNotifications;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "User", "LockNotificationManager"));
+            }
+
+             return await ListUser();
+        }
+       
+
+        }
 }
