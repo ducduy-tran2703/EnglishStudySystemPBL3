@@ -396,10 +396,10 @@ namespace EnglishStudySystem.Controllers
         public ActionResult ForgotPassword()
         {
             var categories = _context.Categories
-    .Where(c => !c.IsDeleted)
-    .OrderByDescending(c => c.CreatedDate)
-    .Take(6)
-    .ToList();
+            .Where(c => !c.IsDeleted)
+            .OrderByDescending(c => c.CreatedDate)
+            .Take(6)
+            .ToList();
             ViewBag.ListCategories = categories;
             return View();
         }
