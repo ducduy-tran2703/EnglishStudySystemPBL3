@@ -1,0 +1,53 @@
+﻿@model IEnumerable<EnglishStudySystem.Models.Payment>
+
+@{
+    ViewBag.Title = "Lịch sử giao dịch";
+    Layout = "~/Views/Shared/LayoutCustomer.cshtml";
+}
+
+<h2>Lịch sử giao dịch</h2>
+<hr />
+
+@if (!Model.Any())
+{
+    <p>Chưa có giao dịch nào.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Ngày thanh toán</th>
+                <th>Khóa học</th>
+                <th>Số tiền</th>
+                <th>Trạng thái</th>
+                <th>Phương thức</th>
+                <th>Mã giao dịch</th>
+                <th>Mô tả</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var payment in Model)
+            {
+                <tr>
+                    <td>@payment.PaymentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@(payment.Category?.Name ?? "Không xác định")</td>
+                    <td>@String.Format("{0:N0}₫", payment.Amount)</td>
+                    <td>@payment.Status</td>
+                    <td>@payment.PaymentMethod</td>
+                    <td>@payment.TransactionId</td>
+                    <td>@payment.Description</td>
+                    <td>
+                        @if (payment.Status == "Failed")
+                        {
+                            <a href="@Url.Action("RetryPayment", "Customer", new { paymentId = payment.Id })" class="btn btn-sm btn-warning">
+                                Thanh toán lại
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

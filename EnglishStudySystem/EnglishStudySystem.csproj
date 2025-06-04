@@ -434,6 +434,7 @@
     <Content Include="Views\Shared\_CommentPartial.cshtml" />
     <Content Include="Views\Category\_CategoryDropdownPartial.cshtml" />
     <Content Include="Views\Notification\_NotificationBellPartial.cshtml" />
+    <Content Include="Views\Customer\PaymentHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
