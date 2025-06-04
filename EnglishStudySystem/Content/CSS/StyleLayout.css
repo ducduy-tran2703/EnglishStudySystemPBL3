@@ -109,3 +109,14 @@ body {
 .dropdown.show .dropdown-toggle::after {
     transform: rotate(180deg);
 }
+.notification-badge {
+    position: absolute;
+    top: 4px; /* Hạ xuống thấp hơn */
+    right: 2px; /* Gần mép phải hơn */
+    transform: translate(50%, -20%); /* Dịch nhẹ để che một phần chuông */
+    font-size: 0.65rem;
+    padding: 3px 6px;
+    border-radius: 999px;
+    z-index: 10;
+}
+
