@@ -213,7 +213,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 // Lấy tất cả người dùng có role là "Student" (học viên)
                 var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
                 var students = await userManager.Users
-                    .Where(u => u.Roles.Any(r => r.RoleId == "Student")) // Giả sử role Student có ID là "Student"
+                    .Where(u => u.Roles.Any(r => r.RoleId == "3380b389-119c-4443-91e6-c9bb52bd8513")) // Giả sử role Student có ID là "Student"
                     .ToListAsync();
 
                 // Tạo UserNotification cho từng học viên
