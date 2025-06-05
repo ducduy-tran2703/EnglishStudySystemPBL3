@@ -174,52 +174,38 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             };
             return View(userViewModel);
         }
-        [HttpGet]
-        public async Task<ActionResult> Delete(string id)
-        {
-                var user = await _userManager.FindByIdAsync(id);
-                if (user == null)
-                {
-                    return HttpNotFound();
-                }
-
-                var roles = _userManager.GetRoles(user.Id);
-
-                var userViewModel = new UserViewModel
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    IsActive = user.IsActive,
-                    AccountStatus = user.AccountStatus,
-                    Roles = string.Join(", ", roles)
-                };
-                return View(userViewModel);          
-        }
 
         [HttpPost]
-        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            
-           
-
+            try
+            {
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                 {
-                    return HttpNotFound();
+                    return Json(new { success = false, message = "Không tìm thấy người dùng" });
                 }
+
                 user.IsActive = false;
-                _context.SaveChanges();
-                return RedirectToAction("ListUser");
-                // Handle errors
-              
-                //return RedirectToAction("Delete", new { id });
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return Json(new { success = true, message = $"Đã xóa tài khoản {user.UserName} thành công!" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = string.Join(", ", result.Errors) });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
         }
-            
-        
+
+
         //[Authorize(Roles = "Admin")]
         public ActionResult CreateEditor()
         {

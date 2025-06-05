@@ -6,8 +6,44 @@
 }
 
 <div class="container-fluid px-4">
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-trash-alt text-danger" style="font-size: 3rem; opacity: 0.7;"></i>
+                    </div>
+                    <h6 class="mb-3">Bạn có chắc chắn muốn xóa tài khoản?</h6>
+                    <p class="text-muted mb-0">
+                        <strong id="userNameToDelete"></strong>
+                    </p>
+                    <small class="text-muted">Tài khoản sẽ được đánh dấu là không hoạt động!</small>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Hủy
+                    </button>
+                    <form id="deleteForm" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="userIdToDelete" />
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="fas fa-trash-alt me-1"></i>Xác nhận xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card border-0 shadow-lg rounded-lg overflow-hidden">
-        <!-- Card Header with Gradient Background -->
+        <!-- Tiêu đề thẻ với nền gradient -->
         <div class="card-header bg-gradient-success text-white py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -17,21 +53,19 @@
                     <small class="font-weight-light">Quản lý tất cả người dùng hệ thống</small>
                 </div>
                 <div>
-
                     @if (ViewBag.IsAdmin != null && ViewBag.IsAdmin)
                     {
                         @Html.ActionLink("Tạo Editor", "CreateEditor", "Users", null,
                              new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
                     }
-
-                        @Html.ActionLink("Tài khoản đã xóa", "ListDeletedAccount", "Users", null,
+                    @Html.ActionLink("Tài khoản đã xóa", "ListDeletedAccount", "Users", null,
                         new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
-                    </div>
+                </div>
             </div>
         </div>
 
         <div class="card-body p-0">
-            <!-- Search and Filter Section -->
+            <!-- Phần tìm kiếm và lọc -->
             <div class="p-4 border-bottom">
                 <div class="row">
                     <div class="col-md-8">
@@ -42,13 +76,13 @@
                                 </span>
                             </div>
                             <input type="text" id="userSearch" class="form-control border-0 py-2"
-                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">               
+                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Role Tabs with Icons -->
+            <!-- Tab vai trò với biểu tượng -->
             <ul class="nav nav-tabs nav-justified border-bottom-0 px-4 pt-3" id="userTabs" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active d-flex flex-column align-items-center" id="admin-tab" data-toggle="tab" href="#admin" role="tab">
@@ -73,9 +107,9 @@
                 </li>
             </ul>
 
-            <!-- Tab Content -->
+            <!-- Nội dung tab -->
             <div class="tab-content p-4" id="userTabsContent">
-                <!-- Admin Tab -->
+                <!-- Tab Admin -->
                 <div class="tab-pane fade show active" id="admin" role="tabpanel">
                     <div class="table-responsive rounded-lg shadow-sm">
                         <table class="table table-hover mb-0">
@@ -124,7 +158,7 @@
                     </div>
                 </div>
 
-                <!-- Editor Tab -->
+                <!-- Tab Editor -->
                 <div class="tab-pane fade" id="editor" role="tabpanel">
                     <div class="table-responsive rounded-lg shadow-sm">
                         <table class="table table-hover mb-0">
@@ -151,97 +185,95 @@
                                         </td>
                                         <td>@item.Email</td>
                                         <td>@item.FullName</td>
-
                                         <td>
                                             <span class="badge @(item.IsActive ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
                                                 @(item.IsActive ? "Hoạt động" : "Không hoạt động")
                                             </span>
                                         </td>
-                                        
-                                            <td class="text-center">
-                                                <div class="btn-group btn-group-sm shadow" role="group">
-                                                    <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
-                                                        <i class="fas fa-info-circle text-info"></i>
-                                                    </a>
-                                                    @if (ViewBag.IsAdmin!= null && ViewBag.IsAdmin)
-                                                    {
-                                                        <!-- LockUserManager form -->
-                                                        if (item.CanManageUsers)
-                                                        {
-                                                            <form action="@Url.Action("LockUserManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý người dùng">
-                                                                    <i class="fas fa-user-lock text-warning"></i>
-                                                                </button>
-                                                            </form>
-                                                        }
-                                                        else
-                                                        {
-                                                            <form action="@Url.Action("LockUserManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý người dùng">
-                                                                    <i class="fas fa-user text-success"></i>
-                                                                </button>
-                                                            </form>
-                                                        }
-
-                                                        <!-- LockCategoryManager form -->
-                                                        if (item.CanManageCategories)
-                                                        {
-                                                            <form action="@Url.Action("LockCategoryManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý danh mục">
-                                                                    <i class="fas fa-folder-minus text-warning"></i>
-                                                                </button>
-                                                            </form>
-                                                        }
-                                                        else
-                                                        {
-                                                            <form action="@Url.Action("LockCategoryManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý danh mục">
-                                                                    <i class="fas fa-folder-minus text-success"></i>
-                                                                </button>
-                                                            </form>
-                                                        }
-
-                                                        <!-- LockNotificationManager form -->
-                                                        if (item.CanManageNotifications)
-                                                        {
-                                                            <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý thông báo">
-                                                                    <i class="fas fa-bell-slash text-warning"></i>
-                                                                </button>
-                                                            </form>
-                                                        }
-                                                        else
-                                                        {
-                                                            <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý thông báo">
-                                                                    <i class="fas fa-bell text-success"></i>
-                                                                </button>
-                                                            </form>
-                                                        }
-
-                                                        <!-- Delete form -->
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm shadow" role="group">
+                                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
+                                                    <i class="fas fa-info-circle text-info"></i>
                                                 </a>
+                                                @if (ViewBag.IsAdmin != null && ViewBag.IsAdmin)
+                                                {
+                                                    <!-- Form LockUserManager -->
+                                                    if (item.CanManageUsers)
+                                                    {
+                                                        <form action="@Url.Action("LockUserManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý người dùng">
+                                                                <i class="fas fa-user-lock text-warning"></i>
+                                                            </button>
+                                                        </form>
                                                     }
-                                                    </div>
-                                            </td>
-                                            
-                                  </tr>
-                                }
+                                                    else
+                                                    {
+                                                        <form action="@Url.Action("LockUserManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý người dùng">
+                                                                <i class="fas fa-user text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
 
+                                                    <!-- Form LockCategoryManager -->
+                                                    if (item.CanManageCategories)
+                                                    {
+                                                        <form action="@Url.Action("LockCategoryManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý danh mục">
+                                                                <i class="fas fa-folder-minus text-warning"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form action="@Url.Action("LockCategoryManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý danh mục">
+                                                                <i class="fas fa-folder-minus text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    <!-- Form LockNotificationManager -->
+                                                    if (item.CanManageNotifications)
+                                                    {
+                                                        <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý thông báo">
+                                                                <i class="fas fa-bell-slash text-warning"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý thông báo">
+                                                                <i class="fas fa-bell text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    <!-- Nút xóa với thuộc tính data -->
+                                            <a href="#" class="btn btn-light btn-delete" title="Xóa"
+                                               data-id="@item.Id"
+                                               data-username="@item.UserName">
+                                                <i class="fas fa-trash-alt text-danger"></i>
+                                            </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Customer Tab -->
+                <!-- Tab Customer -->
                 <div class="tab-pane fade" id="customer" role="tabpanel">
                     <div class="table-responsive rounded-lg shadow-sm">
                         <table class="table table-hover mb-0">
@@ -278,12 +310,14 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                @if (ViewBag.user_now.CanManageUsers || ViewBag.IsAdmin) { 
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
-                                                </a>
+                                                @if (ViewBag.user_now.CanManageUsers || ViewBag.IsAdmin)
+                                                {
+                                                   <a href="#" class="btn btn-light btn-delete" title="Xóa"
+                                                      data-id="@item.Id"
+                                                      data-username="@item.UserName">
+                                                       <i class="fas fa-trash-alt text-danger"></i>
+                                                   </a>
                                                 }
-                                                
                                             </div>
                                         </td>
                                     </tr>
@@ -294,7 +328,7 @@
                 </div>
             </div>
 
-            <!-- Empty State -->
+            <!-- Trạng thái trống -->
             <div class="text-center py-5 empty-state d-none">
                 <div class="py-5">
                     <i class="fas fa-user-slash fa-4x text-muted mb-4"></i>
@@ -311,21 +345,51 @@
 
 @section scripts {
     <script>
-        $(document).ready(function () {
-            // Initialize tooltips
-            $('[title]').tooltip({
-                placement: 'top',
-                trigger: 'hover'
-            });
+        // Xử lý submit form xóa
+$('#deleteForm').on('submit', function(e) {
+    e.preventDefault();
+    const form = $(this);
 
-            // Tab functionality
+    // Hiển thị loading
+    $('#confirmDeleteBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang xóa...');
+
+    $.ajax({
+        url: '@Url.Action("DeleteConfirmed", "Users")',
+        type: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+            if (response.success) {
+                // Hiển thị thông báo thành công
+                toastr.success(response.message);
+                // Đóng modal và reload trang sau 1.5 giây
+                $('#deleteConfirmModal').modal('hide');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                // Hiển thị thông báo lỗi
+                toastr.error(response.message);
+                $('#confirmDeleteBtn').prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i>Xác nhận xóa');
+            }
+        },
+        error: function(xhr) {
+            // Hiển thị thông báo lỗi từ server
+            let errorMessage = 'Có lỗi xảy ra khi xóa tài khoản';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
+            toastr.error(errorMessage);
+            $('#confirmDeleteBtn').prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i>Xác nhận xóa');
+        }
+    });
+});
+
+            // Chức năng tab
             $('#userTabs a').on('click', function (e) {
                 e.preventDefault();
                 $(this).tab('show');
                 updateEmptyState();
             });
 
-            // Search functionality with debounce
+            // Chức năng tìm kiếm với debounce
             let searchTimeout;
             $('#userSearch').on('keyup', function () {
                 clearTimeout(searchTimeout);
@@ -334,22 +398,12 @@
                 }, 300);
             });
 
-            // Filter functionality
+            // Chức năng lọc
             $('.filter-option').on('click', function (e) {
                 e.preventDefault();
                 $('.filter-option').removeClass('active');
                 $(this).addClass('active');
                 filterUsers($(this).data('filter'));
-            });
-
-            // Delete confirmation
-            $('.btn-delete').on('click', function (e) {
-                e.preventDefault();
-                const deleteUrl = $(this).attr('href');
-
-                if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
-                    window.location.href = deleteUrl;
-                }
             });
 
             function filterUsers(statusFilter = 'all') {
@@ -364,13 +418,11 @@
                     const fullname = $row.data('fullname');
                     const rowStatus = $row.data('status');
 
-                    // Kiểm tra tìm kiếm
                     const matchesSearch = searchTerm === '' ||
                         username.includes(searchTerm) ||
                         email.includes(searchTerm) ||
                         fullname.includes(searchTerm);
 
-                    // Kiểm tra bộ lọc trạng thái
                     const matchesFilter = statusFilter === 'all' || rowStatus === statusFilter;
 
                     if (matchesSearch && matchesFilter) {
@@ -409,158 +461,196 @@
                 filterUsers();
             }
 
-            // Initialize
+            // Khởi tạo
             updateEmptyState();
         });
     </script>
 }
 
-<style>
-    /* Custom CSS for enhanced appearance */
-    .form-control {
-        flex: 1;
-        width: 100%;
-        max-width: 800px;
-        border-radius: 100px;
-    }
-    .card {
-        border-radius: 0.5rem;
-        overflow: hidden;
-    }
-
-    .card-header {
-        border-bottom: none;
-    }
-
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    }
-
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #007bff 0%, #3d8bfd 100%);
-    }
-
-    .bg-gradient-warning {
-        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-    }
-
-    .bg-gradient-info {
-        background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
-    }
-
-    .avatar-sm {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .nav-tabs {
-        border-bottom: none;
-    }
-
-        .nav-tabs .nav-link {
-            border: none;
-            color: #6c757d;
-            font-weight: 500;
-            padding: 1rem 0.5rem;
-            transition: all 0.3s;
-            position: relative;
-            background: transparent;
+@section styles {
+    <style>
+        .form-control {
+            flex: 1;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 100px;
         }
 
-            .nav-tabs .nav-link.active {
-                color: #28a745;
+        .card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            border-bottom: none;
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #007bff 0%, #3d8bfd 100%);
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+        }
+
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            border-bottom: none;
+        }
+
+            .nav-tabs .nav-link {
+                border: none;
+                color: #6c757d;
+                font-weight: 500;
+                padding: 1rem 0.5rem;
+                transition: all 0.3s;
+                position: relative;
                 background: transparent;
             }
 
-                .nav-tabs .nav-link.active:after {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 40px;
-                    height: 3px;
-                    background: #28a745;
-                    border-radius: 3px;
+                .nav-tabs .nav-link.active {
+                    color: #28a745;
+                    background: transparent;
                 }
 
-            .nav-tabs .nav-link:hover:not(.active) {
-                color: #28a745;
-                background: rgba(40, 167, 69, 0.05);
-            }
+                    .nav-tabs .nav-link.active:after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 40px;
+                        height: 3px;
+                        background: #28a745;
+                        border-radius: 3px;
+                    }
 
-    .badge-success-light {
-        background-color: rgba(40, 167, 69, 0.1);
-        color: #28a745;
-    }
+                .nav-tabs .nav-link:hover:not(.active) {
+                    color: #28a745;
+                    background: rgba(40, 167, 69, 0.05);
+                }
 
-    .badge-secondary-light {
-        background-color: rgba(108, 117, 125, 0.1);
-        color: #6c757d;
-    }
-
-    .table thead th {
-        border-bottom: 1px solid #e9ecef;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        color: #6c757d;
-    }
-
-    .table td {
-        vertical-align: middle;
-        border-top: 1px solid #f8f9fa;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
-
-    .btn-light {
-        background-color: #f8f9fa;
-        border-color: #f8f9fa;
-    }
-
-    .empty-state {
-        background-color: #f8f9fa;
-        border-radius: 0.5rem;
-        margin: 1rem;
-    }
-
-    .rounded-pill {
-        border-radius: 50rem !important;
-    }
-
-    .shadow-sm {
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-    }
-
-    .dropdown-menu {
-        border: none;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        border-radius: 0.5rem;
-    }
-
-    .dropdown-item {
-        padding: 0.5rem 1.5rem;
-    }
-
-        .dropdown-item.active {
+        .badge-success-light {
             background-color: rgba(40, 167, 69, 0.1);
             color: #28a745;
         }
 
-    .dropdown-divider {
-        border-color: #f8f9fa;
-    }
+        .badge-secondary-light {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
 
-    .dropdown-header {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #6c757d;
-        font-weight: 600;
-    }
-</style>
+        .table thead th {
+            border-bottom: 1px solid #e9ecef;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #f8f9fa;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-light {
+            background-color: #f8f9fa;
+            border-color: #f8f9fa;
+        }
+
+        .empty-state {
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            margin: 1rem;
+        }
+
+        .rounded-pill {
+            border-radius: 50rem !important;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1.5rem;
+        }
+
+            .dropdown-item.active {
+                background-color: rgba(40, 167, 69, 0.1);
+                color: #28a745;
+            }
+
+        .dropdown-divider {
+            border-color: #f8f9fa;
+        }
+
+        .dropdown-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        /* Modal Animation */
+        .modal.fade .modal-dialog {
+            transform: translateY(-100px);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+        }
+
+        /* Custom modal styling */
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+        }
+
+        /* Backdrop blur effect */
+        .modal-backdrop.show {
+            backdrop-filter: blur(3px);
+            background-color: rgba(0,0,0,0.6);
+        }
+    </style>
+}
