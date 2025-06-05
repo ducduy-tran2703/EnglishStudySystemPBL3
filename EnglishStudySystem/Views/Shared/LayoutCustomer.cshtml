@@ -74,6 +74,7 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")">Thông tin cá nhân</a></li>
                         <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")">Đổi mật khẩu</a></li>
+                        <li><a class="dropdown-item" href="@Url.Action("PaymentHistory", "Customer")">Lịch sử giao dịch</a></li>
                         <li>
                             @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
                             {

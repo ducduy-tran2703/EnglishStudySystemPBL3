@@ -292,5 +292,18 @@ namespace EnglishStudySystem.Controllers
                 return PartialView("_TestHistoryStats", viewModel);
             }
         }
+        public ActionResult PaymentHistory()
+        {
+            string currentUserId = User.Identity.GetUserId();
+
+            var payments = _context.Payments
+                             .Where(p => p.UserId == currentUserId)
+                             .Include("Category")
+                             .OrderByDescending(p => p.PaymentDate)
+                             .ToList();
+
+            return View(payments);
+        }
+
     }
 }
