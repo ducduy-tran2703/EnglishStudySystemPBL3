@@ -119,12 +119,15 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
-                                                    <i class="fas fa-undo text-success"></i>
-                                                </a>
+                                                @if (ViewBag.IsAdmin != null && ViewBag.IsAdmin)
+                                                {
+                                                    <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
+                                                        <i class="fas fa-undo text-success"></i>
+                                                    </a>
                                                 <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
                                                     <i class="fas fa-trash-alt text-danger"></i>
                                                 </a>
+                                                }
                                             </div>
                                         </td>
                                     </tr>
@@ -171,14 +174,17 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
-                                                    <i class="fas fa-undo text-success"></i>
+                                                @if (ViewBag.user_now.CanManageUsers || ViewBag.IsAdmin)
+                                                {
+                                                    <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
+                                                        <i class="fas fa-undo text-success"></i>
 
-                                                </a>
-                                                <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
-                                                </a>
-                                            </div>
+                                                    </a>
+                                                    <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </a>
+                                                }
+                                                </div>
                                         </td>
                                     </tr>
                                 }
