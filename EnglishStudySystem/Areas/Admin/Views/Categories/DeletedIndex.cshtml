@@ -51,18 +51,18 @@
                                     <div class="d-flex gap-2">
                                         @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
 
-                                        @using (Html.BeginForm("Restore", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                        @using (Html.BeginForm("Restore", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline restore-form", id = "restoreForm_" + item.Id }))
                                         {
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bạn có chắc chắn muốn khôi phục danh mục này?');">
+                                            <button type="button" class="btn btn-sm btn-success restore-btn" data-form-id="restoreForm_@item.Id" data-category-name="@item.Name">
                                                 <i class="fas fa-undo me-1"></i>Khôi phục
                                             </button>
                                         }
 
-                                        @using (Html.BeginForm("HardDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                        @using (Html.BeginForm("HardDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline hard-delete-form", id = "hardDeleteForm_" + item.Id }))
                                         {
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn XÓA VĨNH VIỄN danh mục này? Thao tác không thể hoàn tác!');">
+                                            <button type="button" class="btn btn-sm btn-danger hard-delete-btn" data-form-id="hardDeleteForm_@item.Id" data-category-name="@item.Name">
                                                 <i class="fas fa-trash-alt me-1"></i>Xóa vĩnh viễn
                                             </button>
                                         }
@@ -72,6 +72,73 @@
                         }
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận khôi phục -->
+<div class="modal fade" id="restoreConfirmModal" tabindex="-1" aria-labelledby="restoreConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white border-0">
+                <h5 class="modal-title" id="restoreConfirmModalLabel">
+                    <i class="fas fa-undo me-2"></i>Xác nhận khôi phục
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-undo text-success" style="font-size: 3rem; opacity: 0.7;"></i>
+                </div>
+                <h6 class="mb-3">Bạn có chắc chắn muốn khôi phục danh mục?</h6>
+                <p class="text-muted mb-0">
+                    <strong id="restoreCategoryName"></strong>
+                </p>
+                <small class="text-muted">Danh mục sẽ được đưa trở lại danh sách hoạt động.</small>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-success px-4" id="confirmRestoreBtn">
+                    <i class="fas fa-undo me-1"></i>Khôi phục
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa vĩnh viễn -->
+<div class="modal fade" id="hardDeleteConfirmModal" tabindex="-1" aria-labelledby="hardDeleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title" id="hardDeleteConfirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>CẢNH BÁO - Xóa vĩnh viễn
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-skull-crossbones text-danger" style="font-size: 3rem; opacity: 0.7;"></i>
+                </div>
+                <h5 class="mb-3 text-danger fw-bold">NGUY HIỂM!</h5>
+                <h6 class="mb-3">Bạn có chắc chắn muốn XÓA VĨNH VIỄN danh mục?</h6>
+                <p class="text-muted mb-2">
+                    <strong id="hardDeleteCategoryName"></strong>
+                </p>
+                <div class="alert alert-danger mx-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Thao tác này không thể hoàn tác!</strong><br>
+                    Dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-danger px-4" id="confirmHardDeleteBtn">
+                    <i class="fas fa-skull-crossbones me-1"></i>Xóa vĩnh viễn
+                </button>
             </div>
         </div>
     </div>
@@ -132,5 +199,115 @@
             background-color: #e74c3c;
             border-color: #e74c3c;
         }
+
+        /* Modal Animation */
+        .modal.fade .modal-dialog {
+            transform: translateY(-100px);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+        }
+
+        /* Custom modal styling */
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+        }
+
+        /* Button hover effects */
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+
+        /* Backdrop blur effect */
+        .modal-backdrop.show {
+            backdrop-filter: blur(3px);
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        /* Special styling for hard delete modal */
+        #hardDeleteConfirmModal .modal-content {
+            border: 2px solid #e74c3c;
+        }
+
+        #hardDeleteConfirmModal .alert-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: #c0392b;
+        }
+
+        /* Pulse animation for dangerous action */
+        .btn-danger:hover {
+            animation: pulse-danger 1s infinite;
+        }
+
+        @@keyframes pulse-danger {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
     </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let currentFormId = null;
+
+            // Xử lý click nút khôi phục
+            $('.restore-btn').click(function () {
+                currentFormId = $(this).data('form-id');
+                const categoryName = $(this).data('category-name');
+
+                $('#restoreCategoryName').text(categoryName);
+                $('#restoreConfirmModal').modal('show');
+            });
+
+            // Xử lý click nút xóa vĩnh viễn
+            $('.hard-delete-btn').click(function () {
+                currentFormId = $(this).data('form-id');
+                const categoryName = $(this).data('category-name');
+
+                $('#hardDeleteCategoryName').text(categoryName);
+                $('#hardDeleteConfirmModal').modal('show');
+            });
+
+            // Xử lý xác nhận khôi phục
+            $('#confirmRestoreBtn').click(function () {
+                if (currentFormId) {
+                    $('#' + currentFormId).submit();
+                }
+            });
+
+            // Xử lý xác nhận xóa vĩnh viễn
+            $('#confirmHardDeleteBtn').click(function () {
+                if (currentFormId) {
+                    $('#' + currentFormId).submit();
+                }
+            });
+
+            // Reset khi đóng modal
+            $('.modal').on('hidden.bs.modal', function () {
+                currentFormId = null;
+            });
+        });
+    </script>
 }

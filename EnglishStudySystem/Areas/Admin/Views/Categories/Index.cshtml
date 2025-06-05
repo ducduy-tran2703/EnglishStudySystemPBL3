@@ -58,10 +58,10 @@
                                         @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
                                         @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-sm btn-warning text-white" })
 
-                                        @using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                        @using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline delete-form", id = "deleteForm_" + item.Id }))
                                         {
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm danh mục này?');">
+                                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-form-id="deleteForm_@item.Id" data-category-name="@item.Name">
                                                 <i class="fas fa-trash-alt me-1"></i>Xóa
                                             </button>
                                         }
@@ -71,6 +71,37 @@
                         }
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-trash-alt text-danger" style="font-size: 3rem; opacity: 0.7;"></i>
+                </div>
+                <h6 class="mb-3">Bạn có chắc chắn muốn xóa danh mục?</h6>
+                <p class="text-muted mb-0">
+                    <strong id="categoryNameToDelete"></strong>
+                </p>
+                <small class="text-muted">Hành động này có thể được hoàn tác sau.</small>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-danger px-4" id="confirmDeleteBtn">
+                    <i class="fas fa-trash-alt me-1"></i>Xóa
+                </button>
             </div>
         </div>
     </div>
@@ -117,5 +148,77 @@
             .table tbody tr:hover {
                 background-color: rgba(52, 152, 219, 0.1) !important;
             }
+
+        /* Modal Animation */
+        .modal.fade .modal-dialog {
+            transform: translateY(-100px);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+        }
+
+        /* Custom modal styling */
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+        }
+
+        /* Button hover effects */
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+
+        /* Backdrop blur effect */
+        .modal-backdrop.show {
+            backdrop-filter: blur(3px);
+            background-color: rgba(0,0,0,0.6);
+        }
     </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let currentFormId = null;
+
+            // Xử lý click nút xóa
+            $('.delete-btn').click(function () {
+                currentFormId = $(this).data('form-id');
+                const categoryName = $(this).data('category-name');
+
+                $('#categoryNameToDelete').text(categoryName);
+                $('#deleteConfirmModal').modal('show');
+            });
+
+            // Xử lý xác nhận xóa
+            $('#confirmDeleteBtn').click(function () {
+                if (currentFormId) {
+                    $('#' + currentFormId).submit();
+                }
+            });
+
+            // Reset khi đóng modal
+            $('#deleteConfirmModal').on('hidden.bs.modal', function () {
+                currentFormId = null;
+            });
+        });
+    </script>
 }
