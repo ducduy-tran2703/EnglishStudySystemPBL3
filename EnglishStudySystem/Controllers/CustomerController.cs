@@ -268,16 +268,16 @@ namespace EnglishStudySystem.Controllers
             {
                 // Lấy danh sách các lần làm bài kiểm tra của user
                 var testAttempts = _context.UserTestAttempts
-                    .Where(uta => uta.UserId == userId)
-                    .Include(uta => uta.Test) // Load Test
-                    .Include(uta => uta.Test.Lesson) // Load Lesson từ Test (EF6 hỗ trợ đường dẫn)
-                    .Include(uta => uta.UserAnswers.Select(ua => ua.Question.Answers)) // Load sâu vào UserAnswers -> Question -> Answers
-                    .OrderByDescending(uta => uta.AttemptDate)
-                    .ToList();
+            .Where(uta => uta.UserId == userId)
+            .Include(uta => uta.Test) // Load Test
+            .Include(uta => uta.Test.Lesson) // Load Lesson từ Test
+            .OrderByDescending(uta => uta.AttemptDate)
+            .ToList();
 
                 // Tạo view model chứa các thông tin cần hiển thị
                 var viewModel = testAttempts.Select(uta => new TestHistoryViewModel
                 {
+                    Id = uta.Id,
                     TestId = uta.TestId,
                     TestTitle = uta.Test?.Title,
                     LessonName = uta.Test?.Lesson?.Title,
