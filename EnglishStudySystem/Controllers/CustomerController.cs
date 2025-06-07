@@ -297,10 +297,20 @@ namespace EnglishStudySystem.Controllers
             string currentUserId = User.Identity.GetUserId();
 
             var payments = _context.Payments
-                             .Where(p => p.UserId == currentUserId)
-                             .Include("Category")
-                             .OrderByDescending(p => p.PaymentDate)
-                             .ToList();
+                                 .Where(p => p.UserId == currentUserId)
+                                 .Include("Category")
+                                 .OrderByDescending(p => p.PaymentDate)
+                                 .ToList();
+
+            // Tạo danh sách các CategoryId đã có thanh toán thành công
+            var completedCategoryIds = payments
+                .Where(p => p.Status == "Completed")
+                .Select(p => p.CategoryId)
+                .Distinct()
+                .ToHashSet();
+
+            // Truyền danh sách này qua ViewBag để sử dụng trong View
+            ViewBag.CompletedCategoryIds = completedCategoryIds;
 
             return View(payments);
         }

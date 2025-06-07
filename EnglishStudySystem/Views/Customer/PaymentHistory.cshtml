@@ -1,10 +1,8 @@
 ﻿@model IEnumerable<EnglishStudySystem.Models.Payment>
-
 @{
     ViewBag.Title = "Lịch sử giao dịch";
     Layout = "~/Views/Shared/LayoutCustomer.cshtml";
 }
-
 <!-- CSS tùy chỉnh -->
 <style>
     h2.page-title {
@@ -39,10 +37,8 @@
         font-weight: bold;
     }
 </style>
-
 <h2 class="page-title">LỊCH SỬ GIAO DỊCH</h2>
 <hr />
-
 @if (!Model.Any())
 {
     <p class="text-center text-muted">Chưa có giao dịch nào.</p>
@@ -82,6 +78,10 @@ else
                             break;
                     }
 
+                    // Kiểm tra xem CategoryId này đã có thanh toán thành công chưa
+                    var completedCategoryIds = ViewBag.CompletedCategoryIds as HashSet<int>;
+                    bool hasCompletedPayment = completedCategoryIds != null && completedCategoryIds.Contains(payment.CategoryId);
+
                     <tr>
                         <td>@payment.PaymentDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@(payment.Category?.Name ?? "Không xác định")</td>
@@ -91,11 +91,15 @@ else
                         <td>@payment.TransactionId</td>
                         <td>@payment.Description</td>
                         <td>
-                            @if (payment.Status == "Failed")
+                            @if (payment.Status == "Failed" && !hasCompletedPayment)
                             {
                                 <a href="@Url.Action("Payment", "Customer", new { categoryId = payment.CategoryId })" class="btn btn-sm btn-warning">
                                     <i class="bi bi-arrow-repeat"></i> Thanh toán lại
                                 </a>
+                            }
+                            else if (payment.Status == "Failed" && hasCompletedPayment)
+                            {
+                                <span class="text-muted">Đã thanh toán</span>
                             }
                         </td>
                     </tr>
