@@ -85,7 +85,7 @@ else
                     <tr>
                         <td>@payment.PaymentDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@(payment.Category?.Name ?? "Không xác định")</td>
-                        <td>@String.Format("{0:N0}₫", payment.Amount)</td>
+                        <td>@String.Format("${0:N0}", payment.Amount)</td>
                         <td class="@statusClass">@payment.Status</td>
                         <td>@payment.PaymentMethod</td>
                         <td>@payment.TransactionId</td>
