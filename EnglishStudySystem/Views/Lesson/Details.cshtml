@@ -15,12 +15,16 @@
                     <h1 class="fw-bold mb-2">@Model.Title</h1>
                     <p class="text-muted mb-0">Thuộc danh mục: @Model.Category.Name</p>
                 </div>
-                <div>
-                    <button id="btnSaveLesson" class="btn @(isSaved ? "btn-danger" : "btn-outline-danger") position-relative">
-                        <i class="fas fa-heart me-2 @(isSaved ? "text-white" : "text-danger")"></i>
-                        @(isSaved ? "Đã yêu thích" : "Yêu thích")
-                    </button>
-                </div>
+                @if(ViewBag.CanView==false)
+                {
+                    <div>
+                        <button id="btnSaveLesson" class="btn @(isSaved ? "btn-danger" : "btn-outline-danger") position-relative">
+                            <i class="fas fa-heart me-2 @(isSaved ? "text-white" : "text-danger")"></i>
+                            @(isSaved ? "Đã yêu thích" : "Yêu thích")
+                        </button>
+                    </div>
+                }
+                
             </div>
 
             <!-- Lesson Description -->
@@ -106,7 +110,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-2">
                             <i class="fas fa-user me-2 text-muted"></i>
-                            <strong>Người tạo:</strong> @ViewBag.CreatorName 
+                            <strong>Người tạo:</strong> @ViewBag.CreatorName
                         </li>
                         <li class="mb-2">
                             <i class="fas fa-calendar me-2 text-muted"></i>
@@ -116,7 +120,7 @@
                         {
                             <li class="mb-2">
                                 <i class="fas fa-user-edit me-2 text-muted"></i>
-                                <strong>Cập nhật bởi:</strong> @ViewBag.UpdaterName 
+                                <strong>Cập nhật bởi:</strong> @ViewBag.UpdaterName
                             </li>
                             <li>
                                 <i class="fas fa-calendar-check me-2 text-muted"></i>
@@ -147,28 +151,31 @@
             </div>
 
             <!-- Tests Section -->
-            <div class="card border-0 shadow-sm mt-4">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h3 class="h5 mb-0">Bài kiểm tra</h3>
+            @if (ViewBag.CanView == false)
+            {
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h3 class="h5 mb-0">Bài kiểm tra</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            @foreach (var test in ViewBag.LessonTests as List<EnglishStudySystem.Models.Test>)
+                            {
+                                <li class="mb-2">
+                                    <a href="@Url.Action("Start", "Test", new { id = test.Id })" class="text-decoration-none">
+                                        <i class="fas fa-question-circle me-2 text-purple"></i>@test.Title
+                                        <span class="badge bg-purple float-end">Làm bài</span>
+                                    </a>
+                                </li>
+                            }
+                            @if ((ViewBag.LessonTests as List<EnglishStudySystem.Models.Test>)?.Count == 0)
+                            {
+                                <li class="text-muted">Chưa có bài kiểm tra nào cho bài học này.</li>
+                            }
+                        </ul>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <ul class="list-unstyled">
-                        @foreach (var test in ViewBag.LessonTests as List<EnglishStudySystem.Models.Test>)
-                        {
-                            <li class="mb-2">
-                                <a href="@Url.Action("Start", "Test", new { id = test.Id })" class="text-decoration-none">
-                                    <i class="fas fa-question-circle me-2 text-purple"></i>@test.Title
-                                    <span class="badge bg-purple float-end">Làm bài</span>
-                                </a>
-                            </li>
-                        }
-                        @if ((ViewBag.LessonTests as List<EnglishStudySystem.Models.Test>)?.Count == 0)
-                        {
-                            <li class="text-muted">Chưa có bài kiểm tra nào cho bài học này.</li>
-                        }
-                    </ul>
-                </div>
-            </div>
+            }
         </div>
     </div>
 </main>

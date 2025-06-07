@@ -26,7 +26,10 @@
                     @:Miễn phí
                 }
             </span>
-            @if (ViewBag.DaMua)
+            @if (ViewBag.CanView)
+            {
+            }
+            else if (ViewBag.DaMua)
             {
                 <span class="btn btn-secondary ms-2 d-flex align-items-center custom-button" disabled>
                     <i class="fa fa-check-circle me-2"></i><span class="button-text">Đã mua</span>
@@ -44,7 +47,7 @@
                     <i class="fa fa-shopping-cart me-2"></i><span class="button-text">Mua ngay</span>
                 </a>
             }
-        </div>
+            </div>
     </div>
     <!-- Lessons List -->
     <div class="card border-0 shadow-sm">
@@ -66,7 +69,7 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
                                         <h4 class="h6 fw-bold mb-0 me-2" style="color: #000000;">@lesson.Title</h4>
-                                        @if (lesson.IsFreeTrial)
+                                        @if (lesson.IsFreeTrial )
                                         {
                                             <span class="badge bg-success bg-opacity-10 text-success px-2 py-1" style="font-size: 0.75rem;">
                                                 <i class="fa fa-gift me-1"></i>Miễn phí
@@ -79,7 +82,13 @@
                                     }
                                 </div>
                                 <div class="ms-3">
-                                    @if (lesson.IsFreeTrial)
+                                    @if (ViewBag.CanView)
+                                    {
+                                        <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })" class="btn btn-sm btn-success px-3">
+                                            <i class="fa fa-eye me-1"></i>Xem bài học
+                                        </a>
+                                    }
+                                    else if (lesson.IsFreeTrial)
                                     {
                                         <!-- Bài học miễn phí - hiển thị nút "Học thử" -->
                                         <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })" class="btn btn-sm btn-warning px-3">
