@@ -9,7 +9,6 @@ using Microsoft.AspNet.Identity;
 
 namespace EnglishStudySystem.Controllers
 {
-    [Authorize(Roles = "Customer")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;

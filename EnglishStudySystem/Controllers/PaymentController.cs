@@ -8,7 +8,6 @@ using Microsoft.AspNet.Identity;
 
 namespace EnglishStudySystem.Controllers
 {
-    [Authorize(Roles = "Customer")]
     public class PaymentController : Controller
     {
         private Momo _momoService = new Momo();
