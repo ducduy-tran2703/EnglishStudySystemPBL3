@@ -12,10 +12,11 @@ using EnglishStudySystem.Areas.Admin.ViewModel;
 using Microsoft.Owin.Logging;
 using System.Security.Claims;
 using System.Net;
+using Microsoft.AspNet.Identity;
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
-    [Authorize(Roles = "Administrator, Editor" )]
+    [Authorize(Roles = "Administrator, Editor")]
     public class UsersController : Controller
     {
         private ApplicationDbContext _context;
@@ -43,6 +44,17 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // GET: Admin/Users
         public async Task<ActionResult> ListUser()
         {
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            bool isAdmin = userRoles[0].Contains("Admin");
+            ViewBag.IsAdmin = isAdmin;
+            ViewBag.User_now = user_now;
+            System.Diagnostics.Debug.WriteLine($"Admin Roles: {string.Join(", ", userRoles)}"); // Hiển thị tất cả các vai trò người dùng có
+            System.Diagnostics.Debug.WriteLine($"Admin Roles: {isAdmin}");
             // Lấy TẤT CẢ user từ database
             var allUsersFromDb = await _userManager.Users.ToListAsync();
             System.Diagnostics.Debug.WriteLine($"Total users fetched from DB: {allUsersFromDb.Count}"); // Ghi log số lượng
@@ -64,6 +76,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                             Email = user.Email,
                             FullName = user.FullName,
                             IsActive = user.IsActive,
+                            CanManageUsers = user.CanManageUsers,
+                            CanManageCategories = user.CanManageCategories,
+                            CanManageNotifications = user.CanManageNotifications,
                             // AccountStatus = user.AccountStatus, // Đảm bảo ApplicationUser có thuộc tính này
                             Roles = string.Join(", ", roles)
                         });
@@ -90,13 +105,13 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             {
                 return HttpNotFound();
             }
-
             // Get roles of the user asynchronously
             var roles = await _userManager.GetRolesAsync(user.Id);
 
             // UserViewModel của bạn (từ EnglishStudySystem.Models)
             // đã tự khởi tạo Categories và PurchasedCategories thành List<Category> rỗng
             // trong constructor của nó.
+
             var userViewModel = new UserViewModel // UserViewModel từ namespace Models hoặc Admin.ViewModel
             {
                 Id = user.Id,
@@ -104,7 +119,10 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 Email = user.Email,
                 FullName = user.FullName,           // Đảm bảo ApplicationUser có FullName
                 IsActive = user.IsActive,
-                AccountStatus = user.AccountStatus, // Đảm bảo ApplicationUser có AccountStatus và kiểu khớp
+                AccountStatus = user.AccountStatus,
+                CanManageCategories = user.CanManageCategories,
+                CanManageNotifications = user.CanManageNotifications,
+                CanManageUsers = user.CanManageUsers,
                 Roles = string.Join(", ", roles)
                 // Categories và PurchasedCategories sẽ được điền bên dưới
             };
@@ -121,7 +139,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
 
             // Lấy khóa học ĐÃ TẠO nếu user là Editor
-            if (roles.Contains("Editor")|| roles.Contains("Editor"))
+            if (roles.Contains("Editor") || roles.Contains("Editor"))
 
             {
                 // GIẢ SỬ:
@@ -159,25 +177,25 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(string id)
         {
-                var user = await _userManager.FindByIdAsync(id);
-                if (user == null)
-                {
-                    return HttpNotFound();
-                }
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
 
-                var roles = _userManager.GetRoles(user.Id);
+            var roles = _userManager.GetRoles(user.Id);
 
-                var userViewModel = new UserViewModel
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    IsActive = user.IsActive,
-                    AccountStatus = user.AccountStatus,
-                    Roles = string.Join(", ", roles)
-                };
-                return View(userViewModel);          
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                IsActive = user.IsActive,
+                AccountStatus = user.AccountStatus,
+                Roles = string.Join(", ", roles)
+            };
+            return View(userViewModel);
         }
 
         [HttpPost]
@@ -185,23 +203,23 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            
-           
 
-                var user = await _userManager.FindByIdAsync(id);
-                if (user == null)
-                {
-                    return HttpNotFound();
-                }
-                user.IsActive = false;
-                _context.SaveChanges();
-                return RedirectToAction("ListUser");
-                // Handle errors
-              
-                //return RedirectToAction("Delete", new { id });
+
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            user.IsActive = false;
+            _context.SaveChanges();
+            return RedirectToAction("ListUser");
+            // Handle errors
+
+            //return RedirectToAction("Delete", new { id });
         }
-            
-        
+
+
         //[Authorize(Roles = "Admin")]
         public ActionResult CreateEditor()
         {
@@ -221,7 +239,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     Email = model.Email,
                     FullName = model.FullName,
                     IsActive = true,
-                   
+
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -238,7 +256,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     return RedirectToAction("CreateEditor");
                 }
 
-                
+
             }
 
             // Nếu có lỗi, hiển thị lại form với thông báo lỗi
@@ -247,6 +265,15 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         public async Task<ActionResult> ListDeletedAccount()
         {
 
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            bool isAdmin = userRoles[0].Contains("Admin");
+            ViewBag.IsAdmin = isAdmin;
+            ViewBag.User_now = user_now;
             var usersWithRoles = await _userManager.Users.ToListAsync();
 
             var userViewModels = new List<UserViewModel>();
@@ -352,11 +379,11 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return HttpNotFound();
             }
             var result = await _userManager.DeleteAsync(user);
-            await _userManager.UpdateAsync(user);
+            
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Tài khoản đã được xóa thành công!";
-                return RedirectToAction("ListUser");  // Chuyển hướng về trang danh sách người dùng
+                return RedirectToAction("ListDeletedAccount");  // Chuyển hướng về trang danh sách người dùng
             }
             else
             {
@@ -367,6 +394,81 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             //return RedirectToAction("Delete", new { id });
         }
-        
+        [HttpPost]
+        [ActionName("LockUserManager")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LockUserManager(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.CanManageUsers = !user.CanManageUsers;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "User", "LockUserManager"));
+            }
+
+            return RedirectToAction("ListUser");
+        }
+
+        [HttpPost]
+        [ActionName("LockCategoryManager")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LockCategoryManager(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.CanManageCategories = !user.CanManageCategories;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "User", "LockCategoryManager"));
+            }
+
+            return RedirectToAction("ListUser");
+        }
+
+        [HttpPost]
+        [ActionName("LockNotificationManager")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LockNotificationManager(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.CanManageNotifications = !user.CanManageNotifications;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "User", "LockNotificationManager"));
+            }
+
+            return await ListUser();
+        }
+
+
     }
 }

@@ -189,6 +189,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LessonController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -228,6 +229,8 @@
       <DependentUpon>202506062119576_AddDurationColumnInTest.cs</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\TestViewModel.cs" />
+    <Compile Include="ViewModel\FavoriteLessonViewModel.cs" />
+    <Compile Include="ViewModel\LessonHistoryViewModel.cs" />
     <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
     <Compile Include="Migrations\202505150937503_AddParentCommentIdToComments.Designer.cs">
       <DependentUpon>202505150937503_AddParentCommentIdToComments.cs</DependentUpon>
@@ -284,6 +287,7 @@
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\SavedLesson.cs" />
     <Compile Include="Models\Test.cs" />
+    <Compile Include="Models\TestHistoryViewModel.cs" />
     <Compile Include="Models\UserAnswer.cs" />
     <Compile Include="Models\UserNotification.cs" />
     <Compile Include="Models\UserPermission.cs" />
@@ -452,6 +456,8 @@
     <Content Include="Views\Shared\_CommentPartial.cshtml" />
     <Content Include="Views\Category\_CategoryDropdownPartial.cshtml" />
     <Content Include="Views\Notification\_NotificationBellPartial.cshtml" />
+    <Content Include="Views\Customer\PaymentHistory.cshtml" />
+    <Content Include="Views\Error\AccessDenied.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />

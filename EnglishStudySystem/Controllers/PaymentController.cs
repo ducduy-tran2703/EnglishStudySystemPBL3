@@ -63,7 +63,7 @@ namespace EnglishStudySystem.Controllers
                 }
                 else
                 {
-                    SavePaymentToDatabase(amount, orderID, categoryId, "Rejected");
+                    SavePaymentToDatabase(amount, orderID, categoryId, "Failed");
                     // Lấy thông tin khóa học
                     var category = _db.Categories.Find(categoryId);
                     string courseName = category?.Name ?? "khóa học";
@@ -96,17 +96,26 @@ namespace EnglishStudySystem.Controllers
                     System.Diagnostics.Debug.WriteLine("Lỗi: UserId null");
                     return;
                 }
-                var payment = new Payment
+                string Description = "";
+                if(status == "Completed")
                 {
-                    Amount = amount,
-                    PaymentDate = DateTime.Now,
-                    Status = status,
-                    TransactionId = orderID,
-                    PaymentMethod = "MOMOPAYMENT",
-                    Description = "Hoàn tất xử lý",
-                    UserId = userId,
-                    CategoryId = categoryId
-                };
+                    Description = "Khóa học chưa được thanh toán  ";
+                }
+                else
+                {
+                    Description = "Đã thanh toán khóa học ";
+                }
+                var payment = new Payment
+                    {
+                        Amount = amount,
+                        PaymentDate = DateTime.Now,
+                        Status = status,
+                        TransactionId = orderID,
+                        PaymentMethod = "MOMOPAYMENT",
+                        Description = Description,
+                        UserId = userId,
+                        CategoryId = categoryId
+                    };
 
                 _db.Payments.Add(payment);
                 int recordsAffected = _db.SaveChanges();

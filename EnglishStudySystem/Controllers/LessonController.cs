@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace EnglishStudySystem.Controllers
 {
@@ -16,10 +17,10 @@ namespace EnglishStudySystem.Controllers
             var currentUserId = User.Identity.GetUserId(); // Lấy ID người dùng hiện tại
             ViewBag.UserId = currentUserId; // Truyền vào ViewBag
             var lesson = _db.Lessons
-    .Include(l => l.Category)
-    .Include(l => l.Comments.Select(c => c.User))
-    .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
-    .FirstOrDefault(l => l.Id == id);
+            .Include(l => l.Category)
+            .Include(l => l.Comments.Select(c => c.User))
+            .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
+            .FirstOrDefault(l => l.Id == id);
             if (lesson != null)
             {
                 // Lấy thông tin người tạo
@@ -37,6 +38,20 @@ namespace EnglishStudySystem.Controllers
             if (lesson == null)
             {
                 return HttpNotFound();
+            }
+            if (lesson.IsFreeTrial==false)
+            {
+                // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
+                bool hasPurchased = _db.Payments.Any(p =>
+                p.UserId == userId &&
+                    p.CategoryId == lesson.CategoryId &&
+                    p.Status == "Completed" &&
+                    p.PaymentDate <= DateTime.Now);
+
+                if (!hasPurchased)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { message = "Bạn cần mua khóa học để xem bài học này" });
+                }
             }
             if (User.Identity.IsAuthenticated)
             {

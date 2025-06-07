@@ -179,6 +179,8 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 db.Categories.Add(category); // Thêm Entity Model vào DbSet
                 await db.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu bất đồng bộ
 
+                await CreateNewCourseNotification(category.Id, category.Name, currentUserId);
+
                 // Chuyển hướng về trang danh sách sau khi tạo thành công
                 return RedirectToAction("Index");
             }
@@ -190,6 +192,51 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             return View(viewModel); // <-- Trả về View với ViewModel
         }
+        private async Task CreateNewCourseNotification(int categoryId, string categoryName, string senderId)
+        {
+            try
+            {
+                // Tạo thông báo
+                var notification = new Notification
+                {
+                    Title = "Khóa học mới đã được thêm vào!",
+                    Content = $"Khóa học '{categoryName}' đã sẵn sàng. Hãy khám phá ngay!",
+                    CreatedDate = DateTime.Now,
+                    SenderId = senderId,
+                    TargetController = "Category",
+                    TargetAction = "Details",
+                    PrimaryRelatedEntityId = categoryId,
+                    RelatedEntityType = "NewCourse",
+                    IsDeleted = false
+                };
+
+                // Lấy tất cả người dùng có role là "Student" (học viên)
+                var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                var students = await userManager.Users
+                    .Where(u => u.Roles.Any(r => r.RoleId == "3380b389-119c-4443-91e6-c9bb52bd8513")) // Giả sử role Student có ID là "Student"
+                    .ToListAsync();
+
+                // Tạo UserNotification cho từng học viên
+                foreach (var student in students)
+                {
+                    notification.UserNotifications.Add(new UserNotification
+                    {
+                        UserId = student.Id,
+                        IsRead = false,
+                        IsDeleted = false
+                    });
+                }
+
+                db.Notifications.Add(notification);
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần
+                System.Diagnostics.Debug.WriteLine($"Lỗi khi tạo thông báo: {ex.Message}");
+            }
+        }
+
 
 
         // --- ACTION: CHỈNH SỬA DANH MỤC (Edit) ---

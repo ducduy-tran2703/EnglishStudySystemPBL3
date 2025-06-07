@@ -9,6 +9,7 @@ using EnglishStudySystem.Models;
 using EnglishStudySystem.ViewModel;
 using Microsoft.AspNet.Identity;
 
+
 namespace EnglishStudySystem.Controllers
 {
     public class CustomerController : Controller
@@ -212,19 +213,27 @@ namespace EnglishStudySystem.Controllers
         {
             var userId = User.Identity.GetUserId();
 
-            ApplicationDbContext _context = new ApplicationDbContext();
+            using (ApplicationDbContext _context = new ApplicationDbContext())
+            {
+                var lessonHistories = _context.LessonHistories
+                    .Where(h => h.UserId == userId && !h.Lesson.IsDeleted)
+                    .Include(h => h.Lesson.Category) // Thêm include để load thông tin khóa học
+                    .OrderByDescending(h => h.ViewDate)
+                    .ToList();
 
-            var lessonHistories = _context.LessonHistories
-                .Where(h => h.UserId == userId && !h.Lesson.IsDeleted)
-                .OrderByDescending(h => h.ViewDate)
-                .ToList();
+                var viewModel = lessonHistories.Select(h => new LessonHistoryViewModel
+                {
+                    LessonId = h.LessonId,
+                    LessonTitle = h.Lesson.Title,
+                    LessonDescription = h.Lesson.Description,
+                    CreatedDate = h.Lesson.CreatedDate,
+                    ViewDate = h.ViewDate,
+                    CourseName = h.Lesson.Category?.Name, // Lấy tên khóa học
+                    CourseId = h.Lesson.CategoryId // Lấy ID khóa học để tạo link
+                }).ToList();
 
-            var lessons = lessonHistories.Select(h => h.Lesson).ToList();
-
-            var viewDates = lessonHistories.ToDictionary(h => h.LessonId, h => h.ViewDate);
-            ViewBag.ViewDates = viewDates;
-
-            return PartialView("_LessonsHistoryStats", lessons);
+                return PartialView("_LessonsHistoryStats", viewModel);
+            }
         }
 
         public ActionResult GetFavoriteLessonsStats()
@@ -234,9 +243,18 @@ namespace EnglishStudySystem.Controllers
             {
                 var favoriteLessons = _context.SavedLessons
                     .Where(s => s.UserId == userId)
+                    .Include(s => s.Lesson.Category) // Load thông tin khóa học
                     .OrderByDescending(s => s.SavedDate)
-                    .Select(s => s.Lesson)
-                    .Where(l => !l.IsDeleted)
+                    .Select(s => new FavoriteLessonViewModel
+                    {
+                        LessonId = s.Lesson.Id,
+                        LessonTitle = s.Lesson.Title,
+                        LessonDescription = s.Lesson.Description,
+                        CreatedDate = s.Lesson.CreatedDate,
+                        SavedDate = s.SavedDate,
+                        CourseName = s.Lesson.Category != null ? s.Lesson.Category.Name : null,
+                        CourseId = s.Lesson.CategoryId
+                    })
                     .Distinct()
                     .ToList();
 
@@ -248,17 +266,44 @@ namespace EnglishStudySystem.Controllers
             var userId = User.Identity.GetUserId();
             using (var _context = new ApplicationDbContext())
             {
-                // Lấy danh sách các Test mà user đã làm (qua bảng UserTestAttempt)
-                var tests = _context.UserTestAttempts
+                // Lấy danh sách các lần làm bài kiểm tra của user
+                var testAttempts = _context.UserTestAttempts
                     .Where(uta => uta.UserId == userId)
-                    .Include(uta => uta.Test)
-                    .Include(uta => uta.Test.Lesson)
-                    .Select(uta => uta.Test) // Chỉ lấy thông tin Test
-                    .Distinct() // Loại bỏ trùng lặp
+                    .Include(uta => uta.Test) // Load Test
+                    .Include(uta => uta.Test.Lesson) // Load Lesson từ Test (EF6 hỗ trợ đường dẫn)
+                    .Include(uta => uta.UserAnswers.Select(ua => ua.Question.Answers)) // Load sâu vào UserAnswers -> Question -> Answers
+                    .OrderByDescending(uta => uta.AttemptDate)
                     .ToList();
 
-                return PartialView("_TestHistoryStats", tests);
+                // Tạo view model chứa các thông tin cần hiển thị
+                var viewModel = testAttempts.Select(uta => new TestHistoryViewModel
+                {
+                    TestId = uta.TestId,
+                    TestTitle = uta.Test?.Title,
+                    LessonName = uta.Test?.Lesson?.Title,
+                    AttemptDate = uta.AttemptDate,
+                    Score = uta.Score,
+                    TotalQuestions = uta.Test?.QuestionCount ?? 0,
+                    CorrectAnswers = uta.UserAnswers?.Count(ua => ua.IsCorrect) ?? 0,
+                    IsCompleted = uta.IsCompleted,
+                    Duration = uta.EndTime.HasValue ? (uta.EndTime.Value - uta.StartTime).TotalMinutes : 0
+                }).ToList();
+
+                return PartialView("_TestHistoryStats", viewModel);
             }
         }
+        public ActionResult PaymentHistory()
+        {
+            string currentUserId = User.Identity.GetUserId();
+
+            var payments = _context.Payments
+                             .Where(p => p.UserId == currentUserId)
+                             .Include("Category")
+                             .OrderByDescending(p => p.PaymentDate)
+                             .ToList();
+
+            return View(payments);
+        }
+
     }
 }

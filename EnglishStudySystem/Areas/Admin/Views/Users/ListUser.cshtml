@@ -17,10 +17,15 @@
                     <small class="font-weight-light">Quản lý tất cả người dùng hệ thống</small>
                 </div>
                 <div>
-                    @Html.ActionLink("Tạo Editor", "CreateEditor", "Users", null,
-                        new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
+
+                    @if (ViewBag.IsAdmin != null && ViewBag.IsAdmin)
+                    {
+                        @Html.ActionLink("Tạo Editor", "CreateEditor", "Users", null,
+                             new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
+                    }
+
                     @Html.ActionLink("Tài khoản đã xóa", "ListDeletedAccount", "Users", null,
-                        new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
+                    new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
                 </div>
             </div>
         </div>
@@ -37,7 +42,7 @@
                                 </span>
                             </div>
                             <input type="text" id="userSearch" class="form-control border-0 py-2"
-                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">               
+                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">
                         </div>
                     </div>
                 </div>
@@ -146,23 +151,91 @@
                                         </td>
                                         <td>@item.Email</td>
                                         <td>@item.FullName</td>
+
                                         <td>
                                             <span class="badge @(item.IsActive ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
                                                 @(item.IsActive ? "Hoạt động" : "Không hoạt động")
                                             </span>
                                         </td>
+
                                         <td class="text-center">
                                             <div class="btn-group btn-group-sm shadow" role="group">
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
-                                                </a>
+                                                @if (ViewBag.IsAdmin != null && ViewBag.IsAdmin)
+                                                {
+                                                    <!-- LockUserManager form -->
+                                                    if (item.CanManageUsers)
+                                                    {
+                                                        <form action="@Url.Action("LockUserManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý người dùng">
+                                                                <i class="fas fa-user-lock text-warning"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form action="@Url.Action("LockUserManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý người dùng">
+                                                                <i class="fas fa-user text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    <!-- LockCategoryManager form -->
+                                                    if (item.CanManageCategories)
+                                                    {
+                                                        <form action="@Url.Action("LockCategoryManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý danh mục">
+                                                                <i class="fas fa-folder-minus text-warning"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form action="@Url.Action("LockCategoryManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý danh mục">
+                                                                <i class="fas fa-folder-minus text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    <!-- LockNotificationManager form -->
+                                                    if (item.CanManageNotifications)
+                                                    {
+                                                        <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý thông báo">
+                                                                <i class="fas fa-bell-slash text-warning"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý thông báo">
+                                                                <i class="fas fa-bell text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    <!-- Delete form -->
+                                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </a>
+                                                }
                                             </div>
                                         </td>
+
                                     </tr>
                                 }
+
                             </tbody>
                         </table>
                     </div>
@@ -205,9 +278,13 @@
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
-                                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
-                                                </a>
+                                                @if (ViewBag.user_now.CanManageUsers || ViewBag.IsAdmin)
+                                                {
+                                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </a>
+                                                }
+
                                             </div>
                                         </td>
                                     </tr>
@@ -235,6 +312,7 @@
 
 @section scripts {
     <script>
+
         $(document).ready(function () {
             // Initialize tooltips
             $('[title]').tooltip({
@@ -264,16 +342,6 @@
                 $('.filter-option').removeClass('active');
                 $(this).addClass('active');
                 filterUsers($(this).data('filter'));
-            });
-
-            // Delete confirmation
-            $('.btn-delete').on('click', function (e) {
-                e.preventDefault();
-                const deleteUrl = $(this).attr('href');
-
-                if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
-                    window.location.href = deleteUrl;
-                }
             });
 
             function filterUsers(statusFilter = 'all') {
@@ -337,6 +405,25 @@
             updateEmptyState();
         });
     </script>
+    <script>
+        // Khi người dùng click tab, lưu ID tab vào localStorage
+        document.querySelectorAll('#userTabs a').forEach(function (tabLink) {
+            tabLink.addEventListener('shown.bs.tab', function (event) {
+                localStorage.setItem('selectedTab', event.target.getAttribute('href'));
+            });
+        });
+
+        // Khi load lại trang, nếu có tab đã lưu, active nó
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectedTab = localStorage.getItem('selectedTab');
+            if (selectedTab) {
+                var triggerTab = document.querySelector('#userTabs a[href="' + selectedTab + '"]');
+                if (triggerTab) {
+                    new bootstrap.Tab(triggerTab).show();
+                }
+            }
+        });
+    </script>
 }
 
 <style>
@@ -347,6 +434,7 @@
         max-width: 800px;
         border-radius: 100px;
     }
+
     .card {
         border-radius: 0.5rem;
         overflow: hidden;

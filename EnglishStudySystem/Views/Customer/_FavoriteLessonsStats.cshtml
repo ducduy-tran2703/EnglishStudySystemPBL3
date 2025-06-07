@@ -1,153 +1,142 @@
-﻿@*
-    Partial View để hiển thị danh sách lịch sử bài học.
-    Model của view này là một danh sách các đối tượng Lesson.
-    Sử dụng model Lesson được định nghĩa trong namespace EnglishStudySystem.Models.
-    CSS để định dạng được nhúng trực tiếp trong view.
-    - Mỗi mục bài học có thể nhấn vào để xem chi tiết.
-    - Khoảng cách giữa các mục được thu hẹp.
-    - Tiêu đề được căn giữa.
-    - Màu chủ đạo là màu vàng.
-*@
-@model List<EnglishStudySystem.Models.Lesson>
+﻿@model List<EnglishStudySystem.ViewModel.FavoriteLessonViewModel>
 
-@* Nhúng CSS trực tiếp vào View - Đã cập nhật màu sắc chủ đạo thành vàng và tinh chỉnh nhỏ *@
 <style>
-    /* Định dạng cho tiêu đề Lịch sử Bài học */
-    .statistics-section h3 {
-        color: #ffc107; /* Màu vàng chủ đạo */
-        border-bottom: 2px solid #e9ecef; /* Đường gạch dưới nhẹ (giữ màu trung tính) */
-        padding-bottom: 10px; /* Khoảng cách dưới đường gạch */
-        margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
-        font-size: 1.8em; /* Kích thước font lớn hơn */
-        text-align: center; /* Căn giữa tiêu đề */
-        font-weight: bold; /* Làm đậm tiêu đề */
+    .favorite-lessons-container {
+        margin: 20px auto;
+        max-width: 800px;
     }
 
-    /* Định dạng cho danh sách chứa các bài học */
-    .lessons-history-list {
-        margin-top: 20px;
+    .favorite-lessons-header {
+        text-align: center;
+        color: #ffc107;
+        font-size: 2em;
+        font-weight: bold;
+        margin-bottom: 10px;
     }
 
-    /* Định dạng cho mỗi mục bài học trong danh sách */
-    .lesson-history-item {
-        background-color: #fff; /* Nền trắng cho mỗi mục */
-        border: 1px solid #e0e0e0; /* Viền nhẹ */
-        border-radius: 8px; /* Bo tròn góc nhiều hơn một chút (ví dụ từ 5px lên 8px) */
-        /* padding: 15px; */ /* Bỏ padding ở đây vì sẽ áp dụng cho thẻ a bên trong */
-        margin-bottom: 12px; /* Điều chỉnh khoảng cách giữa các mục (ví dụ từ 10px lên 12px) */
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.07); /* Đổ bóng rõ hơn một chút */
-        overflow: hidden; /* Đảm bảo hiệu ứng hover và border-radius hiển thị đúng */
-        position: relative; /* Cần thiết cho thẻ a bao quanh */
+    .favorite-lessons-divider {
+        width: 60px;
+        height: 4px;
+        background-color: #ffc107;
+        margin: 0 auto 30px auto;
+        border-radius: 4px;
     }
 
-        /* Định dạng cho thẻ a bao quanh nội dung mỗi item để toàn bộ item có thể click */
-        .lesson-history-item a {
-            display: block; /* Biến thẻ a thành khối để chiếm toàn bộ không gian */
-            padding: 15px; /* Áp dụng padding vào thẻ a */
-            text-decoration: none; /* Bỏ gạch chân mặc định của link */
-            color: inherit; /* Thừa hưởng màu chữ từ cha (lesson-history-item) */
-            transition: background-color 0.2s ease; /* Thêm hiệu ứng nền khi hover */
+    .favorite-lesson-item {
+        background: #fff;
+        border: 1px solid #ffe58f;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .favorite-lesson-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
-        /* Hiệu ứng khi di chuột qua mục bài học */
-        .lesson-history-item:hover {
-            transform: translateY(-4px); /* Nhấc mục lên nhiều hơn một chút khi di chuột */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Đổ bóng rõ hơn nhiều khi di chuột */
+    .lesson-title {
+        font-size: 1.4em;
+        color: #e0a800;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+        .lesson-title a {
+            text-decoration: none;
+            color: inherit;
         }
 
-        /* Tùy chọn: Đổi màu nền nhẹ khi hover */
-        .lesson-history-item a:hover {
-            background-color: #fff8e1; /* Màu vàng rất nhạt cho nền khi hover */
-        }
-
-
-        /* Định dạng cho tiêu đề của từng bài học (h4) */
-        .lesson-history-item h4 {
-            color: #d39e00; /* Màu vàng sẫm hơn cho tiêu đề bài học */
-            margin-top: 0; /* Bỏ khoảng cách trên mặc định của h4 */
-            margin-bottom: 5px; /* Khoảng cách dưới tiêu đề */
-            font-size: 1.3em; /* Kích thước font cho tiêu đề bài học */
-        }
-
-        /* Định dạng cho mô tả bài học (p) */
-        .lesson-history-item p {
-            color: #555; /* Màu chữ xám hơn cho mô tả (giữ nguyên để dễ đọc) */
-            margin-bottom: 5px; /* Khoảng cách dưới mô tả */
-            line-height: 1.5; /* Khoảng cách dòng */
-        }
-
-            /* Định dạng cho ngày tạo (small bên trong p) */
-            .lesson-history-item p small {
-                color: #6c757d; /* Màu chữ xám nhạt hơn cho ngày tháng (giữ nguyên để dễ đọc) */
-                font-size: 0.9em; /* Kích thước font nhỏ hơn cho ngày tháng */
-                display: block; /* Hiển thị ngày tháng trên dòng riêng */
-                margin-top: 8px; /* Khoảng cách trên ngày tháng */
+            .lesson-title a:hover {
+                text-decoration: underline;
             }
 
-    /* Định dạng cho đường kẻ phân cách (hr) */
-    .lessons-history-list hr {
-        display: none; /* Vẫn ẩn đường kẻ hr */
+    .course-name {
+        font-size: 0.9em;
+        color: #999;
+        margin-bottom: 10px;
     }
+
+        .course-name a {
+            color: #ffc107;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .course-name a:hover {
+                text-decoration: underline;
+            }
+
+    .lesson-description {
+        color: #444;
+        font-size: 1em;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .lesson-dates {
+        font-size: 0.85em;
+        color: #888;
+    }
+
+        .lesson-dates i {
+            margin-right: 5px;
+        }
 </style>
 
-
-@*
-    Kiểm tra xem danh sách bài học có dữ liệu hay không.
-    Nếu không có bài học nào, hiển thị thông báo.
-*@
 @if (Model != null && Model.Any())
 {
-    @* Lưu ý: "statistics-section" class nằm ở view cha chứa Partial View này *@
-    <div class="statistics-section-content">
-        @* Thêm một div bao ngoài nếu cần để nhóm nội dung *@
-        <h3>Bài học yêu thích</h3>
-        <div class="lessons-history-list">
-            @*
-                Duyệt qua từng bài học trong danh sách Model.
-            *@
-            @foreach (var lesson in Model)
-            {
-                @*
-                    Bao quanh nội dung của mỗi bài học bằng thẻ a để toàn bộ item có thể click
-                    và dẫn đến trang chi tiết bài học.
-                    Giả định có một Action "Details" trong Controller "Lesson" nhận ID bài học.
-                    Nếu tên Controller/Action khác, hãy chỉnh sửa @Url.Action("Details", "Lesson", ...) cho phù hợp.
-                *@
-                <div class="lesson-history-item">
-                    <a href="@Url.Action("Details", "Lesson", new { id = lesson.Id })">
-                        @* Hiển thị Tiêu đề bài học *@
-                        <h4>@lesson.Title</h4>
-
-                        @* Hiển thị Mô tả (nếu có) *@
-                        @if (!string.IsNullOrEmpty(lesson.Description))
-                        {
-                            <p>@lesson.Description</p>
-                        }
-
-                        @* Hiển thị Ngày tạo *@
-                        <p>
-                            <small>Ngày đăng: @lesson.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
-                        </p>
-
-                        @* Các thông tin khác nếu muốn *@
-
-                    </a> @* Kết thúc thẻ a *@
-                </div>
-                @* hr đã được ẩn bằng CSS, bạn có thể xóa dòng này nếu muốn *@
-                @* <hr /> *@
-            }
+    <div class="favorite-lessons-container">
+        <div class="favorite-lessons-header">
+             Bài học yêu thích
         </div>
-    </div> @* Kết thúc div statistics-section-content *@
+        <div class="favorite-lessons-divider"></div>
+
+        @foreach (var item in Model)
+        {
+            <div class="favorite-lesson-item">
+                <div class="lesson-title">
+                    <a href="@Url.Action("Details", "Lesson", new { id = item.LessonId })">
+                        @item.LessonTitle
+                    </a>
+                </div>
+
+                @if (!string.IsNullOrEmpty(item.CourseName))
+                {
+                    <div class="course-name">
+                        Khóa học:
+                        <a href="@Url.Action("Details", "Category", new { id = item.CourseId })">
+                            @item.CourseName
+                        </a>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(item.LessonDescription))
+                {
+                    <div class="lesson-description">@item.LessonDescription</div>
+                }
+
+                <div class="lesson-dates">
+                    <div>
+                        <i class="far fa-calendar-alt"></i> Đã lưu: @item.SavedDate.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                    <div>
+                        <i class="far fa-clock"></i> Ngày đăng: @item.CreatedDate.ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }
 else
 {
-    @* Hiển thị thông báo khi không có bài học nào được tìm thấy *@
-    <p>Không tìm thấy lịch sử bài học nào gần đây.</p>
+    <div class="favorite-lessons-container">
+        <div class="favorite-lessons-header">
+            <i class="fas fa-star"></i> Bài học yêu thích
+        </div>
+        <div class="favorite-lessons-divider"></div>
+        <p style="text-align: center;">Bạn chưa lưu bài học yêu thích nào.</p>
+    </div>
 }
-
-@*
-    Lưu ý:
-    - Đảm bảo namespace trong `@model` khớp với namespace thực tế của lớp Lesson trong dự án của bạn.
-    - Nhúng CSS trực tiếp như thế này chỉ nên dùng cho mục đích đơn giản hoặc thử nghiệm. Đối với ứng dụng thực tế, nên sử dụng tệp CSS riêng.
-    - Chỉnh sửa `@Url.Action("Details", "Lesson", new { id = lesson.Id })` nếu Action hoặc Controller xem chi tiết bài học của bạn có tên khác.
-*@
