@@ -76,13 +76,6 @@ namespace EnglishStudySystem.Controllers
             {
                 return RedirectToAction("HomePage", "Home");
             }
-            var categories = _context.Categories
-                .Where(c => !c.IsDeleted)
-                .OrderByDescending(c => c.CreatedDate)
-                .Take(6)
-                .ToList();
-            ViewBag.ListCategories = categories;
-
             // --- LOGIC XÁC ĐỊNH FINAL RETURNURL ---
             string finalReturnUrl;
 
@@ -151,14 +144,6 @@ namespace EnglishStudySystem.Controllers
         public async Task<ActionResult> Login(LoginViewModel model)
         {
 
-            // Giữ lại việc lấy categories nếu View cần hiển thị chúng khi validation thất bại
-            var categories = _context.Categories
-            .Where(c => !c.IsDeleted)
-            .OrderByDescending(c => c.CreatedDate)
-            .Take(6)
-            .ToList();
-            ViewBag.ListCategories = categories;
-
 
             if (!ModelState.IsValid)
             {
@@ -179,6 +164,31 @@ namespace EnglishStudySystem.Controllers
                     // Để lấy ID ngay đây, bạn có thể lấy từ user object: user.Id
                     if (user != null)
                     {
+                        if (!user.EmailConfirmed)
+                        {
+                            // Nếu email chưa được xác nhận, đăng xuất và thông báo lỗi
+                            string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                            if (UserManager.EmailService != null)
+                            {
+                                await UserManager.EmailService.SendAsync(new IdentityMessage
+                                {
+                                    Destination = user.Email,
+                                    Subject = "Xác nhận Email của bạn",
+                                    Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                                });
+                            }
+                            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                            ModelState.AddModelError("", "Email chưa được xác nhận. Vui lòng kiểm tra hộp thư của bạn.");
+                            return View(model);
+                        }
+                        if (!user.IsActive)
+                        {
+                            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                            ModelState.AddModelError("", "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên thông qua email:Noobita.vn@gmail.");
+                            return View(model);
+                        }
                         Session["ID"] = user.Id; // Lấy ID từ user object
                         Session["FullName"] = user.FullName;
 
@@ -276,14 +286,13 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            var categories = _context.Categories
-     .Where(c => !c.IsDeleted)
-     .OrderByDescending(c => c.CreatedDate)
-     .Take(6)
-     .ToList();
-            ViewBag.ListCategories = categories;
+            if (TempData["ConfirmMessage"] != null)
+            {
+                ViewBag.Message = TempData["ConfirmMessage"];
+            }
             return View();
         }
+
 
         //
         // POST: /Account/Register
@@ -305,45 +314,41 @@ namespace EnglishStudySystem.Controllers
                     AccountStatus = UserAccountStatus.Normal,
                     EmailConfirmed = false
                 };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     await UserManager.AddToRoleAsync(user.Id, "Customer");
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
+
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // Send the email with the confirmation link
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
                     if (UserManager.EmailService != null)
                     {
+                        var expirationTime = DateTime.Now.Add(ApplicationUserManager.PasswordResetTokenLifespan);
+                        string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")}";
                         await UserManager.EmailService.SendAsync(new IdentityMessage
                         {
+
                             Destination = user.Email,
                             Subject = "Xác nhận Email của bạn",
-                            Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                            Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>" + "<br/>" + expirationMessage
                         });
                     }
-                    else
-                    {
-                        // Handle case where EmailService is not configured
-                        ViewBag.ErrorMessage = "Dịch vụ gửi Email chưa được cấu hình. Không thể gửi Email xác nhận.";
-                        // Optionally log the error
-                        // Redirect to an error page or back to registration with an error message
-                        return View("Error"); // Cần có View Error.cshtml
-                    }
-                    
-                    // Redirect to a page informing the user to check their email
-                    return RedirectToAction("RegisterConfirmation", new { email = user.Email });
 
+                    // Gửi thông báo về lại view
+                    ViewBag.Message = "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.";
+                    ModelState.Clear(); // Xóa form
+                    return View();
                 }
+
                 AddErrors(result);
             }
 
-            // If we got this far, something failed, redisplay form
+            // Có lỗi → hiển thị lại form
             return View(model);
         }
+
 
         // GET: /Account/RegisterConfirmation
         [AllowAnonymous]
@@ -362,35 +367,21 @@ namespace EnglishStudySystem.Controllers
         {
             if (userId == null || code == null)
             {
-                ViewBag.ErrorMessage = "Liên kết xác nhận không hợp lệ.";
                 return View("Error");
             }
-            // Find the user by ID
-            var user = await UserManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                ViewBag.ErrorMessage = $"Người dùng với ID '{userId}' không tồn tại.";
-                return View("Error"); // Display an error view
-            }
-            // Confirm the email
+
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             if (result.Succeeded)
             {
-                // Email confirmed successfully!
-                // You can redirect to a success page or the login page.
-                 ViewBag.StatusMessage = "Cảm ơn bạn đã xác nhận Email của mình!"; // Message for a confirmation view
-               // return RedirectToAction("ConfirmEmailConfirmation"); // Redirect to a success view
-                 
-                 return RedirectToAction("Login"); // Alternatively, redirect to login page
+                // Đưa thông báo vào TempData để hiển thị lại tại Register view
+                TempData["ConfirmSuccess"] = true;
+                TempData["ConfirmMessage"] = "Tài khoản của bạn đã được xác nhận thành công!";
+                return RedirectToAction("Register");
             }
-            else
-            {
-                // Handle confirmation failure (e.g., invalid token, user not found, token expired)
-                AddErrors(result); // Display specific errors from IdentityResult
-                ViewBag.ErrorMessage = "Lỗi xác nhận Email.";
-                return View("Error"); // Display an error view
-            }
+
+            return View("Error");
         }
+
 
         //
         // GET: /Account/ConfirmEmailConfirmation
@@ -443,7 +434,7 @@ namespace EnglishStudySystem.Controllers
                     string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ResetPassword", "Account", new {code = code,email = model.Email }, protocol: Request.Url.Scheme);
                     var expirationTime = DateTime.Now.Add(ApplicationUserManager.PasswordResetTokenLifespan);
-                    string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")} (giờ địa phương).";
+                    string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")}";
                     await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>" + "<br/>" + expirationMessage);
                     ViewBag.Message = "Kiểm tra Gmail của bạn để cập nhật mật khẩu mới.";
                     return View(model);
