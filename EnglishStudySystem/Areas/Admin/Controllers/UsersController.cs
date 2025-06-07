@@ -238,8 +238,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     UserName = model.UserName,
                     Email = model.Email,
                     FullName = model.FullName,
-                    IsActive = true,
-
+                    IsActive = true,                  
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
