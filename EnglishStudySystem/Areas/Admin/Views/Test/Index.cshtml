@@ -1,0 +1,57 @@
+﻿@model IEnumerable<EnglishStudySystem.ViewModel.TestDetailViewModel>
+
+@{
+    ViewBag.Title = $"Bài kiểm tra của Bài học: {ViewBag.LessonTitle}";
+}
+
+<h2>Bài kiểm tra của Bài học: @ViewBag.LessonTitle</h2>
+
+<p>
+    @Html.ActionLink("Thêm Bài kiểm tra mới", "Create", new { lessonId = ViewBag.LessonId }, new { @class = "btn btn-primary" })
+</p>
+<p>
+    @Html.ActionLink("Quay lại Bài học", "Details", "Lesson", new { id = ViewBag.LessonId }, new { @class = "btn btn-default" })
+</p>
+
+<table class="table">
+    <tr>
+        <th>Tiêu đề</th>
+        <th>Mô tả</th>
+        <th></th>
+    </tr>
+
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>
+                    @Html.ActionLink("Xem Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-info btn-sm" }) |
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" }) |
+                    @using (Html.BeginForm("Delete", "Test", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline-block" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bài kiểm tra này không?');">Xóa</button>
+                    }
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="3">Chưa có bài kiểm tra nào cho bài học này.</td>
+        </tr>
+    }
+</table>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}

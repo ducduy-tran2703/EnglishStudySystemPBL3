@@ -173,6 +173,7 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\LessonsController.cs" />
     <Compile Include="Areas\Admin\Controllers\SharedController.cs" />
+    <Compile Include="Areas\Admin\Controllers\TestController.cs" />
     <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
     <Compile Include="Areas\Admin\ViewModel\CategoryDetailsWithLessonsViewModel.cs" />
     <Compile Include="Areas\Admin\ViewModel\DashboardViewModel.cs" />
@@ -223,6 +224,11 @@
     <Compile Include="Migrations\202505141556100_AddCategoryIdToPaymentsTable.Designer.cs">
       <DependentUpon>202505141556100_AddCategoryIdToPaymentsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202506062119576_AddDurationColumnInTest.cs" />
+    <Compile Include="Migrations\202506062119576_AddDurationColumnInTest.Designer.cs">
+      <DependentUpon>202506062119576_AddDurationColumnInTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\TestViewModel.cs" />
     <Compile Include="ViewModel\FavoriteLessonViewModel.cs" />
     <Compile Include="ViewModel\LessonHistoryViewModel.cs" />
     <EmbeddedResource Include="Migrations\202505150937503_AddParentCommentIdToComments.cs" />
@@ -260,6 +266,10 @@
     <Compile Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.cs" />
     <Compile Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.Designer.cs">
       <DependentUpon>202505230907418_UpdateClass_IsfreeTrial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202506041737087_AddOrderColumnInQuestion.cs" />
+    <Compile Include="Migrations\202506041737087_AddOrderColumnInQuestion.Designer.cs">
+      <DependentUpon>202506041737087_AddOrderColumnInQuestion.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -304,6 +314,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505230907418_UpdateClass_IsfreeTrial.resx">
       <DependentUpon>202505230907418_UpdateClass_IsfreeTrial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202506041737087_AddOrderColumnInQuestion.resx">
+      <DependentUpon>202506041737087_AddOrderColumnInQuestion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202506062119576_AddDurationColumnInTest.resx">
+      <DependentUpon>202506062119576_AddDurationColumnInTest.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -369,6 +385,11 @@
     <Content Include="Areas\Admin\Views\Lessons\Create.cshtml" />
     <Content Include="Areas\Admin\Views\Lessons\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Lessons\Details.cshtml" />
+    <Content Include="Areas\Admin\Views\Test\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Test\Create.cshtml" />
+    <Content Include="Areas\Admin\Views\Test\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Test\_QuestionFormPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Test\Details.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

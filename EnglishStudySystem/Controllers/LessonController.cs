@@ -17,10 +17,10 @@ namespace EnglishStudySystem.Controllers
             var currentUserId = User.Identity.GetUserId(); // Lấy ID người dùng hiện tại
             ViewBag.UserId = currentUserId; // Truyền vào ViewBag
             var lesson = _db.Lessons
-    .Include(l => l.Category)
-    .Include(l => l.Comments.Select(c => c.User))
-    .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
-    .FirstOrDefault(l => l.Id == id);
+            .Include(l => l.Category)
+            .Include(l => l.Comments.Select(c => c.User))
+            .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
+            .FirstOrDefault(l => l.Id == id);
             if (lesson != null)
             {
                 // Lấy thông tin người tạo

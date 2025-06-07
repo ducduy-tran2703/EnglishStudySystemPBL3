@@ -33,7 +33,7 @@
                         <dd class="col-sm-8">@Model.Roles</dd>
                     </dl>
 
-                    @using (Html.BeginForm("Delete", "Users", new { id = Model.Id }, FormMethod.Post))
+                    @using (Html.BeginForm("DeletePermanent", "Users", new { id = Model.Id }, FormMethod.Post))
                     {
                         @Html.AntiForgeryToken()
 

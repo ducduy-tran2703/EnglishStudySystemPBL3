@@ -344,16 +344,6 @@
                 filterUsers($(this).data('filter'));
             });
 
-            // Delete confirmation
-            $('.btn-delete').on('click', function (e) {
-                e.preventDefault();
-                const deleteUrl = $(this).attr('href');
-
-                if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
-                    window.location.href = deleteUrl;
-                }
-            });
-
             function filterUsers(statusFilter = 'all') {
                 const searchTerm = $('#userSearch').val().toLowerCase();
                 const activeTab = $('.tab-pane.active');
