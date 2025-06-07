@@ -379,11 +379,11 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return HttpNotFound();
             }
             var result = await _userManager.DeleteAsync(user);
-            await _userManager.UpdateAsync(user);
+            
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Tài khoản đã được xóa thành công!";
-                return RedirectToAction("ListUser");  // Chuyển hướng về trang danh sách người dùng
+                return RedirectToAction("ListDeletedAccount");  // Chuyển hướng về trang danh sách người dùng
             }
             else
             {
