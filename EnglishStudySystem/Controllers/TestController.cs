@@ -12,6 +12,7 @@ using System.Web.Services.Description;
 using static System.Net.Mime.MediaTypeNames;
 namespace EnglishStudySystem.Controllers
 {
+    [Authorize(Roles = "Customer")]
     public class TestController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
