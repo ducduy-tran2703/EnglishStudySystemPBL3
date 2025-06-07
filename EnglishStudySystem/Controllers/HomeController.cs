@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace EnglishStudySystem.Controllers
 {
+    [Authorize(Roles = "Customer")]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
