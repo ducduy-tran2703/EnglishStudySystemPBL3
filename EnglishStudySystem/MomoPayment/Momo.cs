@@ -20,7 +20,7 @@ namespace EnglishStudySystem.MomoPayment
             string redirectUrl = "";
             string ipnUrl = "\"https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b\"";
             string requestType = "captureWallet";
-            string amount = (amountCourse*100).ToString();
+            string amount = (amountCourse* 26054).ToString();
             string orderId = orderID;
             string requestId = Guid.NewGuid().ToString();
             string extraData = "";

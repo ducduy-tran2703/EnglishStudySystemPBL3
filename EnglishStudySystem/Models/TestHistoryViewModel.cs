@@ -7,6 +7,7 @@ namespace EnglishStudySystem.Models
 {
     public class TestHistoryViewModel
     {
+        public int Id { get; set; }
         public int TestId { get; set; }
         public string TestTitle { get; set; }
         public string LessonName { get; set; }
