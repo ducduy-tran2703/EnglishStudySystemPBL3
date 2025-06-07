@@ -331,7 +331,9 @@
     <Content Include="Content\CSS2\DetailUserStyle.css" />
     <Content Include="Content\CSS2\EditProfileStyle.css" />
     <Content Include="Content\CSS2\ForgetPasswordStyle.css" />
+    <Content Include="Content\CSS2\ResetPasswordStyle.css" />
     <Content Include="Content\CSS\LearningActivities.css" />
+    <Content Include="Content\CSS\LoginStyle.css" />
     <Content Include="Content\CSS\RegisterStyle.css" />
     <Content Include="Content\CSS\StyleLayout.css" />
     <Content Include="Content\CSS\_NotificationDropdownPartial.css" />

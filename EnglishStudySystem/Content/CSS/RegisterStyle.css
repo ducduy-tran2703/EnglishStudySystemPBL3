@@ -43,14 +43,14 @@ hr {
     margin-bottom: 20px;
 }
 
-.input-group {
+.register-form-wrapper .input-group {
     display: flex;
     border: 1px solid #ddd;
     border-radius: 4px;
     transition: all 0.3s ease;
 }
 
-    .input-group:focus-within {
+    .register-form-wrapper .input-group:focus-within {
         border-color: #4caf50;
         box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
     }
