@@ -124,9 +124,9 @@
                                                     <a href="@Url.Action("Revive", new { id = item.Id })" class="btn btn-light btn-delete" title="Khôi phục">
                                                         <i class="fas fa-undo text-success"></i>
                                                     </a>
-                                                <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
-                                                </a>
+                                                    <a href="@Url.Action("DeletePermanent", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa vĩnh viễn">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </a>
                                                 }
                                             </div>
                                         </td>
@@ -184,7 +184,7 @@
                                                         <i class="fas fa-trash-alt text-danger"></i>
                                                     </a>
                                                 }
-                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -311,6 +311,25 @@
             // Initialize
             updateEmptyState();
             $('#clearSearch').hide(); // Hide clear button initially
+        });
+    </script>
+    <script>
+        // Khi người dùng click tab, lưu ID tab vào localStorage
+        document.querySelectorAll('#userTabs a').forEach(function (tabLink) {
+            tabLink.addEventListener('shown.bs.tab', function (event) {
+                localStorage.setItem('selectedTab', event.target.getAttribute('href'));
+            });
+        });
+
+        // Khi load lại trang, nếu có tab đã lưu, active nó
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectedTab = localStorage.getItem('selectedTab');
+            if (selectedTab) {
+                var triggerTab = document.querySelector('#userTabs a[href="' + selectedTab + '"]');
+                if (triggerTab) {
+                    new bootstrap.Tab(triggerTab).show();
+                }
+            }
         });
     </script>
 }

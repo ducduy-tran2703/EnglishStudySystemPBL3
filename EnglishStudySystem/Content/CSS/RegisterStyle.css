@@ -64,20 +64,20 @@ hr {
     border-right: 1px solid #ddd;
 }
 
-.form-control {
+.register-form-wrapper .form-control {
     flex: 1;
     padding: 10px 15px;
     border: none;
     font-size: 1rem;
     border-radius: 0 4px 4px 0;
-    width: 100%; /* Đảm bảo chiếm hết không gian */
-    max-width: 500px; /* Giới hạn chiều rộng tối đa */
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
 }
 
-    .form-control:focus {
+/*    .form-control:focus {
         outline: none;
-    }
-
+    }*/
 /* Button */
 .form-submit {
     text-align: center;
