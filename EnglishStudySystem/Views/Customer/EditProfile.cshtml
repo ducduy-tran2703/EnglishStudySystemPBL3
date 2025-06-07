@@ -5,7 +5,7 @@
 
 @section Styles {
     <link href="~/Content/CSS2/DetailUserStyle.css" rel="stylesheet" />
-    <link href="~/Content/CSS2/EditProfileStyle.css" rel="stylesheet"/>
+    <link href="~/Content/CSS2/EditProfileStyle.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 }
 
@@ -43,16 +43,16 @@
             <div class="detail-user-info-item">
                 <div class="detail-user-info-label"><i class="fas fa-envelope"></i> Email</div>
                 <div class="detail-user-info-value">
-                    @Html.TextBoxFor(m => m.Email, new { @class = "edit-form-control" })
-                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "edit-form-control", @readonly = "readonly" })
+                    <small class="text-muted">Liên hệ quản trị viên để thay đổi email</small>
                 </div>
             </div>
 
             <div class="detail-user-info-item">
                 <div class="detail-user-info-label"><i class="fas fa-phone"></i> Số điện thoại</div>
                 <div class="detail-user-info-value">
-                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "edit-form-control" })
-                    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "edit-form-control", @readonly = "readonly" })
+                    <small class="text-muted">Liên hệ quản trị viên để thay đổi số điện thoại</small>
                 </div>
             </div>
 
@@ -66,11 +66,10 @@
 
             <div class="detail-user-action-buttons">
                 <button type="submit" class="detail-user-btn detail-user-btn-edit">
-                    <i class="fas fa-save"></i> Update infor
+                    <i class="fas fa-save"></i> Cập nhật thông tin
                 </button>
                 <a href="@Url.Action("DetailUser", "Customer")" class="detail-user-btn detail-user-btn-change-password">
-                    <i class="fas fa-arrow-left"></i> Back
-
+                    <i class="fas fa-arrow-left"></i> Quay lại
                 </a>
             </div>
         }
@@ -83,6 +82,12 @@
         $(document).ready(function () {
             // Thêm hiệu ứng khi load trang
             $('.detail-user-wrapper').css('opacity', '1');
+
+            // Vô hiệu hóa click chuột phải trên các trường readonly
+            $('[readonly]').on('contextmenu', function (e) {
+                e.preventDefault();
+                return false;
+            });
         });
     </script>
 }

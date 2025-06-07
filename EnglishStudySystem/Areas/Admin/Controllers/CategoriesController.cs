@@ -84,6 +84,13 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         public async Task<ActionResult> Details(int? id)
         {
             // Kiểm tra ID có được cung cấp không
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            ViewBag.CanEdit = User.IsInRole("Administrator") || user_now.CanManageCategories;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest); // Trả về lỗi 400 Bad Request
