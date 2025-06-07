@@ -77,6 +77,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
                         db.Lessons.Add(lesson);
                         await db.SaveChangesAsync();
+                        await CreateNewLessonNotification(lesson.Id, lesson.Title, lesson.CategoryId, currentUserId);
 
                         return RedirectToAction("Details", "Categories", new { id = lesson.CategoryId });
                     }
@@ -107,6 +108,57 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             // Nếu ModelState ban đầu không hợp lệ
             ViewBag.CategoryName = category?.Name;
             return View(viewModel);
+        }
+        private async Task CreateNewLessonNotification(int lessonId, string lessonTitle, int categoryId, string senderId)
+        {
+            try
+            {
+                // Tạo thông báo
+                var notification = new Notification
+                {
+                    Title = "Bài học mới đã được thêm vào!",
+                    Content = $"Bài học '{lessonTitle}' đã sẵn sàng. Hãy bắt đầu học ngay!",
+                    CreatedDate = DateTime.Now,
+                    SenderId = senderId,
+                    TargetController = "Lesson",
+                    TargetAction = "Details",
+                    PrimaryRelatedEntityId = lessonId,
+                    RelatedEntityType = "NewLesson",
+                    IsDeleted = false
+                };
+
+                // Lấy danh sách người dùng đã mua khóa học này
+                var paidUsers = await db.Payments
+                    .Where(p => p.CategoryId == categoryId &&
+                               p.Status == "Completed" &&
+                               p.PaymentDate <= DateTime.Now)
+                    .Select(p => p.UserId)
+                    .Distinct()
+                    .ToListAsync();
+
+                // Tạo UserNotification cho từng người dùng đã mua
+                foreach (var userId in paidUsers)
+                {
+                    notification.UserNotifications.Add(new UserNotification
+                    {
+                        UserId = userId,
+                        IsRead = false,
+                        IsDeleted =false,
+                    });
+                }
+
+                // Chỉ lưu thông báo nếu có người nhận
+                if (notification.UserNotifications.Any())
+                {
+                    db.Notifications.Add(notification);
+                    await db.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần
+                System.Diagnostics.Debug.WriteLine($"Lỗi khi tạo thông báo bài học mới: {ex.Message}");
+            }
         }
 
         // GET: Admin/Lessons/Details/5

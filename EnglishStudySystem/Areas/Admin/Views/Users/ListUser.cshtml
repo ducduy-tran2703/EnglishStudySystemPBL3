@@ -312,6 +312,7 @@
 
 @section scripts {
     <script>
+
         $(document).ready(function () {
             // Initialize tooltips
             $('[title]').tooltip({
@@ -402,6 +403,25 @@
 
             // Initialize
             updateEmptyState();
+        });
+    </script>
+    <script>
+        // Khi người dùng click tab, lưu ID tab vào localStorage
+        document.querySelectorAll('#userTabs a').forEach(function (tabLink) {
+            tabLink.addEventListener('shown.bs.tab', function (event) {
+                localStorage.setItem('selectedTab', event.target.getAttribute('href'));
+            });
+        });
+
+        // Khi load lại trang, nếu có tab đã lưu, active nó
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectedTab = localStorage.getItem('selectedTab');
+            if (selectedTab) {
+                var triggerTab = document.querySelector('#userTabs a[href="' + selectedTab + '"]');
+                if (triggerTab) {
+                    new bootstrap.Tab(triggerTab).show();
+                }
+            }
         });
     </script>
 }

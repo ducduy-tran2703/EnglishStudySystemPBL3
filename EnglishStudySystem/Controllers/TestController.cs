@@ -8,6 +8,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Razor.Tokenizer.Symbols;
 using System.Data.Entity;
+using System.Web.Services.Description;
+using static System.Net.Mime.MediaTypeNames;
 namespace EnglishStudySystem.Controllers
 {
     public class TestController : Controller
@@ -35,6 +37,22 @@ namespace EnglishStudySystem.Controllers
 
             var test = db.Tests.Include(t => t.Questions).FirstOrDefault(t => t.Id == id);
             if (test == null) return HttpNotFound();
+
+            if (!test.Lesson.IsFreeTrial)
+            {
+                // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
+                bool hasPurchased = db.Payments.Any(p =>
+                    p.UserId == userId &&
+                    p.CategoryId == test.Lesson.CategoryId &&
+                    p.Status == "Completed" &&
+                    p.PaymentDate <= DateTime.Now);
+
+                if (!hasPurchased)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { message = "Bạn cần mua khóa học này trước khi làm bài kiểm tra." });
+                }
+            }
+
             // Tạo attempt mới
             var attempt = new UserTestAttempt
             {
@@ -157,6 +175,21 @@ namespace EnglishStudySystem.Controllers
             if (attempt == null)
             {
                 return HttpNotFound();
+            }
+            var test = db.Tests.Include(t => t.Questions).FirstOrDefault(t => t.Id == id);
+            if (!test.Lesson.IsFreeTrial)
+            {
+                // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
+                bool hasPurchased = db.Payments.Any(p =>
+                p.UserId == userId &&
+                    p.CategoryId == test.Lesson.CategoryId &&
+                    p.Status == "Completed" &&
+                    p.PaymentDate <= DateTime.Now);
+
+                if (!hasPurchased)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { message = "Bạn cần mua khóa học này trước khi làm bài kiểm tra." });
+                }
             }
             ViewBag.UrlBack = Request.UrlReferrer?.ToString();
             return View(attempt);
