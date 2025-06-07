@@ -9,10 +9,14 @@
         <h2 class="text-white mb-0" style="background: linear-gradient(135deg, #2c3e50, #3498db); padding: 10px 20px; border-radius: 8px;">
             <i class="fas fa-folder me-2"></i>@ViewBag.Title
         </h2>
-        <div>
-            @Html.ActionLink("Thêm mới Danh mục", "Create", null, new { @class = "btn btn-success me-2" })
-            @Html.ActionLink("Xem Danh mục đã xóa", "DeletedIndex", null, new { @class = "btn btn-dark" })
-        </div>
+        @if (ViewBag.CanEdit)
+            {
+                <div>
+                    @Html.ActionLink("Thêm mới Danh mục", "Create", null, new { @class = "btn btn-success me-2" })
+                    @Html.ActionLink("Xem Danh mục đã xóa", "DeletedIndex", null, new { @class = "btn btn-dark" })
+                </div>
+            }
+        
     </div>
 
     <div class="card shadow-sm" style="border: none; border-radius: 10px; overflow: hidden;">
@@ -54,20 +58,26 @@
                                 <td class="text-success fw-bold">@String.Format("{0:C}", item.Price)</td>
                                 <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
                                 <td>
-                                    <div class="d-flex gap-2">
-                                        @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
-                                        @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-sm btn-warning text-white" })
+                                    @if (ViewBag.CanEdit)
+                                    {
 
-                                        @using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline delete-form", id = "deleteForm_" + item.Id }))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-form-id="deleteForm_@item.Id" data-category-name="@item.Name">
-                                                <i class="fas fa-trash-alt me-1"></i>Xóa
-                                            </button>
-                                        }
-                                    </div>
+                                        <div class="d-flex gap-2">
+                                            @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
+                                            @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-sm btn-warning text-white" })
+
+                                            @using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline delete-form", id = "deleteForm_" + item.Id }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <button type="button" class="btn btn-sm btn-danger delete-btn" data-form-id="deleteForm_@item.Id" data-category-name="@item.Name">
+                                                    <i class="fas fa-trash-alt me-1"></i>Xóa
+                                                </button>
+                                            }
+                                        </div>
+
+                                    }
                                 </td>
-                            </tr>
+
+                                </tr>
                         }
                     </tbody>
                 </table>

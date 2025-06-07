@@ -33,9 +33,13 @@
                 <!-- User Actions -->
                 <div class="d-flex align-items-center">
                     <!-- Quick Stats -->
-                    <div class="d-none d-lg-flex me-4 align-items-center">
-                        @{ Html.RenderAction("QuickStats", "Shared", new { area = "Admin" }); }
-                    </div>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <div class="d-none d-lg-flex me-4 align-items-center">
+                            @{ Html.RenderAction("QuickStats", "Shared", new { area = "Admin" }); }
+                        </div>
+                    }
+
 
                     <!-- User Profile Dropdown -->
                     <div class="dropdown" data-bs-toggle="tooltip" title="Tài khoản">
@@ -51,7 +55,7 @@
                                     <i class="fas fa-user me-2"></i>Thông tin cá nhân
                                 </a>
                             }
-                       
+
                             <li><hr class="dropdown-divider"></li>
                             @using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm" }))
                             {

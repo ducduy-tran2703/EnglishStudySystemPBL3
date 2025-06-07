@@ -109,9 +109,7 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group btn-group-sm shadow" role="group">
-                                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-light" title="Sửa">
-                                                    <i class="fas fa-edit text-primary"></i>
-                                                </a>
+                                                
                                                 <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-light" title="Chi tiết">
                                                     <i class="fas fa-info-circle text-info"></i>
                                                 </a>
@@ -205,25 +203,7 @@
                                                         </form>
                                                     }
 
-                                                    <!-- LockNotificationManager form -->
-                                                    if (item.CanManageNotifications)
-                                                    {
-                                                        <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                            @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-light btn-lock" title="Khóa quản lý thông báo">
-                                                                <i class="fas fa-bell-slash text-warning"></i>
-                                                            </button>
-                                                        </form>
-                                                    }
-                                                    else
-                                                    {
-                                                        <form action="@Url.Action("LockNotificationManager", new { id = item.Id })" method="post" style="display:inline;">
-                                                            @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-light btn-lock" title="Mở khóa quản lý thông báo">
-                                                                <i class="fas fa-bell text-success"></i>
-                                                            </button>
-                                                        </form>
-                                                    }
+                                                   
 
                                                     <!-- Delete form -->
                                                     <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">

@@ -11,6 +11,8 @@ using EnglishStudySystem;
 using EnglishStudySystem.Areas.Admin.ViewModel;
 using EnglishStudySystem.Models; // Cần cho ApplicationDbContext, Category
 using Microsoft.AspNet.Identity; // Cần để lấy User ID và UserName của người tạo/cập nhật
+using Microsoft.AspNet.Identity.EntityFramework;
+
 
 // Cần thêm using để sử dụng các thuộc tính phân quyền Identity
 using Microsoft.AspNet.Identity.Owin;
@@ -26,11 +28,29 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
     {
         // Khai báo DbContext để truy vấn dữ liệu
         private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext _context;
+        private UserManager<ApplicationUser> _userManager;
+        private RoleManager<IdentityRole> _roleManager;
+
+        public CategoriesController()
+        {
+            _context = new ApplicationDbContext();
+            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
+            _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
+        }
 
         // --- ACTION: DANH SÁCH CÁC DANH MỤC CHƯA XÓA MỀM (Index) ---
         // GET: Admin/Categories
         public async Task<ActionResult> Index()
         {
+            
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            ViewBag.CanEdit = User.IsInRole("Administrator")||user_now.CanManageCategories;
             // Lấy tất cả các danh mục CHƯA bị xóa mềm
             // Do không có Global Query Filter, chúng ta phải lọc thủ công bằng .Where(c => !c.IsDeleted)
             var activeCategories = await db.Categories
