@@ -31,6 +31,10 @@ namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với 
         public int QuestionCount { get; set; } // Ví dụ: tổng số câu hỏi trong bài kiểm tra
 
         [Required]
+        [Display(Name = "Thời gian lam bài")]
+        public int Duration { get; set; } // Thời gian làm bài tính bằng phút
+
+        [Required]
         [DataType(DataType.DateTime)]
         [Display(Name = "Ngày tạo")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
@@ -46,5 +50,10 @@ namespace EnglishStudySystem.Models // Đảm bảo namespace này khớp với 
 
         // Bạn có thể thêm các thuộc tính điều hướng khác tại đây, ví dụ: một bài kiểm tra có nhiều câu hỏi
          public virtual ICollection<Question> Questions { get; set; }
+
+        public Test()
+        {
+            Questions = new HashSet<Question>();
+        }
     }
 }

@@ -1,0 +1,272 @@
+﻿@model EnglishStudySystem.ViewModel.TestCreateEditViewModel
+
+@{
+    ViewBag.Title = "Chỉnh sửa Bài kiểm tra";
+}
+
+<style>
+    .question-block, .answer-block {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .answer-block {
+        background-color: #f0f0f0;
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+        .question-header h4 {
+            margin: 0;
+        }
+
+    .remove-question, .remove-answer {
+        color: red;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .add-question-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 10px;
+        font-size: 1.1em;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .answer-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+        .answer-group input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .answer-group label {
+            margin-bottom: 0;
+            flex-grow: 1;
+        }
+</style>
+
+<h2>Chỉnh sửa Bài kiểm tra cho Bài học: @ViewBag.LessonTitle</h2>
+
+@using (Html.BeginForm("Edit", "Test", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.LessonId, new { Value = ViewBag.LessonId })
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Title, new { @class = "control-label" })
+        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Description, new { @class = "control-label" })
+        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 3 })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+    </div>
+
+    <!-- Giữ trường Thời gian làm bài -->
+    <div class="form-group">
+        @Html.LabelFor(model => model.Duration, new { @class = "control-label" })
+        @Html.EditorFor(model => model.Duration, new { htmlAttributes = new { @class = "form-control", type = "number", min = "1" } })
+        @Html.ValidationMessageFor(model => model.Duration, "", new { @class = "text-danger" })
+    </div>
+
+    <h3>Danh sách Câu hỏi</h3>
+    <div id="questionsContainer">
+        @if (Model.Questions != null && Model.Questions.Any())
+        {
+            for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                @Html.Partial("_QuestionFormPartial", Model.Questions[i], new ViewDataDictionary { { "QuestionIndex", i } })
+            }
+        }
+    </div>
+
+    <button type="button" id="addQuestion" class="btn btn-primary add-question-btn"><i class="fa fa-plus"></i> Thêm Câu hỏi mới</button>
+    <p class="text-danger" id="addQuestionError" style="display:none;">Vui lòng nhập đủ thông tin câu hỏi hiện tại trước khi thêm câu mới.</p>
+
+    <div class="form-group" style="margin-top: 30px;">
+        <input type="submit" value="Lưu thay đổi" class="btn btn-success" />
+        @Html.ActionLink("Quay lại Bài học", "Details", "Lessons", new { id = ViewBag.LessonId }, new { @class = "btn btn-default" })
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        var questionIndex = @(Model.Questions != null ? Model.Questions.Count : 0);
+
+        function isCurrentQuestionValid() {
+            if ($('#questionsContainer .question-block').length === 0) {
+                return true;
+            }
+
+            var $lastQuestionBlock = $('#questionsContainer .question-block').last();
+            var currentQuestionToCheckIndex = parseInt($lastQuestionBlock.attr('data-question-index')) || 0;
+
+            var currentQuestionPrefix = "Questions[" + currentQuestionToCheckIndex + "]";
+            console.log('Selector: [name="' + currentQuestionPrefix + '.Content"]');
+            var contentInput = $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.Content"]');
+            console.log('Found elements:', contentInput.length, contentInput);
+
+            if (contentInput.length === 0) {
+                alert('Không tìm thấy trường nội dung câu hỏi. Vui lòng kiểm tra lại.');
+                return false;
+            }
+            if (contentInput.val().trim() === '') {
+                alert('Vui lòng nhập nội dung câu hỏi.');
+                contentInput.focus();
+                return false;
+            }
+
+            var answersValid = true;
+            var firstEmptyAnswerInput = null;
+            for (var i = 0; i < 4; i++) {
+                var answerContentInput = $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.Answers[' + i + '].Content"]');
+                if (answerContentInput.length === 0 || answerContentInput.val().trim() === '') {
+                    answersValid = false;
+                    if (firstEmptyAnswerInput === null) {
+                        firstEmptyAnswerInput = answerContentInput;
+                    }
+                }
+            }
+            if (!answersValid) {
+                alert('Vui lòng nhập đầy đủ nội dung cho tất cả 4 đáp án của câu hỏi hiện tại.');
+                if (firstEmptyAnswerInput !== null && firstEmptyAnswerInput.length > 0) {
+                    firstEmptyAnswerInput.focus();
+                }
+                return false;
+            }
+
+            var correctAnswersCount = $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.IsCorrectAnswer"]:checked').length;
+            if (correctAnswersCount !== 1) {
+                alert('Vui lòng chọn một đáp án đúng cho câu hỏi hiện tại.');
+                $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.IsCorrectAnswer"]').first().focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        $('#addQuestion').click(function () {
+            if (!isCurrentQuestionValid()) {
+                $('#addQuestionError').show();
+                return;
+            }
+            $('#addQuestionError').hide();
+
+            var newQuestionHtml = `
+                <div class="question-block" data-question-index="${questionIndex}">
+                    <div class="question-header">
+                        <h4>Câu hỏi số ${questionIndex + 1}</h4>
+                        <span class="remove-question btn btn-danger btn-sm">Xóa</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="Questions_${questionIndex}_Content">Nội dung câu hỏi</label>
+                        <textarea id="Questions_${questionIndex}_Content" name="Questions[${questionIndex}].Content" class="form-control" rows="3" required></textarea>
+                        <span data-valmsg-for="Questions[${questionIndex}].Content" data-valmsg-replace="true" class="text-danger"></span>
+                    </div>
+                    <label>Đáp án:</label>
+                    ${buildAnswerBlock(questionIndex, 0, 'A')}
+                    ${buildAnswerBlock(questionIndex, 1, 'B')}
+                    ${buildAnswerBlock(questionIndex, 2, 'C')}
+                    ${buildAnswerBlock(questionIndex, 3, 'D')}
+                </div>
+            `;
+            var $newQuestion = $(newQuestionHtml);
+            $('#questionsContainer').append($newQuestion);
+
+            var form = $('form');
+            form.removeData('validator').removeData('unobtrusiveValidation'); // Reset validator
+            $.validator.unobtrusive.parse(form); // Parse lại toàn bộ form
+            if (!form.data('validator')) {
+                form.validate(); // Khởi tạo validator nếu chưa có
+            }
+
+            questionIndex++; // Tăng index trước khi reindex
+            reindexQuestions(); // Reindex sau khi thêm
+
+            $('[name="Questions[' + (questionIndex - 1) + '].Content"]').focus();
+        });
+
+        function buildAnswerBlock(qIndex, aIndex, labelChar) {
+            return `
+                <div class="answer-block">
+                    <div class="answer-group">
+                        <input type="radio" name="Questions[${qIndex}].IsCorrectAnswer" value="${aIndex}" id="q${qIndex}a${aIndex}Correct" required/>
+                        <label for="q${qIndex}a${aIndex}Correct">Đáp án ${labelChar}:</label>
+                        <textarea name="Questions[${qIndex}].Answers[${aIndex}].Content" class="form-control" rows="1" required></textarea>
+                    </div>
+                    <span data-valmsg-for="Questions[${qIndex}].Answers[${aIndex}].Content" data-valmsg-replace="true" class="text-danger"></span>
+                </div>
+            `;
+        }
+
+        $(document).on('click', '.remove-question', function () {
+            $(this).closest('.question-block').remove();
+            reindexQuestions();
+        });
+
+        function reindexQuestions() {
+            questionIndex = 0;
+            $('#questionsContainer .question-block').each(function () {
+                var currentBlock = $(this);
+                currentBlock.attr('data-question-index', questionIndex);
+                currentBlock.find('h4').text('Câu hỏi số ' + (questionIndex + 1));
+
+                var contentTextarea = currentBlock.find('textarea[name$=".Content"]').first();
+                contentTextarea.prop('name', 'Questions[' + questionIndex + '].Content');
+                contentTextarea.attr('id', 'Questions_' + questionIndex + '_Content');
+                currentBlock.find('label[for$="_Content"]').attr('for', 'Questions_' + questionIndex + '_Content');
+                currentBlock.find('span[data-valmsg-for$=".Content"]').attr('data-valmsg-for', 'Questions[' + questionIndex + '].Content');
+
+                currentBlock.find('.answer-block').each(function (answerIdx) {
+                    var answerPrefix = 'Questions[' + questionIndex + '].Answers[' + answerIdx + ']';
+                    $(this).find('input[type="radio"]').attr({
+                        'name': 'Questions[' + questionIndex + '].IsCorrectAnswer',
+                        'id': `q${questionIndex}a${answerIdx}Correct`,
+                        'value': answerIdx
+                    });
+                    $(this).find('label').attr('for', `q${questionIndex}a${answerIdx}Correct`);
+                    $(this).find('textarea[name$=".Content"]').prop('name', answerPrefix + '.Content');
+                    $(this).find('span[data-valmsg-for$=".Content"]').attr('data-valmsg-for', answerPrefix + '.Content');
+                });
+                questionIndex++;
+            });
+
+            var form = $('form');
+            form.removeData('validator').removeData('unobtrusiveValidation');
+            $.validator.unobtrusive.parse(form); // Parse lại toàn bộ form sau reindex
+            if (!form.data('validator')) {
+                form.validate(); // Khởi tạo validator nếu cần
+            }
+        }
+
+        $(document).ready(function() {
+            reindexQuestions();
+        });
+    </script>
+}
