@@ -14,6 +14,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
         public ActionResult Index()
         {
+            if ( User.IsInRole("Editor"))
+                return RedirectToAction("HomePage", "Home",new {area = ""});
+
             var today = DateTime.Today;
             var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
             var firstDayOfYear = new DateTime(today.Year, 1, 1);

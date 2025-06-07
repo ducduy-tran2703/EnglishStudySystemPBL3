@@ -22,7 +22,7 @@
                     <button class="sidebar-toggle btn btn-link me-3 d-lg-none">
                         <i class="fas fa-bars fs-4"></i>
                     </button>
-                    <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="@Url.Action("Index", "Dashboard", new { area = "Admin" })">
+                    <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="/">
                         <i class="fas fa-cog fs-4 me-2 text-success"></i>
                         <span>Admin Panel</span>
                     </a>
@@ -77,11 +77,14 @@
                     <h5><i class="fas fa-cog me-2"></i> Quản trị</h5>
                 </div>
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Home", new { area = "Admin" })">
-                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                        </a>
-                    </li>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Home", new { area = "Admin" })">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                    }
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("ListUser", "Users", new { area = "Admin" })">
                             <i class="fas fa-users me-2"></i> Quản lý người dùng
@@ -92,7 +95,12 @@
                             <i class="fas fa-list me-2"></i> Quản lý danh mục
                         </a>
                     </li>
-                  
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("HomePage", "Home", new { area = "" })">
+                            <i class="fas fa-home me-2"></i>Trang chủ người dùng
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </aside>

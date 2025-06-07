@@ -47,8 +47,13 @@ namespace EnglishStudySystem.Controllers
                     p.CategoryId == lesson.CategoryId &&
                     p.Status == "Completed" &&
                     p.PaymentDate <= DateTime.Now);
-
-                if (!hasPurchased)
+                bool CanView;
+                if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+                    CanView = true;
+                else
+                    CanView = false;
+                @ViewBag.CanView = CanView; 
+                if (!hasPurchased && !CanView)
                 {
                     return RedirectToAction("AccessDenied", "Error", new { message = "Bạn cần mua khóa học để xem bài học này" });
                 }
