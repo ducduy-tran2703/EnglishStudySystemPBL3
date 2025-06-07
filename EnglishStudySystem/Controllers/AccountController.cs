@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using EnglishStudySystem.Models;
+using System.Resources;
 
 namespace EnglishStudySystem.Controllers
 {
@@ -404,12 +405,6 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
-            var categories = _context.Categories
-            .Where(c => !c.IsDeleted)
-            .OrderByDescending(c => c.CreatedDate)
-            .Take(6)
-            .ToList();
-            ViewBag.ListCategories = categories;
             return View();
         }
 
@@ -425,8 +420,8 @@ namespace EnglishStudySystem.Controllers
                 var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null )
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    ViewBag.Message = "Kiểm tra Gmail của bạn để cập nhật mật khẩu mới.";
+                    return View(model);
                 }
 
                 if (!(await UserManager.IsEmailConfirmedAsync(user.Id)))
@@ -446,9 +441,12 @@ namespace EnglishStudySystem.Controllers
                 else
                 {
                     string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                    var callbackUrl = Url.Action("ResetPassword", "Account", new {code = code,email = model.Email }, protocol: Request.Url.Scheme);
+                    var expirationTime = DateTime.Now.Add(ApplicationUserManager.PasswordResetTokenLifespan);
+                    string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")} (giờ địa phương).";
+                    await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>" + "<br/>" + expirationMessage);
+                    ViewBag.Message = "Kiểm tra Gmail của bạn để cập nhật mật khẩu mới.";
+                    return View(model);
                 }
             }
 
@@ -467,12 +465,44 @@ namespace EnglishStudySystem.Controllers
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
-        public ActionResult ResetPassword(string code)
+        public async Task<ActionResult> ResetPassword(string code, string email)
         {
-            return code == null ? View("Error") : View();
+            if (code == null || email == null)
+            {
+                ViewBag.ErrorMessage = "Liên kết đặt lại mật khẩu không hợp lệ.";
+                return View("Error");
+            }
+
+            var user = await UserManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Vẫn không tiết lộ rằng người dùng không tồn tại vì lý do bảo mật.
+                ViewBag.ErrorMessage = "Người dùng không tồn tại hoặc liên kết không hợp lệ.";
+                return View("Error");
+            }
+            var isTokenValid = await UserManager.VerifyUserTokenAsync(user.Id, "ResetPassword", code);
+
+            if (!isTokenValid)
+            {
+                ViewBag.ErrorMessage = "Mã đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu một mã mới.";
+                return View("Error");
+            }
+            var model = new ResetPasswordViewModel
+            {
+                Code = code,
+                Email = email
+            };
+            
+
+            // Kiểm tra TempData cho thông báo thành công (sau khi POST thành công)
+            if (TempData["ResetPasswordSuccess"] != null && (bool)TempData["ResetPasswordSuccess"])
+            {
+                ViewBag.ResetPasswordSuccess = true;
+            }
+
+            return View(model);
         }
 
-        //
         // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
@@ -483,20 +513,26 @@ namespace EnglishStudySystem.Controllers
             {
                 return View(model);
             }
+
             var user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                // Don't reveal that the user does not exist
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                // Không tiết lộ, giả vờ thành công
+                ViewBag.ResetPasswordSuccess = true;
+                return View(model);
             }
+
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                ViewBag.ResetPasswordSuccess = true; // Thông báo thành công
+                return View(model); // KHÔNG Redirect nữa
             }
-            AddErrors(result);
-            return View();
+
+            AddErrors(result); // Nếu lỗi thì hiển thị lại form
+            return View(model);
         }
+
 
         //
         // GET: /Account/ResetPasswordConfirmation

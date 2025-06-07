@@ -1,89 +1,116 @@
 ﻿body {
-    @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap');
-    body
-
-{
+    background: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background: radial-gradient(#a429bc,#9225a7,#7f2092);
-    height: 100vh;
-    overflow: hidden;
-    font-family: 'Times New Roman', sans-serif;
 }
 
-.center {
-    width: 430px;
-    margin: auto;
-    position: relative;
+.register-form-wrapper {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-    .center .header {
-        font-size: 28px;
-        font-weight: bold;
-        color: white;
-        padding: 25px 0 30px 25px;
-        background: #00FA9A;
-        border-bottom: 1px solid #370e3f;
-        border-radius: 5px 5px 0 0;
+    .register-form-wrapper h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
     }
 
-    .center form {
-        position: absolute;
-        background: white;
-        width: 100%;
-        padding: 50px 10px 0 30px;
-        box-sizing: border-box;
-        border: 1px solid #6d1c7d;
-        border-radius: 0 0 5px 5px;
-    }
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f9f9f9;
+    padding: 8px 12px;
+}
 
-form input {
-    height: 50px;
-    width: 90%;
-    padding: 0 10px;
-    border-radius: 3px;
-    border: 1px solid silver;
-    font-size: 18px;
+.input-group-addon {
+    margin-right: 8px;
+    color: #777;
+    font-size: 1.2em;
+}
+
+.form-control {
+    border: none;
+    background: transparent;
+    flex: 1;
+    font-size: 16px;
     outline: none;
 }
 
-    form input[type="password"] {
-        margin-top: 20px;
-    }
-
-form i {
-    position: absolute;
-    font-size: 25px;
-    color: grey;
-    margin: 15px 0 0 -45px;
+.text-danger {
+    color: #e74c3c;
+    font-size: 0.9em;
+    margin-top: 5px;
 }
 
-i.fa-lock {
-    margin-top: 35px;
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
 }
 
-form input[type="submit"] {
-    margin-top: 40px;
-    margin-bottom: 40px;
-    width: 130px;
-    height: 45px;
-    color: white;
-    cursor: pointer;
-    line-height: 45px;
-    border-radius: 45px;
-    border-radius: 5px;
-    background: #5c1769;
+.remember-me-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.95em;
+    color: #555;
 }
 
-    form input[type="submit"]:hover {
-        background: #491254;
-        transition: .5s;
-    }
+.remember-me-checkbox {
+    margin-right: 8px;
+}
 
-form a {
+.forgot-password-link {
+    font-size: 0.9em;
+    color: #3498db;
     text-decoration: none;
-    font-size: 18px;
-    color: #7f2092;
-    padding: 0 0 0 20px;
 }
+
+    .forgot-password-link:hover {
+        text-decoration: underline;
+    }
+
+.form-submit {
+    text-align: center;
+    margin-top: 20px;
 }
+
+.btn-submit {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+    .btn-submit:hover {
+        background-color: #2980b9;
+    }
+
+.register-prompt {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.95em;
+}
+
+.register-link {
+    color: #2ecc71;
+    font-weight: bold;
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+    .register-link:hover {
+        text-decoration: underline;
+    }

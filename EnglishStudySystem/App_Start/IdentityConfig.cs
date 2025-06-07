@@ -61,6 +61,7 @@ namespace EnglishStudySystem
     // Configure the application user manager used in this application. UserManager is defined in ASP.NET Identity and is used by the application.
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
+        public static TimeSpan PasswordResetTokenLifespan { get; private set; }
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
             : base(store)
         {
@@ -107,8 +108,11 @@ namespace EnglishStudySystem
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
-                    new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
+                var tokenProvider = new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
+                tokenProvider.TokenLifespan = TimeSpan.FromMinutes(5); // Hoặc bất kỳ giá trị nào bạn muốn
+                PasswordResetTokenLifespan = tokenProvider.TokenLifespan; // Lưu giá trị đã đặt
+
+                manager.UserTokenProvider = tokenProvider;
             }
             return manager;
         }
