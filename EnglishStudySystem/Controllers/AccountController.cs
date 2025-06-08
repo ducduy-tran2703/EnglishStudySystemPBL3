@@ -286,6 +286,11 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (TempData["ConfirmMessage"] != null)
             {
                 ViewBag.Message = TempData["ConfirmMessage"];
@@ -301,6 +306,11 @@ namespace EnglishStudySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -365,6 +375,11 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (userId == null || code == null)
             {
                 return View("Error");
@@ -396,6 +411,11 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             return View();
         }
 
@@ -406,6 +426,11 @@ namespace EnglishStudySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByEmailAsync(model.Email);
@@ -450,6 +475,11 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             return View();
         }
 
@@ -458,6 +488,11 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ResetPassword(string code, string email)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (code == null || email == null)
             {
                 ViewBag.ErrorMessage = "Liên kết đặt lại mật khẩu không hợp lệ.";
@@ -500,6 +535,11 @@ namespace EnglishStudySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -702,7 +742,22 @@ namespace EnglishStudySystem.Controllers
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error);
+                // Kiểm tra lỗi liên quan đến email
+                if (error.ToLower().Contains("email"))
+                {
+                    ModelState.AddModelError("Email", "Email đã được sử dụng");
+                }
+                // Kiểm tra lỗi liên quan đến tên đăng nhập (dựa trên thông báo "Name ... is already taken.")
+                else if (error.ToLower().Contains("already taken") && error.ToLower().Contains("name"))
+                {
+                    // Thay đổi thông báo lỗi cho tên đăng nhập
+                    ModelState.AddModelError("UserName", "Tên đăng nhập đã tồn tại");
+                }
+                // Xử lý các lỗi khác
+                else
+                {
+                    ModelState.AddModelError("", error); // Giữ nguyên thông báo lỗi gốc cho các lỗi khác
+                }
             }
         }
 
