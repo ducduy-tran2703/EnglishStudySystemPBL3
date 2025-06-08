@@ -24,7 +24,7 @@
                              new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
                     }
 
-                    @Html.ActionLink("Tài khoản đã xóa", "ListDeletedAccount", "Users", null,
+                    @Html.ActionLink("Tài khoản đã bị khóa", "ListDeletedAccount", "Users", null,
                     new { @class = "btn btn-light btn-sm text-success font-weight-bold shadow-sm" })
                 </div>
             </div>
@@ -206,7 +206,7 @@
                                                    
 
                                                     <!-- Delete form -->
-                                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="khóa">
                                                         <i class="fas fa-trash-alt text-danger"></i>
                                                     </a>
                                                 }
@@ -260,7 +260,7 @@
                                                 </a>
                                                 @if (ViewBag.user_now.CanManageUsers || ViewBag.IsAdmin)
                                                 {
-                                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="Xóa">
+                                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-light btn-delete" title="khóa">
                                                         <i class="fas fa-trash-alt text-danger"></i>
                                                     </a>
                                                 }

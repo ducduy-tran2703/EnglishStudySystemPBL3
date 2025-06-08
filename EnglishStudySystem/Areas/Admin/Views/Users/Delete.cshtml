@@ -1,7 +1,7 @@
 ﻿@model EnglishStudySystem.Models.UserViewModel
 
 @{
-    ViewBag.Title = "Xác nhận xóa tài khoản";
+    ViewBag.Title = "Xác nhận khóa tài khoản";
     Layout = "~/Areas/Admin/Views/Shared/AdminLayoutPage.cshtml";
 }
 
@@ -13,11 +13,9 @@
                     <h4 class="mb-0" style="color:white">@ViewBag.Title</h4>
                 </div>
                 <div class="card-body">
-                    <h5 style="color:black">Bạn có chắc chắn muốn xóa tài khoản này?</h5>
+                    <h5 style="color:black">Bạn có chắc chắn muốn khóa tài khoản này?</h5>
 
-                    <div class="alert alert-warning">
-                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến tài khoản này sẽ bị xóa vĩnh viễn.
-                    </div>
+                 
 
                     <dl class="row">
                         <dt class="col-sm-4">Tên đăng nhập:</dt>
@@ -39,7 +37,7 @@
 
                         <div class="form-actions no-color">
                             <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash-alt"></i> Xác nhận xóa
+                                <i class="fas fa-trash-alt"></i> Xác nhận khóa
                             </button>
                             <a href="@Url.Action("ListUser")" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Hủy bỏ
