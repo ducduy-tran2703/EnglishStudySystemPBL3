@@ -10,16 +10,19 @@
             <i class="fas fa-folder-open me-2"></i>@ViewBag.Title
         </h2>
         <div>
-            @if (Model.IsDeleted)
+            @if (ViewBag.CanEdit)
             {
-                @Html.ActionLink("Quay lại Danh sách đã xóa", "DeletedIndex", null, new { @class = "btn btn-dark" })
+                if (Model.IsDeleted)
+                {
+                    @Html.ActionLink("Quay lại Danh sách đã xóa", "DeletedIndex", null, new { @class = "btn btn-dark" })
+                }
+                else
+                {
+                    @Html.ActionLink("Chỉnh sửa", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning me-2" })
+                    @Html.ActionLink("Quay lại Danh sách", "Index", null, new { @class = "btn btn-primary" })
+                }
             }
-            else
-            {
-                @Html.ActionLink("Chỉnh sửa", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning me-2" })
-                @Html.ActionLink("Quay lại Danh sách", "Index", null, new { @class = "btn btn-primary" })
-            }
-        </div>
+            </div>
     </div>
 
     <!-- Phần thông tin chi tiết danh mục -->
@@ -108,7 +111,7 @@
                 <h4 class="mb-0">
                     <i class="fas fa-book me-2"></i>Danh sách Bài học (@Model.Name)
                 </h4>
-                @if (!Model.IsDeleted)
+                @if (!Model.IsDeleted && ViewBag.CanEdit)
                 {
                     @Html.ActionLink("Thêm mới Bài học", "Create", "Lessons", new { categoryId = Model.Id }, new { @class = "btn btn-success btn-sm" })
                 }
@@ -145,20 +148,25 @@
                                         }
                                     </td>
                                     <td>@lesson.CreatedDate.ToString("dd/MM/yyyy")</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            @Html.ActionLink("Chi tiết", "Details", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-sm btn-info" })
-                                            @Html.ActionLink("Sửa", "Edit", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-sm btn-warning text-white" })
+                                    @if (ViewBag.CanEdit)
+                                    {
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                @Html.ActionLink("Chi tiết", "Details", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-sm btn-info" })
+                                                @Html.ActionLink("Sửa", "Edit", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-sm btn-warning text-white" })
 
-                                            @using (Html.BeginForm("SoftDelete", "Lessons", new { id = lesson.Id }, FormMethod.Post, new { @class = "d-inline" }))
-                                            {
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài học này?');">
-                                                    <i class="fas fa-trash-alt me-1"></i>
-                                                </button>
-                                            }
-                                        </div>
-                                    </td>
+                                                @using (Html.BeginForm("SoftDelete", "Lessons", new { id = lesson.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài học này?');">
+                                                        <i class="fas fa-trash-alt me-1"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    }
+
+
                                 </tr>
                             }
                         </tbody>
@@ -169,7 +177,7 @@
             {
                 <div class="p-4 text-center">
                     <p class="text-muted mb-4">Chưa có bài học nào trong danh mục này.</p>
-                    @if (!Model.IsDeleted)
+                    @if (!Model.IsDeleted && ViewBag.CanEdit)
                     {
                         @Html.ActionLink("Thêm mới Bài học", "Create", "Lessons", new { categoryId = Model.Id }, new { @class = "btn btn-success" })
                     }

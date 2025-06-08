@@ -58,23 +58,25 @@
                                 <td class="text-success fw-bold">@String.Format("{0:C}", item.Price)</td>
                                 <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
                                 <td>
-                                    @if (ViewBag.CanEdit)
-                                    {
+                                    
 
-                                        <div class="d-flex gap-2">
-                                            @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
+                                    <div class="d-flex gap-2">
+                                        @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
+                                        @if (ViewBag.CanEdit)
+                                        {
                                             @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-sm btn-warning text-white" })
 
-                                            @using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline delete-form", id = "deleteForm_" + item.Id }))
+                                            using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline delete-form", id = "deleteForm_" + item.Id }))
                                             {
                                                 @Html.AntiForgeryToken()
                                                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-form-id="deleteForm_@item.Id" data-category-name="@item.Name">
                                                     <i class="fas fa-trash-alt me-1"></i>Xóa
                                                 </button>
                                             }
+                                        }
                                         </div>
 
-                                    }
+                                   
                                 </td>
 
                                 </tr>

@@ -36,12 +36,7 @@
         </div>
 
         <div class="form-options">
-            <div class="remember-me-container">
-                <label class="remember-me-label">
-                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "remember-me-checkbox" })
-                    <span class="remember-me-text">Ghi nhớ đăng nhập</span>
-                </label>
-            </div>
+            
             <div class="forgot-password-wrapper">
                 @Html.ActionLink("Quên mật khẩu?", "ForgotPassword", null, new { @class = "forgot-password-link" })
             </div>
