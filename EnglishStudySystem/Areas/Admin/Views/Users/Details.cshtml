@@ -69,15 +69,18 @@
                             @(Model.IsActive ? "Đã kích hoạt" : "Chưa kích hoạt / Bị khóa")
                         </span>
                     </div>
-                    <div class="col-lg-6 mb-3">
-                        <strong class="text-muted d-block mb-1"><i class="fas fa-shield-alt me-2"></i>Trạng thái tài khoản:</strong>                 
-                        <span class="badge @(Model.CanManageCategories ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
-                            @(Model.CanManageCategories || Model.Roles.Contains("Admin") ? "Được phép quản lý danh mục" : "Bị khóa quản lý doanh mục")
-                        </span>
-                        <span class="badge @(Model.CanManageUsers ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
-                            @(Model.CanManageUsers|| Model.Roles.Contains("Admin") ? "Được phép quản lý người dùng" : "Bị khóa quản lý người dùng")
-                        </span>
-                    </div>
+                    @if (Model.Roles.Contains("Editor") || Model.Roles.Contains("Admin"))
+                    {
+                        <div class="col-lg-6 mb-3">
+                            <strong class="text-muted d-block mb-1"><i class="fas fa-shield-alt me-2"></i>Trạng thái tài khoản:</strong>
+                            <span class="badge @(Model.CanManageCategories ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
+                                @(Model.CanManageCategories || Model.Roles.Contains("Admin") ? "Được phép quản lý danh mục" : "Bị khóa quản lý doanh mục")
+                            </span>
+                            <span class="badge @(Model.CanManageUsers ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
+                                @(Model.CanManageUsers || Model.Roles.Contains("Admin") ? "Được phép quản lý người dùng" : "Bị khóa quản lý người dùng")
+                            </span>
+                        </div>
+                    }
                 </div>
             </div>
 
