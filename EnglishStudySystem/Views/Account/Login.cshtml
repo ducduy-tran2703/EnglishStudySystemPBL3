@@ -31,12 +31,15 @@
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock"></i></span>
                 @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Mật khẩu" })
+                <span class="input-group-addon toggle-password" id="togglePasswordLogin">
+                    <i class="fa fa-eye"></i>
+                </span>
             </div>
             @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
         </div>
 
         <div class="form-options">
-            
+
             <div class="forgot-password-wrapper">
                 @Html.ActionLink("Quên mật khẩu?", "ForgotPassword", null, new { @class = "forgot-password-link" })
             </div>
@@ -52,7 +55,21 @@
         </div>
     }
 </div>
- 
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>$(document).ready(function () {
+            // Xử lý cho trường Mật khẩu trên trang Đăng nhập
+            $('#togglePasswordLogin').click(function () {
+                const passwordInput = $('#Password'); // ID của input mật khẩu
+                const icon = $(this).find('i'); // Biểu tượng con mắt
+
+                // Toggle type thuộc tính
+                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+                passwordInput.attr('type', type);
+
+                // Toggle icon
+                icon.toggleClass('fa-eye fa-eye-slash');
+            });
+        });</script>
 }

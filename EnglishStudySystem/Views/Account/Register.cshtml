@@ -74,7 +74,16 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-calendar-alt"></i></span>
-                    @Html.EditorFor(m => m.DateOfBirth, new { htmlAttributes = new { @class = "form-control", placeholder = "Ngày/tháng/năm" } })
+                    @Html.EditorFor(m => m.DateOfBirth, new
+               {
+                   htmlAttributes = new
+                   {
+                       @class = "form-control",
+                       placeholder = "Ngày/tháng/năm",
+                       type = "date", // Đảm bảo kiểu là date để trình duyệt hiển thị lịch
+                       max = DateTime.Today.ToString("yyyy-MM-dd") // Thêm thuộc tính max
+                   }
+               })
                 </div>
                 @Html.ValidationMessageFor(m => m.DateOfBirth, "", new { @class = "text-danger" })
             </div>
@@ -91,6 +100,9 @@
                 <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-lock"></i></span>
                     @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Mật khẩu" })
+                    <span class="input-group-addon toggle-password" id="togglePassword">
+                        <i class="fa fa-eye"></i>
+                    </span>
                 </div>
                 @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
             </div>
@@ -99,6 +111,9 @@
                 <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-key"></i></span>
                     @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Xác nhận mật khẩu" })
+                    <span class="input-group-addon toggle-password" id="toggleConfirmPassword">
+                        <i class="fa fa-eye"></i>
+                    </span>
                 </div>
                 @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
             </div>
@@ -112,4 +127,34 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            // Xử lý cho trường Mật khẩu
+            $('#togglePassword').click(function () {
+                const passwordInput = $('#Password');
+                const icon = $(this).find('i');
+
+                // Toggle type thuộc tính
+                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+                passwordInput.attr('type', type);
+
+                // Toggle icon
+                icon.toggleClass('fa-eye fa-eye-slash');
+            });
+
+            // Xử lý cho trường Xác nhận mật khẩu
+            $('#toggleConfirmPassword').click(function () {
+                const confirmPasswordInput = $('#ConfirmPassword');
+                const icon = $(this).find('i');
+
+                // Toggle type thuộc tính
+                const type = confirmPasswordInput.attr('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.attr('type', type);
+
+                // Toggle icon
+                icon.toggleClass('fa-eye fa-eye-slash');
+            });
+        });
+    </script>
 }
