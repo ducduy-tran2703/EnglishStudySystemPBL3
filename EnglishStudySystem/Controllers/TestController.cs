@@ -183,7 +183,7 @@ namespace EnglishStudySystem.Controllers
                 // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
                 bool hasPurchased = db.Payments.Any(p =>
                 p.UserId == userId &&
-                    p.CategoryId == test.Lesson.CategoryId &&
+                    p.CategoryId == lesson.CategoryId &&
                     p.Status == "Completed" &&
                     p.PaymentDate <= DateTime.Now);
 

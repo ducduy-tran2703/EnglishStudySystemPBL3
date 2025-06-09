@@ -33,7 +33,6 @@ namespace EnglishStudySystem.Controllers
             var categories = _context.Categories
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.CreatedDate)
-                .Take(6)
                 .ToList();
 
             // Lấy thông tin user names nếu cần
@@ -43,7 +42,6 @@ namespace EnglishStudySystem.Controllers
                 .ToDictionary(u => u.Id, u => u.FullName);
 
             ViewBag.UserNames = userNames;
-            ViewBag.ListCategory = categories;
             return View(categories);
         }
         public ActionResult Payment(int categoryId)

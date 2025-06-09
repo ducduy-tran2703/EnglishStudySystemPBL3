@@ -15,6 +15,7 @@ namespace EnglishStudySystem.Controllers
 {
     [Authorize]
     public class AccountController : Controller
+
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
@@ -70,9 +71,15 @@ namespace EnglishStudySystem.Controllers
         //
         // GET: /Account/Login
         [AllowAnonymous]
+        [HttpGet]
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult Login(string ReturnUrl)
         {
             if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("HomePage", "Home");
+            }
+            if (Session["ID"] != null)
             {
                 return RedirectToAction("HomePage", "Home");
             }
@@ -141,10 +148,18 @@ namespace EnglishStudySystem.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public async Task<ActionResult> Login(LoginViewModel model)
         {
 
-
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("HomePage", "Home");
+            }
+            if (Session["ID"] != null)
+            {
+                return RedirectToAction("HomePage", "Home");
+            }
             if (!ModelState.IsValid)
             {
                 // Nếu model state không hợp lệ, hiển thị lại View
@@ -172,11 +187,13 @@ namespace EnglishStudySystem.Controllers
 
                             if (UserManager.EmailService != null)
                             {
+                                var expirationTime = DateTime.Now.Add(ApplicationUserManager.PasswordResetTokenLifespan);
+                                string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")}";
                                 await UserManager.EmailService.SendAsync(new IdentityMessage
                                 {
                                     Destination = user.Email,
                                     Subject = "Xác nhận Email của bạn",
-                                    Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                                    Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>" + "<br/>" + expirationMessage
                                 });
                             }
                             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
