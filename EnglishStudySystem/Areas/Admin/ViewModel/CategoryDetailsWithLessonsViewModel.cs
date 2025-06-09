@@ -4,7 +4,7 @@
 using EnglishStudySystem.Models; // Cần để sử dụng Model Category và Lesson
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations; // Cần cho Display
+using System.ComponentModel.DataAnnotations;
 
 // Đảm bảo namespace này khớp với vị trí bạn đặt file
 namespace EnglishStudySystem.Areas.Admin.ViewModel // Hoặc EnglishStudySystem.Models.ViewModels
@@ -30,29 +30,41 @@ namespace EnglishStudySystem.Areas.Admin.ViewModel // Hoặc EnglishStudySystem.
         public DateTime? DeletedAt { get; set; }
 
         // Audit Fields
+        [Display(Name = "ID người tạo")]
+        public string CreatedByUserId { get; set; }
+
         [Display(Name = "Người tạo")]
-        public string CreatedByUserId { get; set; } // Có thể thêm thuộc tính để hiển thị tên người tạo nếu cần
+        public string CreatedByUserFullName { get; set; } // FullName của người tạo
+
         [Display(Name = "Vai trò người tạo")]
         public string CreatedByUserRole { get; set; }
+
         [Display(Name = "Ngày tạo")]
         public DateTime CreatedDate { get; set; }
 
+        [Display(Name = "ID người cập nhật")]
+        public string UpdatedByUserId { get; set; }
+
         [Display(Name = "Người cập nhật")]
-        public string UpdatedByUserId { get; set; } // Có thể thêm thuộc tính để hiển thị tên người cập nhật
+        public string UpdatedByUserFullName { get; set; } // FullName của người cập nhật
+
         [Display(Name = "Vai trò người cập nhật")]
         public string UpdatedByUserRole { get; set; }
+
         [Display(Name = "Ngày cập nhật")]
         public DateTime? UpdatedDate { get; set; }
 
         // --- Danh sách các Bài học thuộc Danh mục này ---
-        // Sử dụng trực tiếp Model Lesson ở đây để đơn giản,
-        // vì trang này chủ yếu hiển thị và chuyển hướng sang quản lý Lesson
-        public List<Lesson> Lessons { get; set; } // Cần using EnglishStudySystem.Models;
+        // Giữ nguyên là List<Lesson> nếu bạn truyền trực tiếp Model Lesson vào View
+        // Tuy nhiên, để tuân thủ tách biệt Model và ViewModel tốt hơn,
+        // bạn có thể cân nhắc tạo LessonViewModel và sử dụng List<LessonViewModel> ở đây.
+        public List<LessonViewModel> Lessons { get; set; } 
 
-        // Constructor để khởi tạo danh sách Bài học
+        public bool ShowDeletedLessons { get; set; } = false;
+
         public CategoryDetailsWithLessonsViewModel()
         {
-            Lessons = new List<Lesson>();
+            Lessons = new List<LessonViewModel>();
         }
     }
 }
