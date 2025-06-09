@@ -22,7 +22,7 @@ namespace EnglishStudySystem.Controllers
         {
              _context = context;
         }
-        
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult HomePage(string sortOrder)
         {
             //if(User.IsInRole("Administrator") || User.IsInRole("Editor"))
@@ -69,7 +69,7 @@ namespace EnglishStudySystem.Controllers
 
             return View(categories);
         }
-
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult FindHomePage(string keyword)
         {
             // Lấy danh sách categories
