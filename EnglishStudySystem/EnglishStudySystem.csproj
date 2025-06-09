@@ -230,6 +230,10 @@
     <Compile Include="Migrations\202506062119576_AddDurationColumnInTest.Designer.cs">
       <DependentUpon>202506062119576_AddDurationColumnInTest.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202506091748528_nothing.cs" />
+    <Compile Include="Migrations\202506091748528_nothing.Designer.cs">
+      <DependentUpon>202506091748528_nothing.cs</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel\TestViewModel.cs" />
     <Compile Include="ViewModel\FavoriteLessonViewModel.cs" />
     <Compile Include="ViewModel\LessonHistoryViewModel.cs" />
@@ -322,6 +326,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202506062119576_AddDurationColumnInTest.resx">
       <DependentUpon>202506062119576_AddDurationColumnInTest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202506091748528_nothing.resx">
+      <DependentUpon>202506091748528_nothing.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

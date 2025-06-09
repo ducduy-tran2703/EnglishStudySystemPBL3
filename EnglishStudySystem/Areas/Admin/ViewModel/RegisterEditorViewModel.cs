@@ -23,10 +23,12 @@ namespace EnglishStudySystem.Areas.Admin.ViewModel
         [StringLength(100, ErrorMessage = "Họ tên phải từ {2} đến {1} ký tự", MinimumLength = 3)]
         public string FullName { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
-        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 8)]
+        [Required(ErrorMessage = "Mật khẩu không được để trống")]
+        [StringLength(100, ErrorMessage = "{0} phải có ít nhất {2} ký tự.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
+        // Quy tắc: Ít nhất 1 ký tự đặc biệt, ít nhất 1 số, và ít nhất 1 chữ cái viết hoa và 1 chữ cái viết thường
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$", ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]

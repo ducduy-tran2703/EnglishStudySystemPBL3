@@ -1,274 +1,1529 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa Bài kiểm tra</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-@model EnglishStudySystem.ViewModel.TestCreateEditViewModel
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
 
-@{
-    ViewBag.Title = "Chỉnh sửa Bài kiểm tra";
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-<style>
-    .question-block, .answer-block {
-        border: 1px solid #ccc;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-    }
+        .page-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
 
-    .answer-block {
-        background-color: #f0f0f0;
-        margin-top: 10px;
-        padding: 10px;
-    }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
 
-    .question-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
+        .page-header .lesson-title {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
 
-        .question-header h4 {
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            padding: 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
             margin: 0;
         }
 
-    .remove-question, .remove-answer {
-        color: red;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .add-question-btn {
-        margin-top: 20px;
-        width: 100%;
-        padding: 10px;
-        font-size: 1.1em;
-    }
-
-    .form-group {
-        margin-bottom: 10px;
-    }
-
-    .answer-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-
-        .answer-group input[type="radio"] {
-            margin-right: 10px;
+        .form-group {
+            margin-bottom: 25px;
         }
 
-        .answer-group label {
-            margin-bottom: 0;
-            flex-grow: 1;
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
         }
-</style>
 
-<h2>Chỉnh sửa Bài kiểm tra cho Bài học: @ViewBag.LessonTitle</h2>
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
 
-@using (Html.BeginForm("Edit", "Test", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
 
-    @Html.HiddenFor(model => model.Id)
-    @Html.HiddenFor(model => model.LessonId, new { Value = ViewBag.LessonId })
+        .input-group {
+            position: relative;
+        }
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Title, new { @class = "control-label" })
-        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
-        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
-    </div>
+        .input-addon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-weight: 500;
+        }
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Description, new { @class = "control-label" })
-        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 3 })
-        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-    </div>
+        .questions-section {
+            background: #f8f9fa;
+            padding: 40px;
+        }
 
-    <!-- Giữ trường Thời gian làm bài -->
-    <div class="form-group">
-        @Html.LabelFor(model => model.Duration, new { @class = "control-label" })
-        @Html.EditorFor(model => model.Duration, new { htmlAttributes = new { @class = "form-control", type = "number", min = "1" } })
-        @Html.ValidationMessageFor(model => model.Duration, "", new { @class = "text-danger" })
-    </div>
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-    <h3>Danh sách Câu hỏi</h3>
-    <div id="questionsContainer">
-        @if (Model.Questions != null && Model.Questions.Any())
-        {
-            for (int i = 0; i < Model.Questions.Count; i++)
-            {
-                @Html.Partial("_QuestionFormPartial", Model.Questions[i], new ViewDataDictionary { { "QuestionIndex", i } })
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .remove-question {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remove-question:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .question-content {
+            margin-bottom: 25px;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .answer-option:hover {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .answer-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .answer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .answer-radio {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #667eea;
+        }
+
+        .answer-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .answer-input {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-question-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .add-question-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 40px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .floating-save {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-save:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(40, 167, 69, 0.6);
+        }
+
+        @@media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .section {
+                padding: 30px 20px;
+            }
+
+            .answers-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
             }
         }
+
+        .validation-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .animate-in {
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @@keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-edit"></i> Chỉnh sửa Bài kiểm tra</h1>
+            <div class="lesson-title">Bài học: <strong>Introduction to English Grammar</strong></div>
+        </div>
+
+        <form class="form-container" method="post">
+            <!-- General Information Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h2 class="section-title">Thông tin chung</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="title">Tiêu đề bài kiểm tra</label>
+                    <input type="text" id="title" name="title" class="form-input" placeholder="Nhập tiêu đề bài kiểm tra..." value="Grammar Test #1" required>
+                    <span class="validation-error" style="display: none;">Vui lòng nhập tiêu đề</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Mô tả</label>
+                    <textarea id="description" name="description" class="form-input" rows="4" placeholder="Nhập mô tả bài kiểm tra...">Bài kiểm tra kiến thức cơ bản về ngữ pháp tiếng Anh</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="duration">Thời gian làm bài(phút)</label>
+                    <div class="input-group">
+                        <input type="number" id="duration" name="duration" class="form-input" min="1" value="30" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="questions-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h2 class="section-title">Danh sách Câu hỏi</h2>
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Sample Question 1 -->
+                    <div class="question-card animate-in" data-question-index="0">
+                        <div class="question-header">
+                            <div class="question-number">Câu hỏi số 1</div>
+                            <button type="button" class="remove-question">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+
+                        <div class="form-group question-content">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[0].Content" class="form-input" rows="3" placeholder="Nhập nội dung câu hỏi..." required>Which of the following is a correct sentence?</textarea>
+                        </div>
+
+                        <label class="form-label">Các đáp án:</label>
+                        <div class="answers-grid">
+                            <div class="answer-option selected">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="0" class="answer-radio" checked>
+                                    <span class="answer-label">Đáp án A:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[0].Content" class="answer-input" placeholder="Nhập đáp án A..." required>She goes to school every day.</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="1" class="answer-radio">
+                                    <span class="answer-label">Đáp án B:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[1].Content" class="answer-input" placeholder="Nhập đáp án B..." required>She go to school every day.</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="2" class="answer-radio">
+                                    <span class="answer-label">Đáp án C:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[2].Content" class="answer-input" placeholder="Nhập đáp án C..." required>She going to school every day.</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="3" class="answer-radio">
+                                    <span class="answer-label">Đáp án D:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[3].Content" class="answer-input" placeholder="Nhập đáp án D..." required>She gone to school every day.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample Question 2 -->
+                    <div class="question-card animate-in" data-question-index="1">
+                        <div class="question-header">
+                            <div class="question-number">Câu hỏi số 2</div>
+                            <button type="button" class="remove-question">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+
+                        <div class="form-group question-content">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[1].Content" class="form-input" rows="3" placeholder="Nhập nội dung câu hỏi..." required>What is the past tense of "run"?</textarea>
+                        </div>
+
+                        <label class="form-label">Các đáp án:</label>
+                        <div class="answers-grid">
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="0" class="answer-radio">
+                                    <span class="answer-label">Đáp án A:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[0].Content" class="answer-input" placeholder="Nhập đáp án A..." required>runed</textarea>
+                            </div>
+
+                            <div class="answer-option selected">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="1" class="answer-radio" checked>
+                                    <span class="answer-label">Đáp án B:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[1].Content" class="answer-input" placeholder="Nhập đáp án B..." required>ran</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="2" class="answer-radio">
+                                    <span class="answer-label">Đáp án C:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[2].Content" class="answer-input" placeholder="Nhập đáp án C..." required>running</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="3" class="answer-radio">
+                                    <span class="answer-label">Đáp án D:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[3].Content" class="answer-input" placeholder="Nhập đáp án D..." required>runned</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="addQuestion" class="add-question-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Thêm Câu hỏi mới
+                </button>
+
+                <div class="error-message" id="addQuestionError">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Vui lòng nhập đủ thông tin câu hỏi hiện tại trước khi thêm câu mới.
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    Lưu thay đổi
+                </button>
+                <a href="#" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại Bài học
+                </a>
+            </div>
+        </form>
+
+        <!-- Floating Save Button -->
+        <button type="button" class="floating-save" title="Lưu nhanh">
+            <i class="fas fa-save"></i>
+        </button>
     </div>
 
-    <button type="button" id="addQuestion" class="btn btn-primary add-question-btn"><i class="fa fa-plus"></i> Thêm Câu hỏi mới</button>
-    <p class="text-danger" id="addQuestionError" style="display:none;">Vui lòng nhập đủ thông tin câu hỏi hiện tại trước khi thêm câu mới.</p>
+    <script>
+        let questionIndex = 2; // Starting from 2 since we have 2 sample questions
 
-    <div class="form-group" style="margin-top: 30px;">
-        <input type="submit" value="Lưu thay đổi" class="btn btn-success" />
-        @Html.ActionLink("Quay lại Bài học", "Details", "Lessons", new { id = ViewBag.LessonId }, new { @class = "btn btn-default" })
-    </div>
-}
+        // Add question functionality
+        document.getElementById('addQuestion').addEventListener('click', function () {
+            if (!isCurrentQuestionValid()) {
+                document.getElementById('addQuestionError').style.display = 'block';
+                return;
+            }
+            document.getElementById('addQuestionError').style.display = 'none';
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
+            const newQuestionHtml = createQuestionHtml(questionIndex);
+            const questionsContainer = document.getElementById('questionsContainer');
 
-    <script type="text/javascript">
-        var questionIndex = @(Model.Questions != null ? Model.Questions.Count : 0);
+            const newQuestionDiv = document.createElement('div');
+            newQuestionDiv.innerHTML = newQuestionHtml;
+            const newQuestion = newQuestionDiv.firstElementChild;
+
+            questionsContainer.appendChild(newQuestion);
+            questionIndex++;
+
+            // Focus on the new question content
+            newQuestion.querySelector('textarea[name$=".Content"]').focus();
+
+            // Add animation
+            newQuestion.classList.add('animate-in');
+        });
+
+        // Remove question functionality
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-question')) {
+                if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+                    e.target.closest('.question-card').remove();
+                    reindexQuestions();
+                }
+            }
+        });
+
+        // Radio button selection styling
+        document.addEventListener('change', function (e) {
+            if (e.target.type === 'radio') {
+                const questionCard = e.target.closest('.question-card');
+                const answerOptions = questionCard.querySelectorAll('.answer-option');
+
+                answerOptions.forEach(option => option.classList.remove('selected'));
+                e.target.closest('.answer-option').classList.add('selected');
+            }
+        });
+
+        // Floating save button
+        document.querySelector('.floating-save').addEventListener('click', function () {
+            document.querySelector('form').submit();
+        });
 
         function isCurrentQuestionValid() {
-            if ($('#questionsContainer .question-block').length === 0) {
-                return true;
-            }
+            const questionCards = document.querySelectorAll('.question-card');
+            if (questionCards.length === 0) return true;
 
-            var $lastQuestionBlock = $('#questionsContainer .question-block').last();
-            var currentQuestionToCheckIndex = parseInt($lastQuestionBlock.attr('data-question-index')) || 0;
+            const lastQuestion = questionCards[questionCards.length - 1];
+            const questionIndex = lastQuestion.getAttribute('data-question-index');
 
-            var currentQuestionPrefix = "Questions[" + currentQuestionToCheckIndex + "]";
-            console.log('Selector: [name="' + currentQuestionPrefix + '.Content"]');
-            var contentInput = $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.Content"]');
-            console.log('Found elements:', contentInput.length, contentInput);
-
-            if (contentInput.length === 0) {
-                alert('Không tìm thấy trường nội dung câu hỏi. Vui lòng kiểm tra lại.');
-                return false;
-            }
-            if (contentInput.val().trim() === '') {
+            // Check question content
+            const contentTextarea = lastQuestion.querySelector(textarea[name = "Questions[${questionIndex}].Content"]);
+            if (!contentTextarea || contentTextarea.value.trim() === '') {
                 alert('Vui lòng nhập nội dung câu hỏi.');
-                contentInput.focus();
+                if (contentTextarea) contentTextarea.focus();
                 return false;
             }
 
-            var answersValid = true;
-            var firstEmptyAnswerInput = null;
-            for (var i = 0; i < 4; i++) {
-                var answerContentInput = $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.Answers[' + i + '].Content"]');
-                if (answerContentInput.length === 0 || answerContentInput.val().trim() === '') {
-                    answersValid = false;
-                    if (firstEmptyAnswerInput === null) {
-                        firstEmptyAnswerInput = answerContentInput;
-                    }
+            // Check all answers
+            for (let i = 0; i < 4; i++) {
+                const answerTextarea = lastQuestion.querySelector(textarea[name = "Questions[${questionIndex}].Answers[${i}].Content"]);
+                if (!answerTextarea || answerTextarea.value.trim() === '') {
+                    alert('Vui lòng nhập đầy đủ nội dung cho tất cả 4 đáp án.');
+                    if (answerTextarea) answerTextarea.focus();
+                    return false;
                 }
-            }
-            if (!answersValid) {
-                alert('Vui lòng nhập đầy đủ nội dung cho tất cả 4 đáp án của câu hỏi hiện tại.');
-                if (firstEmptyAnswerInput !== null && firstEmptyAnswerInput.length > 0) {
-                    firstEmptyAnswerInput.focus();
-                }
-                return false;
             }
 
-            var correctAnswersCount = $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.IsCorrectAnswer"]:checked').length;
-            if (correctAnswersCount !== 1) {
-                alert('Vui lòng chọn một đáp án đúng cho câu hỏi hiện tại.');
-                $lastQuestionBlock.find('[name="' + currentQuestionPrefix + '.IsCorrectAnswer"]').first().focus();
+            // Check correct answer selection
+            const checkedRadio = lastQuestion.querySelector(input[name = "Questions[${questionIndex}].IsCorrectAnswer"]: checked);
+            if (!checkedRadio) {
+                alert('Vui lòng chọn một đáp án đúng cho câu hỏi.');
                 return false;
             }
 
             return true;
         }
 
-        $('#addQuestion').click(function () {
-            if (!isCurrentQuestionValid()) {
-                $('#addQuestionError').show();
-                return;
-            }
-            $('#addQuestionError').hide();
-
-            var newQuestionHtml = `
-                <div class="question-block" data-question-index="${questionIndex}">
-                    <div class="question-header">
-                        <h4>Câu hỏi số ${questionIndex + 1}</h4>
-                        <span class="remove-question btn btn-danger btn-sm">Xóa</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="Questions_${questionIndex}_Content">Nội dung câu hỏi</label>
-                        <textarea id="Questions_${questionIndex}_Content" name="Questions[${questionIndex}].Content" class="form-control" rows="3" required></textarea>
-                        <span data-valmsg-for="Questions[${questionIndex}].Content" data-valmsg-replace="true" class="text-danger"></span>
-                    </div>
-                    <label>Đáp án:</label>
-                    ${buildAnswerBlock(questionIndex, 0, 'A')}
-                    ${buildAnswerBlock(questionIndex, 1, 'B')}
-                    ${buildAnswerBlock(questionIndex, 2, 'C')}
-                    ${buildAnswerBlock(questionIndex, 3, 'D')}
-                </div>
-            `;
-            var $newQuestion = $(newQuestionHtml);
-            $('#questionsContainer').append($newQuestion);
-
-            var form = $('form');
-            form.removeData('validator').removeData('unobtrusiveValidation'); // Reset validator
-            $.validator.unobtrusive.parse(form); // Parse lại toàn bộ form
-            if (!form.data('validator')) {
-                form.validate(); // Khởi tạo validator nếu chưa có
-            }
-
-            questionIndex++; // Tăng index trước khi reindex
-            reindexQuestions(); // Reindex sau khi thêm
-
-            $('[name="Questions[' + (questionIndex - 1) + '].Content"]').focus();
-        });
-
-        function buildAnswerBlock(qIndex, aIndex, labelChar) {
+        function createQuestionHtml(index) {
             return `
-                <div class="answer-block">
-                    <div class="answer-group">
-                        <input type="radio" name="Questions[${qIndex}].IsCorrectAnswer" value="${aIndex}" id="q${qIndex}a${aIndex}Correct" required/>
-                        <label for="q${qIndex}a${aIndex}Correct">Đáp án ${labelChar}:</label>
-                        <textarea name="Questions[${qIndex}].Answers[${aIndex}].Content" class="form-control" rows="1" required></textarea>
+                    <div class="question-card animate-in" data-question-index="${index}">
+                        <div class="question-header">
+                            <div class="question-number">Câu hỏi số ${index + 1}</div>
+                            <button type="button" class="remove-question">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+
+                        <div class="form-group question-content">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[${index}].Content" class="form-input" rows="3" placeholder="Nhập nội dung câu hỏi..." required></textarea>
+                        </div>
+
+                        <label class="form-label">Các đáp án:</label>
+                        <div class="answers-grid">
+                            ${createAnswerHtml(index, 0, 'A')}
+                            ${createAnswerHtml(index, 1, 'B')}
+                            ${createAnswerHtml(index, 2, 'C')}
+                            ${createAnswerHtml(index, 3, 'D')}
+                        </div>
                     </div>
-                    <span data-valmsg-for="Questions[${qIndex}].Answers[${aIndex}].Content" data-valmsg-replace="true" class="text-danger"></span>
-                </div>
-            `;
+                `;
         }
 
-        $(document).on('click', '.remove-question', function () {
-            $(this).closest('.question-block').remove();
-            reindexQuestions();
-        });
+        function createAnswerHtml(questionIndex, answerIndex, label) {
+            return `
+                    <div class="answer-option">
+                        <div class="answer-header">
+                            <input type="radio" name="Questions[${questionIndex}].IsCorrectAnswer" value="${answerIndex}" class="answer-radio">
+                            <span class="answer-label">Đáp án ${label}:</span>
+                        </div>
+                        <textarea name="Questions[${questionIndex}].Answers[${answerIndex}].Content" class="answer-input" placeholder="Nhập đáp án ${label}..." required></textarea>
+                    </div>
+                `;
+        }
 
         function reindexQuestions() {
+            const questionCards = document.querySelectorAll('.question-card');
             questionIndex = 0;
-            $('#questionsContainer .question-block').each(function () {
-                var currentBlock = $(this);
-                currentBlock.attr('data-question-index', questionIndex);
-                currentBlock.find('h4').text('Câu hỏi số ' + (questionIndex + 1));
 
-                var contentTextarea = currentBlock.find('textarea[name$=".Content"]').first();
-                contentTextarea.prop('name', 'Questions[' + questionIndex + '].Content');
-                contentTextarea.attr('id', 'Questions_' + questionIndex + '_Content');
-                currentBlock.find('label[for$="_Content"]').attr('for', 'Questions_' + questionIndex + '_Content');
-                currentBlock.find('span[data-valmsg-for$=".Content"]').attr('data-valmsg-for', 'Questions[' + questionIndex + '].Content');
+            questionCards.forEach((card, index) => {
+                card.setAttribute('data-question-index', index);
+                card.querySelector('.question-number').textContent = Câu hỏi số ${ index + 1 };
 
-                currentBlock.find('.answer-block').each(function (answerIdx) {
-                    var answerPrefix = 'Questions[' + questionIndex + '].Answers[' + answerIdx + ']';
-                    $(this).find('input[type="radio"]').attr({
-                        'name': 'Questions[' + questionIndex + '].IsCorrectAnswer',
-                        'id': `q${questionIndex}a${answerIdx}Correct`,
-                        'value': answerIdx
-                    });
-                    $(this).find('label').attr('for', `q${questionIndex}a${answerIdx}Correct`);
-                    $(this).find('textarea[name$=".Content"]').prop('name', answerPrefix + '.Content');
-                    $(this).find('span[data-valmsg-for$=".Content"]').attr('data-valmsg-for', answerPrefix + '.Content');
+                // Update form field names
+                const contentTextarea = card.querySelector('textarea[name$=".Content"]');
+                contentTextarea.name = Questions[${ index }].Content;
+
+                const radioButtons = card.querySelectorAll('input[type="radio"]');
+                radioButtons.forEach((radio, radioIndex) => {
+                    radio.name = Questions[${ index }].IsCorrectAnswer;
+                    radio.value = radioIndex;
                 });
+
+                const answerTextareas = card.querySelectorAll('textarea[name*=".Answers["]');
+                answerTextareas.forEach((textarea, textareaIndex) => {
+                    textarea.name = Questions[${ index }].Answers[${ textareaIndex }].Content;
+                });
+
                 questionIndex++;
             });
+        }
 
-            var form = $('form');
-            form.removeData('validator').removeData('unobtrusiveValidation');
-            $.validator.unobtrusive.parse(form); // Parse lại toàn bộ form sau reindex
-            if (!form.data('validator')) {
-                form.validate(); // Khởi tạo validator nếu cần
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add some smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+cdnjs.cloudflare.com
+Duy
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa Bài kiểm tra</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-header .lesson-title {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            padding: 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-addon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .questions-section {
+            background: #f8f9fa;
+            padding: 40px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .remove-question {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remove-question:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .question-content {
+            margin-bottom: 25px;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .answer-option:hover {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .answer-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .answer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .answer-radio {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #667eea;
+        }
+
+        .answer-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .answer-input {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-question-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .add-question-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 40px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .floating-save {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-save:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(40, 167, 69, 0.6);
+        }
+
+        @@media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .section {
+                padding: 30px 20px;
+            }
+
+            .answers-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
             }
         }
 
-        $(document).ready(function() {
-            reindexQuestions();
+        .validation-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .animate-in {
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @@keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-edit"></i> Chỉnh sửa Bài kiểm tra</h1>
+            <div class="lesson-title">Bài học: <strong>Introduction to English Grammar</strong></div>
+        </div>
+
+        <form class="form-container" method="post">
+            <!-- General Information Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h2 class="section-title">Thông tin chung</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="title">Tiêu đề bài kiểm tra</label>
+                    <input type="text" id="title" name="title" class="form-input" placeholder="Nhập tiêu đề bài kiểm tra..." value="Grammar Test #1" required>
+                    <span class="validation-error" style="display: none;">Vui lòng nhập tiêu đề</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Mô tả</label>
+                    <textarea id="description" name="description" class="form-input" rows="4" placeholder="Nhập mô tả bài kiểm tra...">Bài kiểm tra kiến thức cơ bản về ngữ pháp tiếng Anh</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="duration">Thời gian làm bài</label>
+                    <div class="input-group">
+                        <input type="number" id="duration" name="duration" class="form-input" min="1" value="30" required>
+                        <span class="input-addon">phút</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="questions-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h2 class="section-title">Danh sách Câu hỏi</h2>
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Sample Question 1 -->
+                    <div class="question-card animate-in" data-question-index="0">
+                        <div class="question-header">
+                            <div class="question-number">Câu hỏi số 1</div>
+                            <button type="button" class="remove-question">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+
+                        <div class="form-group question-content">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[0].Content" class="form-input" rows="3" placeholder="Nhập nội dung câu hỏi..." required>Which of the following is a correct sentence?</textarea>
+                        </div>
+
+                        <label class="form-label">Các đáp án:</label>
+                        <div class="answers-grid">
+                            <div class="answer-option selected">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="0" class="answer-radio" checked>
+                                    <span class="answer-label">Đáp án A:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[0].Content" class="answer-input" placeholder="Nhập đáp án A..." required>She goes to school every day.</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="1" class="answer-radio">
+                                    <span class="answer-label">Đáp án B:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[1].Content" class="answer-input" placeholder="Nhập đáp án B..." required>She go to school every day.</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="2" class="answer-radio">
+                                    <span class="answer-label">Đáp án C:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[2].Content" class="answer-input" placeholder="Nhập đáp án C..." required>She going to school every day.</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[0].IsCorrectAnswer" value="3" class="answer-radio">
+                                    <span class="answer-label">Đáp án D:</span>
+                                </div>
+                                <textarea name="Questions[0].Answers[3].Content" class="answer-input" placeholder="Nhập đáp án D..." required>She gone to school every day.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample Question 2 -->
+                    <div class="question-card animate-in" data-question-index="1">
+                        <div class="question-header">
+                            <div class="question-number">Câu hỏi số 2</div>
+                            <button type="button" class="remove-question">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+
+                        <div class="form-group question-content">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[1].Content" class="form-input" rows="3" placeholder="Nhập nội dung câu hỏi..." required>What is the past tense of "run"?</textarea>
+                        </div>
+
+                        <label class="form-label">Các đáp án:</label>
+                        <div class="answers-grid">
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="0" class="answer-radio">
+                                    <span class="answer-label">Đáp án A:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[0].Content" class="answer-input" placeholder="Nhập đáp án A..." required>runed</textarea>
+                            </div>
+
+                            <div class="answer-option selected">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="1" class="answer-radio" checked>
+                                    <span class="answer-label">Đáp án B:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[1].Content" class="answer-input" placeholder="Nhập đáp án B..." required>ran</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="2" class="answer-radio">
+                                    <span class="answer-label">Đáp án C:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[2].Content" class="answer-input" placeholder="Nhập đáp án C..." required>running</textarea>
+                            </div>
+
+                            <div class="answer-option">
+                                <div class="answer-header">
+                                    <input type="radio" name="Questions[1].IsCorrectAnswer" value="3" class="answer-radio">
+                                    <span class="answer-label">Đáp án D:</span>
+                                </div>
+                                <textarea name="Questions[1].Answers[3].Content" class="answer-input" placeholder="Nhập đáp án D..." required>runned</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="addQuestion" class="add-question-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Thêm Câu hỏi mới
+                </button>
+
+                <div class="error-message" id="addQuestionError">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Vui lòng nhập đủ thông tin câu hỏi hiện tại trước khi thêm câu mới.
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    Lưu thay đổi
+                </button>
+                <a href="#" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại Bài học
+                </a>
+            </div>
+        </form>
+
+        <!-- Floating Save Button -->
+        <button type="button" class="floating-save" title="Lưu nhanh">
+            <i class="fas fa-save"></i>
+        </button>
+    </div>
+
+    <script>
+        let questionIndex = 2; // Starting from 2 since we have 2 sample questions
+
+        // Add question functionality
+        document.getElementById('addQuestion').addEventListener('click', function () {
+            if (!isCurrentQuestionValid()) {
+                document.getElementById('addQuestionError').style.display = 'block';
+                return;
+            }
+            document.getElementById('addQuestionError').style.display = 'none';
+
+            const newQuestionHtml = createQuestionHtml(questionIndex);
+            const questionsContainer = document.getElementById('questionsContainer');
+
+            const newQuestionDiv = document.createElement('div');
+            newQuestionDiv.innerHTML = newQuestionHtml;
+            const newQuestion = newQuestionDiv.firstElementChild;
+
+            questionsContainer.appendChild(newQuestion);
+            questionIndex++;
+
+            // Focus on the new question content
+            newQuestion.querySelector('textarea[name$=".Content"]').focus();
+
+            // Add animation
+            newQuestion.classList.add('animate-in');
+        });
+
+        // Remove question functionality
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-question')) {
+                if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+                    e.target.closest('.question-card').remove();
+                    reindexQuestions();
+                }
+            }
+        });
+
+        // Radio button selection styling
+        document.addEventListener('change', function (e) {
+            if (e.target.type === 'radio') {
+                const questionCard = e.target.closest('.question-card');
+                const answerOptions = questionCard.querySelectorAll('.answer-option');
+
+                answerOptions.forEach(option => option.classList.remove('selected'));
+                e.target.closest('.answer-option').classList.add('selected');
+            }
+        });
+
+        // Floating save button
+        document.querySelector('.floating-save').addEventListener('click', function () {
+            document.querySelector('form').submit();
+        });
+
+        function isCurrentQuestionValid() {
+            const questionCards = document.querySelectorAll('.question-card');
+            if (questionCards.length === 0) return true;
+
+            const lastQuestion = questionCards[questionCards.length - 1];
+            const questionIndex = lastQuestion.getAttribute('data-question-index');
+
+            // Check question content
+            const contentTextarea = lastQuestion.querySelector(textarea[name = "Questions[${questionIndex}].Content"]);
+            if (!contentTextarea || contentTextarea.value.trim() === '') {
+                alert('Vui lòng nhập nội dung câu hỏi.');
+                if (contentTextarea) contentTextarea.focus();
+                return false;
+            }
+
+            // Check all answers
+            for (let i = 0; i < 4; i++) {
+                const answerTextarea = lastQuestion.querySelector(textarea[name = "Questions[${questionIndex}].Answers[${i}].Content"]);
+                if (!answerTextarea || answerTextarea.value.trim() === '') {
+                    alert('Vui lòng nhập đầy đủ nội dung cho tất cả 4 đáp án.');
+                    if (answerTextarea) answerTextarea.focus();
+                    return false;
+                }
+            }
+
+            // Check correct answer selection
+            const checkedRadio = lastQuestion.querySelector(input[name = "Questions[${questionIndex}].IsCorrectAnswer"]: checked);
+            if (!checkedRadio) {
+                alert('Vui lòng chọn một đáp án đúng cho câu hỏi.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function createQuestionHtml(index) {
+            return `
+                    <div class="question-card animate-in" data-question-index="${index}">
+                        <div class="question-header">
+                            <div class="question-number">Câu hỏi số ${index + 1}</div>
+                            <button type="button" class="remove-question">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+
+                        <div class="form-group question-content">
+                            <label class="form-label">Nội dung câu hỏi</label>
+                            <textarea name="Questions[${index}].Content" class="form-input" rows="3" placeholder="Nhập nội dung câu hỏi..." required></textarea>
+                        </div>
+
+                        <label class="form-label">Các đáp án:</label>
+                        <div class="answers-grid">
+                            ${createAnswerHtml(index, 0, 'A')}
+                            ${createAnswerHtml(index, 1, 'B')}
+                            ${createAnswerHtml(index, 2, 'C')}
+                            ${createAnswerHtml(index, 3, 'D')}
+                        </div>
+                    </div>
+                `;
+        }
+
+        function createAnswerHtml(questionIndex, answerIndex, label) {
+            return `
+                    <div class="answer-option">
+                        <div class="answer-header">
+                            <input type="radio" name="Questions[${questionIndex}].IsCorrectAnswer" value="${answerIndex}" class="answer-radio">
+                            <span class="answer-label">Đáp án ${label}:</span>
+                        </div>
+                        <textarea name="Questions[${questionIndex}].Answers[${answerIndex}].Content" class="answer-input" placeholder="Nhập đáp án ${label}..." required></textarea>
+                    </div>
+                `;
+        }
+
+        function reindexQuestions() {
+            const questionCards = document.querySelectorAll('.question-card');
+            questionIndex = 0;
+
+            questionCards.forEach((card, index) => {
+                card.setAttribute('data-question-index', index);
+                card.querySelector('.question-number').textContent = Câu hỏi số ${ index + 1 };
+
+                // Update form field names
+                const contentTextarea = card.querySelector('textarea[name$=".Content"]');
+                contentTextarea.name = Questions[${ index }].Content;
+
+                const radioButtons = card.querySelectorAll('input[type="radio"]');
+                radioButtons.forEach((radio, radioIndex) => {
+                    radio.name = Questions[${ index }].IsCorrectAnswer;
+                    radio.value = radioIndex;
+                });
+
+                const answerTextareas = card.querySelectorAll('textarea[name*=".Answers["]');
+                answerTextareas.forEach((textarea, textareaIndex) => {
+                    textarea.name = Questions[${ index }].Answers[${ textareaIndex }].Content;
+                });
+
+                questionIndex++;
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add some smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
         });
     </script>
-}
+</body>
+</html>

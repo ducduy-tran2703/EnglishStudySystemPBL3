@@ -10,23 +10,6 @@ $(document).ready(function () {
     });
 
     // Password strength indicator
-    $('#Password').on('keyup', function () {
-        const password = $(this).val();
-        const strength = checkPasswordStrength(password);
-        updateStrengthIndicator(strength);
-    });
-
-    function checkPasswordStrength(password) {
-        if (!password) return 0;
-
-        let strength = 0;
-        if (password.length >= 8) strength++;
-        if (password.match(/[A-Z]/)) strength++;
-        if (password.match(/[0-9]/)) strength++;
-        if (password.match(/[^A-Za-z0-9]/)) strength++;
-
-        return strength;
-    }
 
     function updateStrengthIndicator(strength) {
         const indicator = $('#password-strength');
