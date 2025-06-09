@@ -9,117 +9,130 @@
     <link href="~/Areas/Admin/Content/CSS/createUserStyle.css" rel="stylesheet" />
     <link href="~/Content/CSS2/DetailUserStyle.css" rel="stylesheet" />
     <style>
-        /* CSS tùy chỉnh cho nút Hủy bỏ */
-        .btn-cancel {
-            padding: 10px 25px;
-            border-radius: 6px;
-            font-weight: 600;
-            background-color: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 180px;
+                html, body {
+                        height: 100%; /* Rất quan trọng: đảm bảo html và body chiếm toàn bộ chiều cao */
+                        margin: 0;
+                        padding: 0;
+
         }
 
-        .btn-cancel:hover {
-            background-color: #e9ecef;
-            color: #495057;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        /* Thêm hoặc cập nhật quy tắc này cho container */
+                .container { /* Đảm bảo chọn đúng container bao quanh nội dung */
+                        min-height: 100vh; /* Quan trọng: container phải chiếm toàn bộ chiều cao của viewport */
+                        display: flex; /* Kích hoạt Flexbox */
+                        justify-content: center; /* Căn giữa theo chiều ngang (trục chính) */
+                        align-items: center; /* Căn giữa theo chiều dọc (trục phụ) */
+
+            /* flex-direction: column; */ /* Nếu bạn muốn các mục con xếp chồng lên nhau, bạn có thể thêm cái này */
+
+            /* Nếu bạn đã có py-5, bạn có thể giữ nó, nhưng min-height 100vh là quan trọng hơn */
+
         }
 
-        /* Đảm bảo khoảng cách giữa các nút */
-        .button-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
+
+        /* Các styles khác của bạn */
+                .btn-cancel {
+                        padding: 10px 25px;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        background-color: #f8f9fa;
+                        color: #6c757d;
+                        border: 1px solid #dee2e6;
+                        transition: all 0.3s ease;
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 180px;
+
         }
 
-        
+                    .btn-cancel:hover {
+                            background-color: #e9ecef;
+                            color: #495057;
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        }
+
+                .button-group {
+                        display: flex;
+                        gap: 15px;
+                        flex-wrap: wrap;
+                        justify-content: center;
+
+        }
+
+
+    </style>
 }
 
-<div class="container-fluid px-4 py-3">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card createEditor-card">
-                <div class="card-header createEditor-card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%)">
-                    <h4 class="mb-0" style="color:white">
-                        <i class="fas fa-user-edit mr-2"></i>@ViewBag.Title
-                    </h4>
-                </div>
+<div class="container d-flex justify-content-center align-items-center py-5">
+    <div class="col-md-8">
+        <div class="card createEditor-card">
+            <div class="card-header createEditor-card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%)">
+                <h4 class="mb-0" style="color:white">
+                    <i class="fas fa-user-edit mr-2"></i>@ViewBag.Title
+                </h4>
+            </div>
 
-                <div class="card-body p-4">
-                    @using (Html.BeginForm("CreateEditor", "Users", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                    {
-                        @Html.AntiForgeryToken()
+            <div class="card-body p-4">
+                @using (Html.BeginForm("CreateEditor", "Users", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.UserName, new { @class = "createEditor-form-label" })
-                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control createEditor-form-control", placeholder = "Nhập tên đăng nhập" })
-                                    @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "createEditor-validation-error text-danger" })
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.Email, new { @class = "createEditor-form-label" })
-                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control createEditor-form-control", placeholder = "Nhập email" })
-                                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "createEditor-validation-error text-danger" })
-                                </div>
-                            </div>
+                    <div class="mb-4">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.UserName, new { @class = "createEditor-form-label" })
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control createEditor-form-control", placeholder = "Nhập tên đăng nhập" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "createEditor-validation-error text-danger" })
                         </div>
+                    </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.FullName, new { @class = "createEditor-form-label" })
-                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control createEditor-form-control", placeholder = "Nhập họ và tên đầy đủ" })
-                                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "createEditor-validation-error text-danger" })
-                                </div>
-                            </div>
+                    <div class="mb-4">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Email, new { @class = "createEditor-form-label" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control createEditor-form-control", placeholder = "Nhập email" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "createEditor-validation-error text-danger" })
                         </div>
+                    </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.Password, new { @class = "createEditor-form-label" })
-                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control createEditor-form-control", placeholder = "Nhập mật khẩu" })
-                                    <div class="progress mt-2" style="height: 5px;">
-                                        <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                    </div>
-                                    <small id="password-strength-text" class="createEditor-password-hint"></small>
-                                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "createEditor-validation-error text-danger" })
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "createEditor-form-label" })
-                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control createEditor-form-control", placeholder = "Nhập lại mật khẩu" })
-                                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "createEditor-validation-error text-danger" })
-                                </div>
-                            </div>
+                    <div class="mb-4">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.FullName, new { @class = "createEditor-form-label" })
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control createEditor-form-control", placeholder = "Nhập họ và tên đầy đủ" })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "createEditor-validation-error text-danger" })
                         </div>
+                    </div>
 
-                        <div class="form-group mt-4 text-center d-flex justify-content-center gap-3">
-                            <button type="submit" class="btn btn-success btn-submit">
-                                <i class="fas fa-save mr-2"></i> Tạo tài khoản
-                            </button>
-
-                            @Html.ActionLink("Hủy bỏ", "ListUser", null, new { @class = "btn btn-cancel" })
+                    <div class="mb-4">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Password, new { @class = "createEditor-form-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control createEditor-form-control", placeholder = "Nhập mật khẩu" })
                         </div>
+                    </div>
 
-                    }
-                </div>
+                    <div class="mb-4">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "createEditor-form-label" })
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control createEditor-form-control", placeholder = "Nhập lại mật khẩu" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "createEditor-validation-error text-danger" })
+                        </div>
+                    </div>
+                    <div class="progress mt-2" style="height: 5px;">
+                        <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small id="password-strength-text" class="createEditor-password-hint"></small>
+                    <div class="form-group mt-4 text-center button-group">
+                        <button type="submit" class="btn btn-success btn-submit">
+                            <i class="fas fa-save mr-2"></i> Tạo tài khoản
+                        </button>
+
+                        @Html.ActionLink("Hủy bỏ", "ListUser", null, new { @class = "btn btn-cancel" })
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -128,4 +141,34 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
     <script src="~/Areas/Admin/Content/JS/createEditor.js"></script>
+
+    @* Thêm thư viện SweetAlert2 *@
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @* Script để hiển thị thông báo SweetAlert2 *@
+    @if (TempData["CreateEditorSuccess"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var success = @Html.Raw(Json.Encode(TempData["CreateEditorSuccess"]));
+                var message = @Html.Raw(Json.Encode(TempData["CreateEditorMessage"]));
+                var icon = success ? 'success' : 'error';
+                var title = success ? 'Thành công!' : 'Thất bại!';
+
+                Swal.fire({
+                    title: title,
+                    text: message,
+                    icon: icon,
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then((result) => {
+                    // Nếu là thông báo thành công và người dùng nhấn OK, chuyển hướng về trang danh sách user
+                    if (success && result.isConfirmed) {
+                        window.location.href = '@Url.Action("ListUser", "Users", new { area = "Admin" })';
+                    }
+                });
+            });
+        </script>
+    }
 }

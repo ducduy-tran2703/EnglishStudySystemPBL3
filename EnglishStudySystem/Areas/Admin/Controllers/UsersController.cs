@@ -250,7 +250,8 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     // Gán quyền Editor
                     await _userManager.AddToRoleAsync(user.Id, "Editor");
 
-                    TempData["SuccessMessage"] = "Đã tạo tài khoản Editor thành công!";
+                    TempData["CreateEditorSuccess"] = true;
+                    TempData["CreateEditorMessage"] = "Tài khoản Editor đã được tạo thành công!";
                     return RedirectToAction("CreateEditor");
                 }
 
