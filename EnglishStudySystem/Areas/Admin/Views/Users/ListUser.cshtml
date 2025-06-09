@@ -32,21 +32,20 @@
 
         <div class="card-body p-0">
             <!-- Search and Filter Section -->
-            <div class="p-4 border-bottom">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="input-group rounded-pill shadow-sm">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-0 ps-3">
-                                    <i class="fas fa-search text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="text" id="userSearch" class="form-control border-0 py-2"
-                                   placeholder="Tìm kiếm theo tên, email hoặc tài khoản...">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <<div class="input-group rounded-pill shadow-sm">
+    <div class="input-group-prepend">
+        <span class="input-group-text bg-white border-0 ps-3">
+            <i class="fas fa-search text-muted"></i>
+        </span>
+    </div>
+    <input type="text"
+           id="userSearch"
+           class="form-control border-0 py-2"
+           placeholder="Tìm kiếm theo tên, email hoặc tài khoản..."
+           maxlength="255"
+           autocomplete="off"
+           spellcheck="false">
+</div>
 
             <!-- Role Tabs with Icons -->
             <ul class="nav nav-tabs nav-justified border-bottom-0 px-4 pt-3" id="userTabs" role="tablist">
@@ -292,7 +291,20 @@
 
 @section scripts {
     <script>
+        $(document).ready(function () {
+            $('#userSearch').on('input keyup paste', function (e) {
+                console.log('Input event:', e.type, 'Value length:', this.value.length);
 
+                // Kiểm tra xem có bị giới hạn không
+                if (this.value.length >= 255) {
+                    console.warn('Đã đạt giới hạn ký tự tối đa');
+                }
+            });
+
+            // Kiểm tra các event listener khác
+            const events = $._data($('#userSearch')[0], 'events');
+            console.log('Events attached to search input:', events);
+        });
         $(document).ready(function () {
             // Initialize tooltips
             $('[title]').tooltip({
