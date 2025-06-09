@@ -481,5 +481,37 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
             base.Dispose(disposing);
         }
+        // POST: Admin/Test/SoftDelete/{id}
+        [HttpPost, ActionName("SoftDelete")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SoftDelete(int id)
+        {
+            var test = await _dbContext.Tests
+                                       .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (test == null)
+            {
+                return HttpNotFound();
+            }
+
+            var lessonId = test.LessonId; // Lưu LessonId để redirect
+
+            try
+            {
+                // Thực hiện xóa mềm
+                test.IsDeleted = true;
+                test.DeletedAt = DateTime.Now;
+
+                await _dbContext.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Bài kiểm tra đã được xóa mềm thành công.";
+                return RedirectToAction("Details", "Lessons", new { id = lessonId });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error soft deleting test: {ex.Message} - Inner: {ex.InnerException?.Message}");
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi xóa mềm bài kiểm tra. Vui lòng thử lại.";
+                return RedirectToAction("Details", "Lessons", new { id = lessonId });
+            }
+        }
     }
 }
