@@ -4,63 +4,183 @@
     ViewBag.Title = $"Chi tiết Bài kiểm tra: {Model.Title}";
 }
 
-<h2>Chi tiết Bài kiểm tra: @Model.Title</h2>
+<div class="container test-details-container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header">Chi tiết Bài kiểm tra: <span class="text-primary">@Model.Title</span></h2>
 
-<div>
-    <h4>Thông tin chung</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>Tiêu đề:</dt>
-        <dd>@Html.DisplayFor(model => model.Title)</dd>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Thông tin chung</h4>
+                </div>
+                <div class="panel-body">
+                    <dl class="dl-horizontal dl-custom">
+                        <dt><i class="fa fa-tag"></i> Tiêu đề:</dt>
+                        <dd>@Html.DisplayFor(model => model.Title)</dd>
 
-        <dt>Mô tả:</dt>
-        <dd>@Html.DisplayFor(model => model.Description)</dd>
+                        <dt><i class="fa fa-align-left"></i> Mô tả:</dt>
+                        <dd>@Html.DisplayFor(model => model.Description)</dd>
 
-        <dt>Thuộc Bài học:</dt>
-        <dd>@Html.ActionLink(Model.LessonTitle, "Details", "Lessons", new { id = ViewBag.LessonId }, null)</dd>
+                        <dt><i class="fa fa-book"></i> Thuộc Bài học:</dt>
+                        <dd>@Html.ActionLink(Model.LessonTitle, "Details", "Lessons", new { id = ViewBag.LessonId }, new { @class = "lesson-link" })</dd>
 
-        <dt>Số lượng câu hỏi:</dt>
-        <dd>@Html.DisplayFor(model => model.QuestionCount)</dd>
+                        <dt><i class="fa fa-question-circle"></i> Số lượng câu hỏi:</dt>
+                        <dd>@Html.DisplayFor(model => model.QuestionCount)</dd>
 
-        <dt>Thời gian làm bài:</dt>
-        <dd>@Html.DisplayFor(model => model.Duration) phút</dd>
-    </dl>
+                        <dt><i class="fa fa-clock-o"></i> Thời gian làm bài(phút):</dt>
+                        <dd>@Html.DisplayFor(model => model.Duration) </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="panel panel-default questions-panel">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Danh sách Câu hỏi</h4>
+                </div>
+                <div class="panel-body">
+                    @if (Model.Questions != null && Model.Questions.Any())
+                    {
+                        var questionCounter = 0;
+                        foreach (var question in Model.Questions.OrderBy(q => q.Order))
+                        {
+                            <div class="question-block panel panel-default">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title question-title">Câu hỏi số @(questionCounter + 1)</h5>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="question-content">@Html.Raw(question.Content)</div>
+                                    <ul class="list-group answer-list">
+                                        @foreach (var answer in question.Answers.OrderBy(a => a.Id))
+                                        {
+                                            var isCorrect = question.CorrectAnswerIndex == question.Answers.ToList().IndexOf(answer);
+                                            var answerChar = (char)('A' + question.Answers.ToList().IndexOf(answer));
+
+                                            <li class="list-group-item @(isCorrect ? "list-group-item-success correct-answer" : "")">
+                                                <div class="answer-content">
+                                                    <span class="answer-letter">@answerChar.</span>
+                                                    @Html.Raw(answer.Content)
+                                                    @if (isCorrect)
+                                                    {
+                                                        <span class="label label-success correct-label pull-right">
+                                                            <i class="fa fa-check"></i> Đúng
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            questionCounter++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> Bài kiểm tra này chưa có câu hỏi nào.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                @Html.ActionLink("Sửa Bài kiểm tra", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning btn-lg" })
+                @Html.ActionLink("Quay lại Bài học", "Details", "Lessons", new { id = ViewBag.LessonId }, new { @class = "btn btn-default btn-lg" })
+            </div>
+        </div>
+    </div>
 </div>
 
-<h3>Danh sách Câu hỏi</h3>
-<hr />
-@if (Model.Questions != null && Model.Questions.Any())
-{
-    var questionCounter = 0;
-    foreach (var question in Model.Questions.OrderBy(q => q.Order))
-    {
-        <div class="question-block">
-            <h4>Câu hỏi số @(questionCounter + 1): @Html.Raw(question.Content)</h4>
-            <ul class="list-group">
-                @foreach (var answer in question.Answers.OrderBy(a => a.Id))
-                {
-                    var isCorrect = question.CorrectAnswerIndex == question.Answers.ToList().IndexOf(answer);
-                    var answerChar = (char)('A' + question.Answers.ToList().IndexOf(answer));
-
-                    <li class="list-group-item @(isCorrect ? "list-group-item-success" : "")">
-                        <strong>Đáp án @answerChar:</strong> @Html.Raw(answer.Content)
-                        @if (isCorrect)
-                        {
-                            <span class="label label-success pull-right">Đúng</span>
-                        }
-                    </li>
-                }
-            </ul>
-        </div>
-        questionCounter++;
+<style>
+    .test-details-container {
+        margin-top: 20px;
+        margin-bottom: 40px;
     }
-}
-else
-{
-    <p>Bài kiểm tra này chưa có câu hỏi nào.</p>
-}
 
-<p style="margin-top: 20px;">
-    @Html.ActionLink("Sửa Bài kiểm tra", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) |
-    @Html.ActionLink("Quay lại Bài học", "Details", "Lessons", new { id = ViewBag.LessonId }, new { @class = "btn btn-default" })
-</p>
+    .page-header {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 15px;
+        margin-top: 0;
+    }
+
+    .dl-custom dt {
+        width: 200px;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+    .dl-custom dd {
+        margin-left: 220px;
+        margin-bottom: 10px;
+    }
+
+    .panel {
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .panel-heading {
+        border-radius: 4px 4px 0 0 !important;
+    }
+
+    .questions-panel {
+        margin-top: 30px;
+    }
+
+    .question-block {
+        margin-bottom: 25px;
+        border: none;
+    }
+
+    .question-title {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .question-content {
+        font-size: 16px;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+    }
+
+    .answer-list {
+        margin-top: 15px;
+    }
+
+    .answer-content {
+        display: flex;
+        align-items: center;
+    }
+
+    .answer-letter {
+        font-weight: bold;
+        margin-right: 10px;
+        min-width: 20px;
+    }
+
+    .correct-answer {
+        background-color: #dff0d8;
+    }
+
+    .correct-label {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+
+    .lesson-link {
+        color: #337ab7;
+        font-weight: bold;
+    }
+
+    .action-buttons {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-lg {
+        padding: 10px 20px;
+    }
+</style>
