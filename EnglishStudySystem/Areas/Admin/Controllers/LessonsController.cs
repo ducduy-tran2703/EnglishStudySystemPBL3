@@ -218,6 +218,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 Title = lesson.Title,
                 Description = lesson.Description,
                 Video_URL = lesson.Video_URL,
+                IsFree = lesson.IsFreeTrial,
                 CategoryId = lesson.CategoryId,
                 CategoryName = lesson.Category?.Name, // Lấy tên danh mục từ navigation property
 

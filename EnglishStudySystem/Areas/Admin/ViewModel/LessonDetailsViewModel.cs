@@ -20,6 +20,9 @@ namespace EnglishStudySystem.Areas.Admin.ViewModel
         [Display(Name = "Đường dẫn Video")]
         public string Video_URL { get; set; }
 
+        [Display(Name = "Miễn phí")] // Thuộc tính IsFree độc lập
+        public bool IsFree { get; set; } // Giờ đây IsFree là một thuộc tính có thể set giá trị trực tiếp
+
         // Foreign Key to Category
         public int CategoryId { get; set; }
 

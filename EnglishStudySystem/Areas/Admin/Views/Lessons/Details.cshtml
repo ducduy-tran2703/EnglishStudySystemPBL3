@@ -40,6 +40,14 @@
                 </dd>
 
                 <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.IsFree)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.IsFree)
+                </dd>
+ 
+
+                <dt class="col-sm-3">
                     @Html.DisplayNameFor(model => model.Video_URL)
                 </dt>
                 <dd class="col-sm-9">
@@ -48,9 +56,9 @@
                         <a href="@Model.Video_URL" target="_blank">@Html.DisplayFor(model => model.Video_URL)</a>
                         // Ví dụ nhúng YouTube (cần điều chỉnh URL):
                         // <div class="ratio ratio-16x9 mt-2" style="max-width: 600px;">
-                        //     <iframe src="https://www.youtube.com/embed/@(Model.Video_URL.Replace("https://www.youtube.com/watch?v=", "").Replace("https://youtu.be/", ""))"
-                        //             title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        //             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        //    <iframe src="https://www.youtube.com/embed/@(Model.Video_URL.Replace("https://www.youtube.com/watch?v=", "").Replace("https://youtu.be/", ""))"
+                        //        title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        //        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         // </div>
                     }
                     else
@@ -84,7 +92,8 @@
                     @Html.DisplayNameFor(model => model.CreatedDate)
                 </dt>
                 <dd class="col-sm-9">
-                    @Html.DisplayFor(model => model.CreatedDate)
+                    @* Display CreatedDate in 24-hour format *@
+                    @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
                 </dd>
 
                 @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
@@ -105,7 +114,8 @@
                         @Html.DisplayNameFor(model => model.UpdatedDate)
                     </dt>
                     <dd class="col-sm-9">
-                        @Html.DisplayFor(model => model.UpdatedDate)
+                        @* Display UpdatedDate in 24-hour format *@
+                        @Model.UpdatedDate.Value.ToString("dd/MM/yyyy HH:mm:ss")
                     </dd>
                 }
 
@@ -123,7 +133,8 @@
                         @Html.DisplayNameFor(model => model.DeletedAt)
                     </dt>
                     <dd class="col-sm-9">
-                        @Html.DisplayFor(model => model.DeletedAt)
+                        @* Display DeletedAt in 24-hour format *@
+                        @Model.DeletedAt?.ToString("dd/MM/yyyy HH:mm")
                     </dd>
                 }
             </dl>

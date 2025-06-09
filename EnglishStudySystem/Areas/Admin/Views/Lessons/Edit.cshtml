@@ -125,7 +125,7 @@
                     </div>
                     <div class="info-item mb-2">
                         <span class="text-muted">Ngày tạo:</span>
-                        <span class="fw-bold">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="fw-bold">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</span>
                     </div>
                 </div>
 
@@ -139,7 +139,9 @@
                         </div>
                         <div class="info-item mb-2">
                             <span class="text-muted">Ngày cập nhật:</span>
-                            <span class="fw-bold">@Model.UpdatedDate?.ToString("dd/MM/yyyy HH:mm")</span>
+                            <span class="fw-bold">
+                            @Model.UpdatedDate.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                            </span>
                         </div>
                     </div>
                 }

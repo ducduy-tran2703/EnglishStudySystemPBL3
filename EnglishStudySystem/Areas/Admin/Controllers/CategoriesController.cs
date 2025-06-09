@@ -28,24 +28,17 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         // Khai báo DbContext để truy vấn dữ liệu
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private ApplicationDbContext _context;
+        private ApplicationDbContext db;
         private UserManager<ApplicationUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
 
         public CategoriesController()
         {
-            _context = new ApplicationDbContext();
-            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
-            _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
-        }
-        private ApplicationDbContext db;
-        private UserManager<ApplicationUser> _userManager;
-        public CategoriesController()
-        {
             db = new ApplicationDbContext();
             _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+            _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db));
         }
+
 
         // --- ACTION: DANH SÁCH CÁC DANH MỤC CHƯA XÓA MỀM (Index) ---
         // GET: Admin/Categories
@@ -169,6 +162,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 Title = l.Title,
                 Description = l.Description,
                 IsDeleted = l.IsDeleted,
+                IsFree = l.IsFreeTrial,
 
                 CreatedDate = l.CreatedDate,
                 CreatedByUserFullName = l.CreatedByUser?.FullName, // Lấy FullName từ navigation property
@@ -209,6 +203,14 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             {
                 return HttpNotFound();
             }
+            // Lấy thông tin người dùng hiện tại để kiểm tra quyền chỉnh sửa
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            ViewBag.CanEdit = User.IsInRole("Administrator") || user_now.CanManageCategories;
 
             // 2. Lấy Roles cho người tạo và người cập nhật của Category
             // Chúng ta cần UserManager để lấy roles vì chúng không phải là navigation property trực tiếp từ Category
