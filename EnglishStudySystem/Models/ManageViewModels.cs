@@ -50,6 +50,7 @@ namespace EnglishStudySystem.Models
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[\W_]).+$", ErrorMessage = "The new password must contain at least one uppercase letter and one special character.")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]

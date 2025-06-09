@@ -266,9 +266,11 @@ namespace EnglishStudySystem.Controllers
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 }
-                return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
+                TempData["SuccessMessage"] = "Mật khẩu của bạn đã được thay đổi thành công!";
+                return View(model);
             }
             AddErrors(result);
+            TempData["ErrorMessage"] = "Đổi mật khẩu thất bại. Mật khẩu cũ bị sai.";
             return View(model);
         }
 
