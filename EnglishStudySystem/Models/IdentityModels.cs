@@ -99,38 +99,14 @@ namespace EnglishStudySystem.Models
         // --- Override SaveChanges cho Soft Delete ---
         public override int SaveChanges()
         {
-            // Lấy tất cả các entry đang được đánh dấu là 'Deleted'
-            var softDeletableEntries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Deleted && e.Entity is ISoftDeletable);
-
-            foreach (var entry in softDeletableEntries)
-            {
-                var entity = (ISoftDeletable)entry.Entity;
-                entity.IsDeleted = true; // Đánh dấu là đã xóa mềm
-                entity.DeletedAt = DateTime.Now; // Lưu thời gian xóa
-                entry.State = EntityState.Modified; // Thay đổi trạng thái từ Deleted thành Modified
-                                                    // Để Entity Framework thực hiện update thay vì delete
-            }
             return base.SaveChanges();
         }
 
-        // --- Async version của SaveChanges (quan trọng nếu bạn dùng async/await) ---
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            var softDeletableEntries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Deleted && e.Entity is ISoftDeletable);
-
-            foreach (var entry in softDeletableEntries)
-            {
-                var entity = (ISoftDeletable)entry.Entity;
-                entity.IsDeleted = true;
-                entity.DeletedAt = DateTime.Now;
-                entry.State = EntityState.Modified;
-            }
             return base.SaveChangesAsync(cancellationToken);
         }
 
-        // MỚI: Thêm override này để hỗ trợ SaveChangesAsync() không tham số CancellationToken
         public override Task<int> SaveChangesAsync()
         {
             return SaveChangesAsync(CancellationToken.None);

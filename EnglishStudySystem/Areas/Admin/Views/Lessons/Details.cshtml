@@ -1,180 +1,262 @@
-﻿@model EnglishStudySystem.Models.Lesson
+﻿@model EnglishStudySystem.Areas.Admin.ViewModel.LessonDetailsViewModel
 
 @{
     ViewBag.Title = "Chi tiết Bài học";
-    // Đảm bảo View này sử dụng Layout Admin của bạn
-    // Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml"; // Ví dụ
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white mb-0" style="background: linear-gradient(135deg, #2c3e50, #3498db); padding: 10px 20px; border-radius: 8px;">
+            <i class="fas fa-book-open me-2"></i>@ViewBag.Title
+        </h2>
+        <div>
+            @Html.ActionLink("Chỉnh sửa Bài học", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" })
+            @Html.ActionLink("Quay lại Chi tiết Danh mục", "Details", "Categories", new { id = Model.CategoryId }, new { @class = "btn btn-outline-secondary ms-2" })
+        </div>
+    </div>
 
-<div>
-    <h4>Thông tin Bài học</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        @* Sử dụng class Bootstrap cho layout *@
+    <div class="card shadow-sm" style="border: none; border-radius: 10px; overflow: hidden;">
+        <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
+            <h4 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Thông tin Bài học
+            </h4>
+        </div>
+        <div class="card-body" style="background-color: #f8f9fa;">
+            <dl class="row">
+                @* Sử dụng Bootstrap row và col cho layout tốt hơn dl-horizontal *@
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Title)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Title)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Video_URL)
-        </dt>
-        <dd>
-            @* Bạn có thể nhúng video ở đây nếu Video_URL là URL của trình phát *@
-            @Html.DisplayFor(model => model.Video_URL)
-        </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Video_URL)
+                </dt>
+                <dd class="col-sm-9">
+                    @if (!string.IsNullOrEmpty(Model.Video_URL))
+                    {
+                        <a href="@Model.Video_URL" target="_blank">@Html.DisplayFor(model => model.Video_URL)</a>
+                        // Ví dụ nhúng YouTube (cần điều chỉnh URL):
+                        // <div class="ratio ratio-16x9 mt-2" style="max-width: 600px;">
+                        //     <iframe src="https://www.youtube.com/embed/@(Model.Video_URL.Replace("https://www.youtube.com/watch?v=", "").Replace("https://youtu.be/", ""))"
+                        //             title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        //             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        // </div>
+                    }
+                    else
+                    {
+                        <span>(Không có đường dẫn video)</span>
+                    }
+                </dd>
 
-        @* --- Hiển thị thông tin Danh mục liên quan (từ Included Category) --- *@
-        <dt>
-            @Html.DisplayNameFor(model => model.Category.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
+                @* --- Hiển thị thông tin Danh mục liên quan --- *@
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.CategoryName)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CategoryName)
+                </dd>
 
-        @* --- Hiển thị Audit Fields --- *@
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedByUserId)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedByUserId)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedByUserRole)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedByUserRole)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CreatedDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
+                @* --- Hiển thị Audit Fields --- *@
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.CreatedByUserFullName)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CreatedByUserFullName)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.CreatedByUserRole)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CreatedByUserRole)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.CreatedDate)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CreatedDate)
+                </dd>
 
-        @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
-        {
-            <dt>
-                @Html.DisplayNameFor(model => model.UpdatedByUserId)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.UpdatedByUserId)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.UpdatedByUserRole)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.UpdatedByUserRole)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.UpdatedDate)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.UpdatedDate)
-            </dd>
-        }
+                @if (!string.IsNullOrEmpty(Model.UpdatedByUserId))
+                {
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.UpdatedByUserFullName)
+                    </dt>
+                    <dd class="col-sm-9">
+                        @Html.DisplayFor(model => model.UpdatedByUserFullName)
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.UpdatedByUserRole)
+                    </dt>
+                    <dd class="col-sm-9">
+                        @Html.DisplayFor(model => model.UpdatedByUserRole)
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.UpdatedDate)
+                    </dt>
+                    <dd class="col-sm-9">
+                        @Html.DisplayFor(model => model.UpdatedDate)
+                    </dd>
+                }
 
-        @* --- Hiển thị trạng thái Xóa mềm --- *@
-        <dt>
-            @Html.DisplayNameFor(model => model.IsDeleted)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.IsDeleted)
-        </dd>
+                @* --- Hiển thị trạng thái Xóa mềm --- *@
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.IsDeleted)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.IsDeleted)
+                </dd>
 
-        @if (Model.IsDeleted)
-        {
-            <dt>
-                @Html.DisplayNameFor(model => model.DeletedAt)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.DeletedAt)
-            </dd>
-        }
-    </dl>
+                @if (Model.IsDeleted)
+                {
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.DeletedAt)
+                    </dt>
+                    <dd class="col-sm-9">
+                        @Html.DisplayFor(model => model.DeletedAt)
+                    </dd>
+                }
+            </dl>
+        </div>
+    </div>
+
+    <hr class="my-4" />
+
+    @* --- Hiển thị Danh sách Bài kiểm tra liên quan (Lọc bài đã xóa mềm ở đây) --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Bài kiểm tra của Bài học này</h3>
+        <p class="mb-0">
+            @Html.ActionLink("Thêm mới Bài kiểm tra", "Create", "Test", new { lessonId = Model.Id }, new { @class = "btn btn-success" })
+        </p>
+    </div>
+
+
+    @if (Model.Tests != null && Model.Tests.Any(t => !t.IsDeleted))
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().Title)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().QuestionCount)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().Duration)
+                        </th>
+                        <th></th> @* Cột cho Actions *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var test in Model.Tests.Where(t => !t.IsDeleted).OrderBy(t => t.Id))
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => test.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => test.QuestionCount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => test.Duration) phút
+                            </td>
+                            <td class="text-end">
+                                @Html.ActionLink("Chi tiết", "Details", "Test", new { id = test.Id }, new { @class = "btn btn-info btn-sm me-1" })
+                                @Html.ActionLink("Chỉnh sửa", "Edit", "Test", new { id = test.Id }, new { @class = "btn btn-warning btn-sm me-1" })
+                                @using (Html.BeginForm("SoftDelete", "Test", new { id = test.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài kiểm tra này?');">Xóa mềm</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model.Tests != null && Model.Tests.Any(t => t.IsDeleted))
+    {
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fas fa-info-circle me-2"></i>Tất cả bài kiểm tra của bài học này đã bị xóa mềm.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>Chưa có bài kiểm tra nào cho bài học này.
+        </div>
+    }
+
+    <hr class="my-4" />
+
+    @section Scripts {
+    }
 </div>
 
-<hr />
+@section Styles {
+    <style>
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
 
-@* --- Hiển thị Danh sách Bài kiểm tra liên quan (Lọc bài đã xóa mềm ở đây) --- *@
-<h3>Bài kiểm tra của Bài học này</h3>
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529; /* Darker text for warning */
+        }
 
-<p>
-    @Html.ActionLink("Thêm mới Bài kiểm tra", "Create", "Test", new { lessonId = Model.Id }, new { @class = "btn btn-success" })
-</p>
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
 
-@if (Model.Tests != null && Model.Tests.Any(t => !t.IsDeleted))
-{
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().Title)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().QuestionCount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Tests.FirstOrDefault().Duration)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var test in Model.Tests.Where(t => !t.IsDeleted).OrderBy(t => t.Id))
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => test.Title)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => test.QuestionCount)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => test.Duration) phút
-                    </td>
-                    <td>
-                        @Html.ActionLink("Chi tiết", "Details", "Test", new { id = test.Id }, new { @class = "btn btn-info btn-sm" }) |
-                        @Html.ActionLink("Chỉnh sửa", "Edit", "Test", new { id = test.Id }, new { @class = "btn btn-warning btn-sm" }) |
-                        @using (Html.BeginForm("SoftDelete", "Test", new { id = test.Id }, FormMethod.Post, new { @style = "display:inline;" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài kiểm tra này?');">Xóa mềm</button>
-                        }
-                    </td>
-                </tr>
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+            vertical-align: bottom;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e2e6ea;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive Table */
+        @@media (max-width: 767.98px) {
+            .table-responsive {
+                border: 1px solid #dee2e6;
+                border-radius: 0.25rem;
+                overflow-x: auto;
             }
-        </tbody>
-    </table>
-}
-else if (Model.Tests != null && Model.Tests.Any(t => t.IsDeleted))
-{
-    <p>Tất cả bài kiểm tra của bài học này đã bị xóa mềm.</p>
-}
-else
-{
-    <p>Chưa có bài kiểm tra nào cho bài học này.</p>
-}
-
-<hr />
-
-@* --- Liên kết điều hướng --- *@
-<p>
-    @Html.ActionLink("Chỉnh sửa Bài học", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) |
-    @Html.ActionLink("Quay lại Chi tiết Danh mục", "Details", "Categories", new { id = Model.CategoryId }, null)
-</p>
-
-@section Scripts {
+        }
+    </style>
 }

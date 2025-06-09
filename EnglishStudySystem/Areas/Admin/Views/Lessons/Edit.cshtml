@@ -25,7 +25,7 @@
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(model => model.Id)
-            @Html.HiddenFor(model => model.CategoryId)
+            @Html.HiddenFor(model => model.CategoryId) @* CategoryId vẫn là hidden vì không có SelectList *@
 
             <div class="card-body" style="background-color: #f8f9fa;">
                 @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
@@ -87,6 +87,16 @@
                     <small class="text-muted">Ví dụ: https://www.youtube.com/embed/VIDEO_ID</small>
                 </div>
 
+                @* Thêm trường IsFreeTrial *@
+                <div class="form-group mb-4">
+                    <div class="form-check">
+                        @Html.CheckBoxFor(model => model.IsFreeTrial, new { @class = "form-check-input" })
+                        @Html.LabelFor(model => model.IsFreeTrial, new { @class = "form-check-label fw-bold", style = "color: #3498db;" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.IsFreeTrial, "", new { @class = "text-danger small" })
+                </div>
+
+
                 <div class="form-group mt-4">
                     <button type="submit" class="btn btn-success px-4 py-2">
                         <i class="fas fa-save me-2"></i>Lưu thay đổi
@@ -99,7 +109,6 @@
         }
     </div>
 
-    <!-- Phần thông tin audit -->
     <div class="card shadow-sm mt-4" style="border: none; border-radius: 10px; overflow: hidden;">
         <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
             <h4 class="mb-0">
@@ -111,7 +120,7 @@
                 <div class="col-md-6">
                     <div class="info-item mb-2">
                         <span class="text-muted">Người tạo:</span>
-                        <span class="fw-bold">@Model.CreatedByUserId</span>
+                        <span class="fw-bold">@Model.CreatedByUserFullName</span> @* ĐÃ SỬA TẠI ĐÂY *@
                         <span class="badge" style="background-color: #3498db;">@Model.CreatedByUserRole</span>
                     </div>
                     <div class="info-item mb-2">
@@ -125,7 +134,7 @@
                     <div class="col-md-6">
                         <div class="info-item mb-2">
                             <span class="text-muted">Người cập nhật:</span>
-                            <span class="fw-bold">@Model.UpdatedByUserId</span>
+                            <span class="fw-bold">@Model.UpdatedByUserFullName</span> @* ĐÃ SỬA TẠI ĐÂY *@
                             <span class="badge" style="background-color: #3498db;">@Model.UpdatedByUserRole</span>
                         </div>
                         <div class="info-item mb-2">
@@ -138,7 +147,6 @@
         </div>
     </div>
 
-    <!-- Phần quản lý bài kiểm tra -->
     <div class="card shadow-sm mt-4" style="border: none; border-radius: 10px; overflow: hidden;">
         <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
             <div class="d-flex justify-content-between align-items-center">

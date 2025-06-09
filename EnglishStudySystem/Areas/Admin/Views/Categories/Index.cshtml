@@ -34,12 +34,30 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @{
+                            // Lấy dictionary chứa tên người dùng từ ViewBag
+                            var userNames = ViewBag.UserNames as Dictionary<string, string>;
+                            if (userNames == null) // Đảm bảo không null
+                            {
+                                userNames = new Dictionary<string, string>();
+                            }
+                        }
+
                         @foreach (var item in Model)
                         {
                             <tr style="background-color: white;">
                                 <td>
                                     <strong>@item.Name</strong>
-                                    <div class="small text-muted">Tạo bởi: @item.UpdatedByUserId</div>
+                                    <div class="small text-muted">
+                                        Tạo bởi:
+                                        @{
+                                            // Lấy tên người tạo từ CreatedByUserId
+                                            var creatorName = !string.IsNullOrEmpty(item.CreatedByUserId) && userNames.ContainsKey(item.CreatedByUserId)
+                                                                ? userNames[item.CreatedByUserId]
+                                                                : "System"; // Mặc định là "System" nếu không tìm thấy
+                                        }
+                                        @creatorName
+                                    </div>
                                 </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.Description))
@@ -51,8 +69,21 @@
                                         <span class="text-muted">Không có mô tả</span>
                                     }
                                 </td>
-                                <td class="text-success fw-bold">@String.Format("{0:C}", item.Price)</td>
-                                <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-success fw-bold">
+                                    @* Sửa định dạng giá tiền thành USD dạng số nguyên *@
+                                    @if (item.Price.HasValue && item.Price > 0)
+                                    {
+                                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C0}", item.Price.Value)
+                                    }
+                                    else
+                                    {
+                                        <text>Free</text>
+                                    }
+                                </td>
+                                <td>
+                                    @* Hiển thị ngày và giờ *@
+                                    @item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")
+                                </td>
                                 <td>
                                     <div class="d-flex gap-2">
                                         @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
@@ -76,7 +107,6 @@
     </div>
 </div>
 
-<!-- Modal xác nhận xóa -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
