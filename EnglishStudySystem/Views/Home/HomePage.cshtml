@@ -81,7 +81,7 @@
                                 <div class="fw-semibold">
                                     @{
                                         var userNames = ViewBag.UserNames as Dictionary<string, string>;
-                                         var userName = userNames != null && userNames.ContainsKey(category.CreatedByUserId)
+                                         var userName = (userNames != null && !string.IsNullOrEmpty(category.CreatedByUserId)) && userNames.ContainsKey(category.CreatedByUserId)
                                             ? userNames[category.CreatedByUserId]
                                             : "System";
                                     }

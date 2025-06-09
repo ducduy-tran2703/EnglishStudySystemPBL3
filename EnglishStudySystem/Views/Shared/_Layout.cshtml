@@ -4,14 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Hệ thống Tự học Tiếng Anh</title>
-    @Styles.Render("~/Content/css")
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="~/Content/CSS/StyleLayout.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="border: 3px solid #28a745; border-radius: 5px;">
         <div class="container-fluid">
-            <!-- Brand & Navigation Items -->
             <div class="d-flex align-items-center">
                 <a class="navbar-brand fw-bold d-flex align-items-center me-4" href="#">
                     <i class="fas fa-globe fs-4 me-2 text-success"></i>
@@ -22,7 +27,6 @@
                     <a href="@Url.Action("HomePage", "Home")" class="nav-link me-3">
                         <i class="fas fa-home me-1"></i> Trang chủ
                     </a>
-                    <!-- Danh mục Dropdown -->
                     <div class="dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" data-bs-toggle="dropdown">
                             <i class="fas fa-list me-1"></i> Danh mục
@@ -35,33 +39,31 @@
                 </div>
             </div>
 
-            <!-- Search Bar (Center) -->
-<div class="search-bar mx-auto" style="width: 40%;">
-    <form action="/Home/FindHomePage" method="get" class="search-form">
-        <div class="input-group">
-            <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control border-success" placeholder="Tìm kiếm..." style="border-radius: 20px 0 0 20px;">
-            <button class="btn btn-success" type="submit" style="border-radius: 0 20px 20px 0;">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-    </form>
-</div>
+            <div class="search-bar mx-auto" style="width: 40%;">
+                <form action="/Home/FindHomePage" method="get" class="search-form">
+                    <div class="input-group">
+                        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control border-success" placeholder="Tìm kiếm..." style="border-radius: 20px 0 0 20px;">
+                        <button class="btn btn-success" type="submit" style="border-radius: 0 20px 20px 0;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
 
 
-            <!-- User Actions -->
-<div class="d-flex align-items-center">
-    <form action="@Url.Action("Login", "Account")" method="get" class="me-2">
-        <button type="submit" class="btn btn-outline-success">
-            <i class="fas fa-sign-in-alt me-1"></i> Đăng nhập
-        </button>
-    </form>
+            <div class="d-flex align-items-center">
+                <form action="@Url.Action("Login", "Account")" method="get" class="me-2">
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-sign-in-alt me-1"></i> Đăng nhập
+                    </button>
+                </form>
 
-    <form action="@Url.Action("Register", "Account")" method="get">
-        <button type="submit" class="btn btn-success">
-            <i class="fas fa-user-plus me-1"></i> Đăng ký
-        </button>
-    </form>
-</div>
+                <form action="@Url.Action("Register", "Account")" method="get">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus me-1"></i> Đăng ký
+                    </button>
+                </form>
+            </div>
 
         </div>
     </nav>
@@ -76,8 +78,18 @@
     </div>
 
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+    <script>
+        $(document).ready(function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 </body>
 </html>
