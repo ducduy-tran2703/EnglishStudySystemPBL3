@@ -2,6 +2,8 @@
 
 @{
     ViewBag.Title = "Chi tiết Danh mục";
+    // Xác định trạng thái ban đầu: nếu danh mục bị xóa thì hiển thị bài học đã xóa
+    var initialShowDeletedLessons = Model.IsDeleted;
 }
 
 <div class="container py-4">
@@ -25,7 +27,6 @@
             </div>
     </div>
 
-    <!-- Phần thông tin chi tiết danh mục -->
     <div class="card shadow-sm mb-4" style="border: none; border-radius: 10px; overflow: hidden;">
         <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
             <h4 class="mb-0">
@@ -42,7 +43,17 @@
 
                     <div class="info-item mb-3 p-3 bg-white rounded shadow-sm">
                         <h5 class="mb-2" style="color: #3498db;"><i class="fas fa-dollar-sign me-2"></i>Giá</h5>
-                        <p class="fs-5" style="color: #27ae60; font-weight: bold;">@String.Format("{0:C}", Model.Price)</p>
+                        <p class="fs-5" style="color: #27ae60; font-weight: bold;">
+                            @* Định dạng giá tiền thành USD dạng số nguyên *@
+                            @if (Model.Price.HasValue && Model.Price > 0)
+                            {
+                                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C0}", Model.Price.Value)
+                            }
+                            else
+                            {
+                                <text>Free</text>
+                            }
+                        </p>
                     </div>
                 </div>
 
@@ -59,6 +70,7 @@
                         </span>
                         @if (Model.IsDeleted)
                         {
+                            @* Hiển thị ngày và giờ xóa *@
                             <p class="text-muted small mt-1">Ngày xóa: @Model.DeletedAt?.ToString("dd/MM/yyyy HH:mm")</p>
                         }
                     </div>
@@ -73,12 +85,20 @@
                         <h5 style="color: #3498db;"><i class="fas fa-user-plus me-2"></i>Thông tin tạo</h5>
                         <div class="info-item mb-2">
                             <span class="text-muted">Người tạo:</span>
-                            <span class="fw-bold">@Model.CreatedByUserId</span>
-                            <span class="badge" style="background-color: #3498db;">@Model.CreatedByUserRole</span>
+                            @* Hiển thị FullName của người tạo (giả định có thuộc tính trong ViewModel) *@
+                            <span class="fw-bold">
+                                @(string.IsNullOrEmpty(Model.CreatedByUserFullName) ? "N/A" : Model.CreatedByUserFullName)
+                            </span>
+                            @* Hiển thị vai trò của người tạo (giả định có thuộc tính trong ViewModel) *@
+                            @if (!string.IsNullOrEmpty(Model.CreatedByUserRole))
+                            {
+                                <span class="badge" style="background-color: #3498db;">@Model.CreatedByUserRole</span>
+                            }
                         </div>
                         <div class="info-item mb-2">
                             <span class="text-muted">Ngày tạo:</span>
-                            <span class="fw-bold">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                            @* Hiển thị ngày và giờ tạo *@
+                            <span class="fw-bold">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</span>
                         </div>
                     </div>
                 </div>
@@ -90,12 +110,22 @@
                             <h5 style="color: #3498db;"><i class="fas fa-user-edit me-2"></i>Thông tin cập nhật</h5>
                             <div class="info-item mb-2">
                                 <span class="text-muted">Người cập nhật:</span>
-                                <span class="fw-bold">@Model.UpdatedByUserId</span>
-                                <span class="badge" style="background-color: #3498db;">@Model.UpdatedByUserRole</span>
+                                @* Hiển thị FullName của người cập nhật (giả định có thuộc tính trong ViewModel) *@
+                                <span class="fw-bold">
+                                    @(string.IsNullOrEmpty(Model.UpdatedByUserFullName) ? "N/A" : Model.UpdatedByUserFullName)
+                                </span>
+                                @* Hiển thị vai trò của người cập nhật (giả định có thuộc tính trong ViewModel) *@
+                                @if (!string.IsNullOrEmpty(Model.UpdatedByUserRole))
+                                {
+                                    <span class="badge" style="background-color: #3498db;">@Model.UpdatedByUserRole</span>
+                                }
                             </div>
                             <div class="info-item mb-2">
                                 <span class="text-muted">Ngày cập nhật:</span>
-                                <span class="fw-bold">@Model.UpdatedDate?.ToString("dd/MM/yyyy HH:mm")</span>
+                                @* Hiển thị ngày và giờ cập nhật *@
+                                <span class="fw-bold">
+                                    @Model.UpdatedDate.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -104,167 +134,221 @@
         </div>
     </div>
 
-    <!-- Phần danh sách bài học -->
     <div class="card shadow-sm" style="border: none; border-radius: 10px; overflow: hidden;">
         <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #3498db, #2ecc71);">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">
-                    <i class="fas fa-book me-2"></i>Danh sách Bài học (@Model.Name)
+                    <i class="fas fa-book me-2"></i><span id="lessonListHeader"></span> (@Model.Name)
                 </h4>
-                @if (!Model.IsDeleted && ViewBag.CanEdit)
-                {
-                    @Html.ActionLink("Thêm mới Bài học", "Create", "Lessons", new { categoryId = Model.Id }, new { @class = "btn btn-success btn-sm" })
-                }
+                <div id="lessonListActions">
+                    @* Các nút sẽ được thêm/xóa bằng JavaScript *@
+                </div>
             </div>
         </div>
         <div class="card-body p-0" style="background-color: #f8f9fa;">
-            @if (Model.Lessons != null && Model.Lessons.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="text-white" style="background-color: #3498db;">
-                            <tr>
-                                <th width="30%">Tiêu đề</th>
-                                <th width="40%">Mô tả</th>
-                                <th width="20%">Ngày tạo</th>
-                                <th width="10%">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var lesson in Model.Lessons.OrderBy(l => l.CreatedDate))
-                            {
-                                <tr style="background-color: white;">
-                                    <td>
-                                        <strong>@lesson.Title</strong>
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(lesson.Description))
-                                        {
-                                            <span>@(lesson.Description.Length > 50 ? lesson.Description.Substring(0, 50) + "..." : lesson.Description)</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Không có mô tả</span>
-                                        }
-                                    </td>
-                                    <td>@lesson.CreatedDate.ToString("dd/MM/yyyy")</td>
-                                    @if (ViewBag.CanEdit)
-                                    {
-                                        <td>
-                                            <div class="d-flex gap-2">
-                                                @Html.ActionLink("Chi tiết", "Details", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-sm btn-info" })
-                                                @Html.ActionLink("Sửa", "Edit", "Lessons", new { id = lesson.Id }, new { @class = "btn btn-sm btn-warning text-white" })
+            <div id="lessonsListContainer">
+                @* Partial View sẽ được tải vào đây bằng AJAX ngay khi trang load. *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                                @using (Html.BeginForm("SoftDelete", "Lessons", new { id = lesson.Id }, FormMethod.Post, new { @class = "d-inline" }))
-                                                {
-                                                    @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa mềm bài học này?');">
-                                                        <i class="fas fa-trash-alt me-1"></i>
-                                                    </button>
-                                                }
-                                            </div>
-                                        </td>
+                    @section Scripts {
+                        <script>
+                            $(document).ready(function () {
+                                // Hàm để tải Partial View
+                                function loadLessonsPartial(showDeleted) {
+                                    var categoryId = @Model.Id;
+                                    // Đảm bảo URL này gọi đến Action "GetLessonsPartial" trong "CategoriesController"
+                                    // và nằm trong Area "Admin"
+                                    var url = '@Url.Action("GetLessonsPartial", "Categories", new { area = "Admin" })';
+
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET',
+                                        data: { categoryId: categoryId, showDeleted: showDeleted },
+                                        success: function (data) {
+                                            $('#lessonsListContainer').html(data);
+                                            updateLessonListHeader(showDeleted);
+                                            updateLessonListActions(showDeleted);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error("Error loading lessons partial:", error);
+                                            $('#lessonsListContainer').html('<div class="p-4 text-center text-danger">Không thể tải danh sách bài học. Vui lòng thử lại sau.</div>');
+                                        }
+                                    });
+                                }
+
+                                // Hàm cập nhật tiêu đề danh sách bài học
+                                function updateLessonListHeader(showDeleted) {
+                                    if (showDeleted) {
+                                        $('#lessonListHeader').text('Danh sách Bài học đã xóa');
+                                    } else {
+                                        $('#lessonListHeader').text('Danh sách Bài học');
                                     }
+                                }
 
+                                // Hàm cập nhật các nút hành động trên header của danh sách bài học
+                                function updateLessonListActions(showDeleted) {
+                                    var actionsHtml = '';
+                                    var categoryId = @Model.Id;
+                                    var isCategoryDeleted = @Model.IsDeleted.ToString().ToLower(); // Chuyển đổi C# bool sang JS bool
 
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="p-4 text-center">
-                    <p class="text-muted mb-4">Chưa có bài học nào trong danh mục này.</p>
-                    @if (!Model.IsDeleted && ViewBag.CanEdit)
-                    {
-                        @Html.ActionLink("Thêm mới Bài học", "Create", "Lessons", new { categoryId = Model.Id }, new { @class = "btn btn-success" })
+                                    if (showDeleted) {
+                                        actionsHtml += '<button type="button" class="btn btn-primary btn-sm me-2" id="btnShowActiveLessons"><i class="fas fa-list me-1"></i> Danh sách Bài học</button>';
+                                    } else {
+                                        // Chỉ hiển thị nút "Thêm mới Bài học" nếu danh mục không bị xóa
+                                        if (!isCategoryDeleted) {
+                                            actionsHtml += '<a href="@Url.Action("Create", "Lessons", new { area = "Admin", categoryId = Model.Id })" class="btn btn-success btn-sm me-2"><i class="fas fa-plus me-1"></i> Thêm mới Bài học</a>';
+                                        }
+                                        actionsHtml += '<button type="button" class="btn btn-dark btn-sm" id="btnShowDeletedLessons"><i class="fas fa-trash-alt me-1"></i> Bài học đã xóa</button>';
+                                    }
+                                    $('#lessonListActions').html(actionsHtml);
+
+                                    // Gắn lại sự kiện cho các nút mới
+                                    $('#btnShowActiveLessons').off('click').on('click', function () {
+                                        loadLessonsPartial(false);
+                                    });
+                                    $('#btnShowDeletedLessons').off('click').on('click', function () {
+                                        loadLessonsPartial(true);
+                                    });
+                                }
+
+                                // Tải danh sách bài học ban đầu khi trang load
+                                // Nếu danh mục bị xóa, mặc định hiển thị bài học đã xóa
+                                // Giá trị của initialShowDeletedLessons được lấy từ Model.IsDeleted ở phía Razor.
+                                loadLessonsPartial(@initialShowDeletedLessons.ToString().ToLower());
+
+                                // --------------------------------------------------------------------------------------
+                                // ĐOẠN JAVASCRIPT XỬ LÝ CÁC NÚT HÀNH ĐỘNG CỦA LESSON
+                                // Nó sẽ lắng nghe sự kiện trên toàn bộ document, đảm bảo hoạt động với các phần tử mới tải
+                                // --------------------------------------------------------------------------------------
+
+                                $(document).on('click', '.btn-lesson-action-ajax', function (e) {
+                                    e.preventDefault(); // Ngăn chặn hành vi mặc định của form/link
+
+                                    var button = $(this);
+                                    var lessonId = button.data('id');
+                                    var actionUrl = button.data('action-url');
+                                    var confirmMessage = button.data('confirm-message');
+                                    var antiForgeryToken = $('input[name="__RequestVerificationToken"]').val(); // Lấy token từ trang chính
+
+                                    if (confirm(confirmMessage)) {
+                                        $.ajax({
+                                            url: actionUrl,
+                                            type: 'POST',
+                                            data: {
+                                                id: lessonId,
+                                                __RequestVerificationToken: antiForgeryToken
+                                            },
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    alert(response.message); // Hoặc dùng Toastr cho thông báo đẹp hơn
+
+                                                    // Sau khi thao tác thành công, tải lại Partial View với trạng thái hiện tại
+                                                    // Để biết trạng thái hiện tại (showDeleted), chúng ta có thể kiểm tra text của header
+                                                    // hoặc một biến JS được giữ trạng thái
+                                                    var currentShowDeleted = $('#lessonListHeader').text().includes('đã xóa');
+                                                    loadLessonsPartial(currentShowDeleted);
+
+                                                } else {
+                                                    alert("Thao tác thất bại: " + response.message);
+                                                }
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error("Lỗi AJAX:", xhr.responseText);
+                                                alert("Có lỗi xảy ra trong quá trình xử lý: " + xhr.responseText);
+                                            }
+                                        });
+                                    }
+                                });
+
+                                // --------------------------------------------------------------------------------------
+                                // KẾT THÚC ĐOẠN JAVASCRIPT ĐƯỢC THÊM VÀO
+                                // --------------------------------------------------------------------------------------
+
+                            });
+                        </script>
                     }
-                </div>
-            }
-        </div>
-    </div>
-</div>
 
-@section Styles {
-    <style>
-        .card {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
+                    @section Styles {
+                        <style>
+                            .card {
+                                border-radius: 10px;
+                                overflow: hidden;
+                                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                            }
 
-        .card-header {
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
+                            .card-header {
+                                font-weight: 600;
+                                letter-spacing: 0.5px;
+                            }
 
-        .info-item h5 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
+                            .info-item h5 {
+                                font-size: 0.9rem;
+                                text-transform: uppercase;
+                            }
 
-        .info-item p {
-            margin-bottom: 0;
-            padding-left: 26px;
-        }
+                            .info-item p {
+                                margin-bottom: 0;
+                                padding-left: 26px;
+                            }
 
-        .badge {
-            font-weight: 500;
-            padding: 0.35em 0.65em;
-            color: white;
-        }
+                            .badge {
+                                font-weight: 500;
+                                padding: 0.35em 0.65em;
+                                color: white;
+                            }
 
-        .btn-primary {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
+                            .btn-primary {
+                                background-color: #3498db;
+                                border-color: #3498db;
+                            }
 
-        .btn-warning {
-            background-color: #f39c12;
-            border-color: #f39c12;
-            color: white;
-        }
+                            .btn-warning {
+                                background-color: #f39c12;
+                                border-color: #f39c12;
+                                color: white;
+                            }
 
-        .btn-dark {
-            background-color: #2c3e50;
-            border-color: #2c3e50;
-        }
+                            .btn-dark {
+                                background-color: #2c3e50;
+                                border-color: #2c3e50;
+                            }
 
-        .btn-success {
-            background-color: #2ecc71;
-            border-color: #2ecc71;
-        }
+                            .btn-success {
+                                background-color: #2ecc71;
+                                border-color: #2ecc71;
+                            }
 
-        .btn-info {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
+                            .btn-info {
+                                background-color: #3498db;
+                                border-color: #3498db;
+                            }
 
-        .btn-danger {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
+                            .btn-danger {
+                                background-color: #e74c3c;
+                                border-color: #e74c3c;
+                            }
 
-        .table th {
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-        }
+                            .table th {
+                                font-weight: 500;
+                                text-transform: uppercase;
+                                font-size: 0.8rem;
+                                letter-spacing: 0.5px;
+                            }
 
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
+                            .table tbody tr {
+                                transition: all 0.2s ease;
+                            }
 
-            .table tbody tr:hover {
-                background-color: rgba(52, 152, 219, 0.1) !important;
-            }
+                                .table tbody tr:hover {
+                                    background-color: rgba(52, 152, 219, 0.1) !important;
+                                }
 
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-        }
-    </style>
-}
+                            .btn-sm {
+                                padding: 0.25rem 0.5rem;
+                                font-size: 0.75rem;
+                            }
+                        </style>
+                    }

@@ -1,0 +1,140 @@
+﻿@model IEnumerable<EnglishStudySystem.Areas.Admin.ViewModel.LessonViewModel>
+
+@{
+    bool showDeletedLessonsInPartial = (bool)(ViewData["ShowDeletedLessons"] ?? false);
+    int categoryIdInPartial = (int)(ViewData["CategoryId"] ?? 0);
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="text-white" style="background-color: #3498db;">
+                <tr>
+                    <th width="25%">Tiêu đề</th> @* Giảm width để thêm cột mới *@
+                    <th width="35%">Mô tả</th> @* Giảm width để thêm cột mới *@
+                    <th width="10%"><i class="fas fa-dollar-sign me-1"></i>Miễn phí?</th> @* THÊM CỘT MỚI: ISFREE *@
+                    @if (showDeletedLessonsInPartial)
+                    {
+                        <th width="15%">Ngày xóa</th>
+                        <th width="15%">Người thực hiện xóa</th>
+                    }
+                    else
+                    {
+                        <th width="15%">Ngày tạo</th>
+                        <th width="15%">Người tạo</th>
+                    }
+                    <th width="10%">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var lesson in Model)
+                {
+                    @* Thêm id cho mỗi hàng để dễ dàng thao tác bằng JavaScript *@
+                    <tr id="lesson-row-@lesson.Id" style="background-color: white;">
+                        <td>
+                            <strong>@lesson.Title</strong>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(lesson.Description))
+                            {
+                                <span>@(lesson.Description.Length > 50 ? lesson.Description.Substring(0, 50) + "..." : lesson.Description)</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có mô tả</span>
+                            }
+                        </td>
+                        <td>
+                            @* HIỂN THỊ TRẠNG THÁI ISFREE *@
+                            @if (lesson.IsFree)
+                            {
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Có</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary"><i class="fas fa-times-circle"></i> Không</span>
+                            }
+                        </td>
+                        @if (showDeletedLessonsInPartial)
+                        {
+                            <td>
+                                @lesson.DeletedAt?.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                @(string.IsNullOrEmpty(lesson.UpdatedByUserFullName) ? "N/A" : lesson.UpdatedByUserFullName)
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @lesson.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                @(string.IsNullOrEmpty(lesson.CreatedByUserFullName) ? "N/A" : lesson.CreatedByUserFullName)
+                            </td>
+                        }
+                        <td>
+                            <div class="d-flex gap-2">
+                                @Html.ActionLink("Chi tiết", "Details", "Lessons", new { area = "Admin", id = lesson.Id }, new { @class = "btn btn-sm btn-info" })
+
+                                @if (!lesson.IsDeleted)
+                                {
+                                    @Html.ActionLink("Sửa", "Edit", "Lessons", new { area = "Admin", id = lesson.Id }, new { @class = "btn btn-sm btn-warning text-white" })
+
+                                    @* Thay thế Html.BeginForm bằng button cho AJAX SoftDelete *@
+                                    <button type="button" class="btn btn-sm btn-danger btn-lesson-action-ajax"
+                                            data-id="@lesson.Id"
+                                            data-action-url="@Url.Action("SoftDelete", "Lessons", new { area = "Admin" })"
+                                            data-confirm-message="Bạn có chắc chắn muốn xóa mềm bài học '@lesson.Title' này không?">
+                                        <i class="fas fa-trash-alt me-1"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    @* Thay thế Html.BeginForm bằng button cho AJAX Restore *@
+                                    <button type="button" class="btn btn-sm btn-success btn-lesson-action-ajax"
+                                            data-id="@lesson.Id"
+                                            data-action-url="@Url.Action("Restore", "Lessons", new { area = "Admin" })"
+                                            data-confirm-message="Bạn có chắc chắn muốn khôi phục bài học '@lesson.Title' này không?">
+                                        <i class="fas fa-undo me-1"></i>
+                                    </button>
+
+                                    @* Thay thế Html.BeginForm bằng button cho AJAX HardDelete *@
+                                    <button type="button" class="btn btn-sm btn-dark btn-lesson-action-ajax"
+                                            data-id="@lesson.Id"
+                                            data-action-url="@Url.Action("HardDelete", "Lessons", new { area = "Admin" })"
+                                            data-confirm-message="Bạn có chắc chắn muốn XÓA VĨNH VIỄN bài học '@lesson.Title' này không? Hành động này không thể hoàn tác!">
+                                        <i class="fas fa-times me-1"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="p-4 text-center">
+        @if (!showDeletedLessonsInPartial)
+        {
+            <p class="text-muted mb-4">Chưa có bài học nào trong danh mục này.</p>
+        }
+        else
+        {
+            <p class="text-muted">Không có bài học đã xóa trong danh mục này.</p>
+        }
+    </div>
+}
+
+<style>
+    /* Add any specific styles for _LessonsListPartial if needed */
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+        border-radius: 0.375rem;
+    }
+</style>

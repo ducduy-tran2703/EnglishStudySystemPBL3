@@ -29,8 +29,12 @@ namespace EnglishStudySystem.Controllers
         // GET: Customer
         public ActionResult CustomerDashBoard()
         {
-            // Lấy danh sách categories giống như HomePage
-            var categories = _context.Categories
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
+                // Lấy danh sách categories giống như HomePage
+                var categories = _context.Categories
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.CreatedDate)
                 .ToList();
@@ -46,6 +50,10 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult Payment(int categoryId)
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var category = _context.Categories.Find(categoryId);
             if (category == null)
             {
@@ -58,8 +66,13 @@ namespace EnglishStudySystem.Controllers
             ViewBag.Lessons = lessons;
             return View(category);
         }
+
         public ActionResult DetailUser()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var userId = User.Identity.GetUserId(); // This method is part of Microsoft.AspNet.Identity namespace
             var user = _context.Users.Find(userId);
             if (user == null)
@@ -79,6 +92,10 @@ namespace EnglishStudySystem.Controllers
 
         public ActionResult EditProfile()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             System.Diagnostics.Debug.WriteLine("Entering POST EditProfile1...");
             var userId = User.Identity.GetUserId();
             var user = _context.Users.Find(userId);
@@ -142,6 +159,10 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult LearningActivities()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var userId = User.Identity.GetUserId();
 
             using (var _context = new ApplicationDbContext())
@@ -185,6 +206,10 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult GetBoughtCoursesStats()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var userId = User.Identity.GetUserId();
 
             ApplicationDbContext _context = new ApplicationDbContext();
@@ -209,6 +234,10 @@ namespace EnglishStudySystem.Controllers
 
         public ActionResult GetLessonsHistoryStats()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var userId = User.Identity.GetUserId();
 
             using (ApplicationDbContext _context = new ApplicationDbContext())
@@ -236,6 +265,10 @@ namespace EnglishStudySystem.Controllers
 
         public ActionResult GetFavoriteLessonsStats()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var userId = User.Identity.GetUserId();
             using (var _context = new ApplicationDbContext())
             {
@@ -261,6 +294,10 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult GetTestHistoryStats()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             var userId = User.Identity.GetUserId();
             using (var _context = new ApplicationDbContext())
             {
@@ -292,6 +329,10 @@ namespace EnglishStudySystem.Controllers
         }
         public ActionResult PaymentHistory()
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+            {
+                return HttpNotFound();
+            }
             string currentUserId = User.Identity.GetUserId();
 
             var payments = _context.Payments

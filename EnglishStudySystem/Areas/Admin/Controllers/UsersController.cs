@@ -100,7 +100,10 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
+            if (id != User.Identity.GetUserId()) // Kiểm tra nếu id là của người dùng hiện tại
+            {
+                return HttpNotFound();
+            }
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {

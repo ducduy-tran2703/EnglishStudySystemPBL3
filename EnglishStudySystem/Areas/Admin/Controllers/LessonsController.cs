@@ -14,7 +14,8 @@ using System.Collections.Generic; // Cần cho List
 using System.Data.Entity.Validation; // Cần cho DbEntityValidationException
 using System.Diagnostics;
 using System.Web;
-using EnglishStudySystem; // Cần cho Debug.WriteLine
+using EnglishStudySystem;
+using Microsoft.AspNet.Identity.EntityFramework; // Cần cho Debug.WriteLine
 
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
@@ -22,9 +23,18 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
     [Authorize(Roles = "Administrator, Editor")] // Đảm bảo Role là "Administrator" nếu đó là tên role Admin
     public class LessonsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db;
+        private UserManager<ApplicationUser> _userManager;
+
+        public LessonsController()
+        {
+            db = new ApplicationDbContext(); // Khởi tạo DbContext
+            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db)); // Lấy UserManager từ OWIN Context
+        }
 
         // --- Actions cho Quản lý Bài học ---
+
+
 
         // GET: Admin/Lessons/Create?categoryId=5
         public ActionResult Create(int? categoryId)
@@ -162,7 +172,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         }
 
         // GET: Admin/Lessons/Details/5
-        // Lấy Entity Lesson và truyền trực tiếp sang View
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
@@ -172,10 +181,13 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             // Lấy Bài học theo ID và NẠP (INCLUDE) các Entity liên quan bằng cú pháp EF6 chuẩn
             // - Category để hiển thị tên danh mục
-            // - Tests để hiển thị danh sách bài kiểm tra (sẽ lọc ở View)
+            // - Tests để hiển thị danh sách bài kiểm tra (sẽ nạp TẤT CẢ Tests)
+            // - CreatedByUser và UpdatedByUser (để lấy FullName)
             var lesson = await db.Lessons
-                                 .Include(l => l.Category) // <-- Include chuẩn EF6
-                                 .Include(l => l.Tests) // <-- Include chuẩn EF6 (sẽ nạp TẤT CẢ Tests)
+                                 .Include(l => l.Category)
+                                 .Include(l => l.Tests) // Tải tất cả Tests liên quan
+                                 .Include(l => l.CreatedByUser) // Tải người tạo
+                                 .Include(l => l.UpdatedByUser) // Tải người cập nhật (người xóa)
                                  .SingleOrDefaultAsync(l => l.Id == id);
 
             if (lesson == null)
@@ -183,12 +195,66 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return HttpNotFound();
             }
 
-            // Truyền Entity Lesson trực tiếp sang View
-            return View(lesson);
+            // --- Lấy Roles cho người tạo và người cập nhật ---
+            // Chúng ta cần UserManager để lấy roles vì chúng không phải là navigation property trực tiếp
+            string createdByUserRole = "N/A";
+            if (!string.IsNullOrEmpty(lesson.CreatedByUserId))
+            {
+                var roles = await _userManager.GetRolesAsync(lesson.CreatedByUserId);
+                createdByUserRole = roles.FirstOrDefault() ?? "N/A";
+            }
+
+            string updatedByUserRole = "N/A";
+            if (!string.IsNullOrEmpty(lesson.UpdatedByUserId))
+            {
+                var roles = await _userManager.GetRolesAsync(lesson.UpdatedByUserId);
+                updatedByUserRole = roles.FirstOrDefault() ?? "N/A";
+            }
+
+            // --- Ánh xạ Entity Lesson sang LessonDetailsViewModel ---
+            var viewModel = new LessonDetailsViewModel
+            {
+                Id = lesson.Id,
+                Title = lesson.Title,
+                Description = lesson.Description,
+                Video_URL = lesson.Video_URL,
+                IsFree = lesson.IsFreeTrial,
+                CategoryId = lesson.CategoryId,
+                CategoryName = lesson.Category?.Name, // Lấy tên danh mục từ navigation property
+
+                // Thông tin Người tạo
+                CreatedByUserId = lesson.CreatedByUserId,
+                CreatedByUserFullName = lesson.CreatedByUser?.FullName ?? lesson.CreatedByUser?.UserName ?? "N/A", // Lấy FullName từ navigation property
+                CreatedByUserRole = createdByUserRole, // Gán vai trò đã lấy
+                CreatedDate = lesson.CreatedDate,
+
+                // Thông tin Người cập nhật (cũng là người xóa)
+                UpdatedByUserId = lesson.UpdatedByUserId,
+                UpdatedByUserFullName = lesson.UpdatedByUser?.FullName ?? lesson.UpdatedByUser?.UserName ?? "N/A", // Lấy FullName từ navigation property
+                UpdatedByUserRole = updatedByUserRole, // Gán vai trò đã lấy
+                UpdatedDate = lesson.UpdatedDate,
+
+                // Thông tin Xóa mềm
+                IsDeleted = lesson.IsDeleted,
+                DeletedAt = lesson.DeletedAt,
+                // Không ánh xạ DeletedByUserFullName vào ViewModel nữa vì nó không tồn tại trong ViewModel
+                // Nếu cần hiển thị người xóa, bạn sẽ sử dụng UpdatedByUserFullName trong View khi IsDeleted = true
+                // VÀO VIEW (Details.cshtml) BẠN SẼ LÀM:
+                // @if (Model.IsDeleted) {
+                //    <dt>Người xóa</dt>
+                //    <dd>@Model.UpdatedByUserFullName</dd>
+                // }
+
+
+                // Danh sách Tests
+                Tests = lesson.Tests.ToList() // Ánh xạ trực tiếp danh sách Tests đã được Include
+            };
+
+            // Truyền LessonDetailsViewModel sang View
+            return View(viewModel);
         }
 
         // GET: Admin/Lessons/Edit/5
-        // Trả về View với LessonEditViewModel
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -196,46 +262,63 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            // --- SỬ DỤNG PHÉP CHIẾU (.Select()) ĐỂ NẠP BÀI HỌC VÀ BÀI KIỂM TRA ĐÃ LỌC ---
-            // Truy vấn và chiếu (project) dữ liệu trực tiếp vào ViewModel.
-            var viewModel = await db.Lessons
-                .Where(l => l.Id == id) // Lọc bài học theo ID
-                .Select(l => new LessonEditViewModel // Chiếu dữ liệu sang ViewModel
-                {
-                    // Ánh xạ các thuộc tính của Bài học
-                    Id = l.Id,
-                    Title = l.Title,
-                    Description = l.Description,
-                    Video_URL = l.Video_URL, // <-- Ánh xạ Video_URL
-                    CategoryId = l.CategoryId,
+            var lesson = await db.Lessons
+                                 .Include(l => l.Category) // Vẫn include Category để lấy CategoryName
+                                 .Include(l => l.Tests)    // Vẫn include Tests nếu bạn muốn hiển thị
+                                 .Include(l => l.CreatedByUser)
+                                 .Include(l => l.UpdatedByUser)
+                                 .SingleOrDefaultAsync(l => l.Id == id);
 
-                    // Chiếu tên danh mục (cần include Category ngầm định)
-                    CategoryName = l.Category.Name, // <-- Lấy tên danh mục
-
-                    // Chiếu và lọc danh sách Bài kiểm tra
-                    // .ToList() là cần thiết để thực thi truy vấn cho Tests và đưa kết quả vào bộ nhớ
-                    Tests = l.Tests.Where(t => !t.IsDeleted).ToList(), // <-- Lọc bài kiểm tra chưa xóa mềm
-
-                    // Ánh xạ Audit Fields từ Entity sang ViewModel để hiển thị
-                    CreatedByUserId = l.CreatedByUserId,
-                    CreatedByUserRole = l.CreatedByUserRole,
-                    CreatedDate = l.CreatedDate,
-                    UpdatedByUserId = l.UpdatedByUserId,
-                    UpdatedByUserRole = l.UpdatedByUserRole,
-                    UpdatedDate = l.UpdatedDate
-                })
-                .SingleOrDefaultAsync(); // Thực thi truy vấn và lấy một kết quả hoặc null
-
-            // --- KẾT THÚC PHÉP CHIẾU ---
-
-
-            if (viewModel == null)
+            if (lesson == null)
             {
-                return HttpNotFound(); // Trả về lỗi 404 nếu không tìm thấy bài học
+                return HttpNotFound();
             }
 
-            // Truyền ViewModel sang View Edit
-            return View(viewModel); // View sẽ sử dụng LessonEditViewModel
+            string createdByUserRole = "N/A";
+            if (!string.IsNullOrEmpty(lesson.CreatedByUserId))
+            {
+                var roles = await _userManager.GetRolesAsync(lesson.CreatedByUserId);
+                createdByUserRole = roles.FirstOrDefault() ?? "N/A";
+            }
+
+            string updatedByUserRole = "N/A";
+            if (!string.IsNullOrEmpty(lesson.UpdatedByUserId))
+            {
+                var roles = await _userManager.GetRolesAsync(lesson.UpdatedByUserId);
+                updatedByUserRole = roles.FirstOrDefault() ?? "N/A";
+            }
+
+            // ***** ĐOẠN CODE LIÊN QUAN ĐẾN CATEGORIESLIST ĐÃ BỊ LOẠI BỎ *****
+            // var categories = await db.Categories.Where(c => !c.IsDeleted).ToListAsync();
+            // ViewBag.CategoryId = new SelectList(categories, "Id", "Name", lesson.CategoryId);
+
+
+            // Ánh xạ từ Lesson entity sang LessonEditViewModel
+            var viewModel = new LessonEditViewModel
+            {
+                Id = lesson.Id,
+                CategoryId = lesson.CategoryId, // Vẫn giữ CategoryId trong ViewModel để bind với form
+                Title = lesson.Title,
+                Description = lesson.Description,
+                Video_URL = lesson.Video_URL,
+                IsFreeTrial = lesson.IsFreeTrial,
+
+                CategoryName = lesson.Category?.Name, // Vẫn gán CategoryName để hiển thị
+
+                CreatedByUserId = lesson.CreatedByUserId,
+                CreatedByUserFullName = lesson.CreatedByUser?.FullName ?? lesson.CreatedByUser?.UserName ?? "N/A",
+                CreatedByUserRole = createdByUserRole,
+                CreatedDate = lesson.CreatedDate,
+
+                UpdatedByUserId = lesson.UpdatedByUserId,
+                UpdatedByUserFullName = lesson.UpdatedByUser?.FullName ?? lesson.UpdatedByUser?.UserName ?? "N/A",
+                UpdatedByUserRole = updatedByUserRole,
+                UpdatedDate = lesson.UpdatedDate,
+
+                Tests = lesson.Tests.ToList()
+            };
+
+            return View(viewModel);
         }
 
 
@@ -316,15 +399,24 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         }
 
 
-        // --- Actions SoftDelete, Restore, HardDelete (Giữ nguyên, làm việc với ID/Entity) ---
-        // Sử dụng Entity Model, không dùng ViewModel form.
+        // --- ACTION: XÓA MỀM BÀI HỌC (SoftDelete) ---
         // POST: Admin/Lessons/SoftDelete/5
         [HttpPost, ActionName("SoftDelete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SoftDeleteConfirmed(int id)
         {
             var lesson = await db.Lessons.FindAsync(id);
-            if (lesson == null || lesson.IsDeleted) return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Categories"));
+
+            if (lesson == null)
+            {
+                // Thay vì HttpNotFound(), trả về JSON lỗi
+                return Json(new { success = false, message = "Bài học không tồn tại." });
+            }
+            if (lesson.IsDeleted)
+            {
+                // Nếu đã xóa mềm, trả về JSON thành công nhưng có thông báo đặc biệt
+                return Json(new { success = true, message = "Bài học đã được xóa mềm trước đó.", lessonId = id });
+            }
 
             lesson.IsDeleted = true;
             lesson.DeletedAt = DateTime.Now;
@@ -338,26 +430,36 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 lesson.UpdatedByUserRole = currentUserRoles.FirstOrDefault() ?? "Unknown";
                 lesson.UpdatedDate = DateTime.Now;
             }
+            else
+            {
+                // Xử lý trường hợp không tìm thấy người dùng (ví dụ: phiên hết hạn)
+                return Json(new { success = false, message = "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại." });
+            }
 
             db.Entry(lesson).State = EntityState.Modified;
             await db.SaveChangesAsync();
 
-            return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Categories"));
+            // TRẢ VỀ JSON KHI THÀNH CÔNG
+            return Json(new { success = true, message = "Xóa mềm bài học thành công.", lessonId = id });
         }
 
+        // --- ACTION: KHÔI PHỤC BÀI HỌC (Restore) ---
         // POST: Admin/Lessons/Restore/5
         [HttpPost, ActionName("Restore")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RestoreConfirmed(int id)
         {
-            // Sử dụng Find(id) hoặc SingleOrDefaultAsync để truy vấn Entity
-            // Cần đảm bảo phương thức này có thể lấy Entity kể cả khi IsDeleted = true
-            // Nếu Find không hoạt động do Global Filter, hãy thử SqlQuery như đã thảo luận
-            var lesson = await db.Lessons.SingleOrDefaultAsync(l => l.Id == id); // <-- Thử dùng SingleOrDefaultAsync
+            var lesson = await db.Lessons.SingleOrDefaultAsync(l => l.Id == id);
 
-            // Redirect nếu không tìm thấy hoặc chưa xóa mềm
-            if (lesson == null || !lesson.IsDeleted) return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Categories"));
-
+            if (lesson == null)
+            {
+                return Json(new { success = false, message = "Bài học không tồn tại." });
+            }
+            if (!lesson.IsDeleted)
+            {
+                // Nếu chưa xóa mềm, trả về JSON thành công nhưng có thông báo đặc biệt
+                return Json(new { success = true, message = "Bài học không đang bị xóa mềm.", lessonId = id });
+            }
 
             lesson.IsDeleted = false;
             lesson.DeletedAt = null;
@@ -371,31 +473,44 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 lesson.UpdatedByUserRole = currentUserRoles.FirstOrDefault() ?? "Unknown";
                 lesson.UpdatedDate = DateTime.Now;
             }
+            else
+            {
+                return Json(new { success = false, message = "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại." });
+            }
 
             db.Entry(lesson).State = EntityState.Modified;
             await db.SaveChangesAsync();
 
-            return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Categories"));
+            // TRẢ VỀ JSON KHI THÀNH CÔNG
+            return Json(new { success = true, message = "Khôi phục bài học thành công.", lessonId = id });
         }
 
+        // --- ACTION: XÓA HOÀN TOÀN BÀI HỌC (HardDelete) ---
         // POST: Admin/Lessons/HardDelete/5
         [HttpPost, ActionName("HardDelete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> HardDeleteConfirmed(int id)
         {
-            // Sử dụng Find(id) hoặc SingleOrDefaultAsync để truy vấn Entity
-            // Cần đảm bảo phương thức này có thể lấy Entity kể cả khi IsDeleted = true
-            var lesson = await db.Lessons.SingleOrDefaultAsync(l => l.Id == id); // <-- Thử dùng SingleOrDefaultAsync
+            var lesson = await db.Lessons.SingleOrDefaultAsync(l => l.Id == id);
 
-            if (lesson == null) return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Categories"));
+            if (lesson == null)
+            {
+                return Json(new { success = false, message = "Bài học không tồn tại." });
+            }
 
-            var categoryId = lesson.CategoryId; // Lưu lại CategoryId trước khi xóa
+            // TÙY CHỌN: Chỉ cho phép xóa cứng các bản ghi đã bị xóa mềm (như bạn đã code)
+            if (!lesson.IsDeleted)
+            {
+                return Json(new { success = false, message = "Chỉ có thể xóa cứng bài học đã bị xóa mềm." });
+            }
 
-            db.Lessons.Remove(lesson); // Xóa entity
-            await db.SaveChangesAsync(); // Lưu thay đổi
+            // var categoryId = lesson.CategoryId; // Không cần thiết nếu không redirect
 
-            // Chuyển hướng về trang Chi tiết Danh mục
-            return RedirectToAction("Details", "Categories", new { id = categoryId });
+            db.Lessons.Remove(lesson);
+            await db.SaveChangesAsync();
+
+            // TRẢ VỀ JSON KHI THÀNH CÔNG
+            return Json(new { success = true, message = "Xóa cứng bài học thành công.", lessonId = id });
         }
 
 

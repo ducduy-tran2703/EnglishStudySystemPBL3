@@ -1,6 +1,7 @@
 ﻿// EnglishStudySystem/Areas/Admin/Controllers/CategoriesController.cs
 
 using System;
+using System.Collections.Generic;
 using System.Data.Entity; // Cần cho Include, EntityState, ToListAsync
 using System.Linq; // Cần cho Where, OrderBy
 using System.Net; // Cần cho HttpStatusCodeResult
@@ -27,17 +28,17 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         // Khai báo DbContext để truy vấn dữ liệu
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private ApplicationDbContext _context;
+        private ApplicationDbContext db;
         private UserManager<ApplicationUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
 
         public CategoriesController()
         {
-            _context = new ApplicationDbContext();
-            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
-            _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
+            db = new ApplicationDbContext();
+            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+            _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db));
         }
+
 
         // --- ACTION: DANH SÁCH CÁC DANH MỤC CHƯA XÓA MỀM (Index) ---
         // GET: Admin/Categories
@@ -58,6 +59,36 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                                            .OrderBy(c => c.Name) // Sắp xếp theo tên danh mục
                                            .ToListAsync(); // Thực hiện truy vấn bất đồng bộ
 
+            // --- BẮT ĐẦU PHẦN THÊM VÀO ĐỂ LẤY TÊN ĐẦY ĐỦ CỦA NGƯỜI TẠO ---
+
+            // Lấy danh sách tất cả các CreatedByUserId duy nhất từ các danh mục
+            var createdByUserIds = activeCategories.Select(c => c.CreatedByUserId)
+                                                   .Where(id => id != null) // Chỉ lấy các ID không null
+                                                   .Distinct() // Lọc các ID trùng lặp
+                                                   .ToList();
+
+            // Khởi tạo Dictionary để lưu trữ FullName của người dùng
+            var userNames = new Dictionary<string, string>();
+
+            // Nếu có User ID, truy vấn FullName của họ từ bảng Users
+            if (createdByUserIds.Any())
+            {
+                var users = await db.Users
+                                    .Where(u => createdByUserIds.Contains(u.Id))
+                                    .ToListAsync();
+
+                foreach (var user in users)
+                {
+                    // Ưu tiên FullName, nếu FullName null/empty thì dùng UserName
+                    userNames[user.Id] = !string.IsNullOrEmpty(user.FullName) ? user.FullName : user.UserName;
+                }
+            }
+
+            // Truyền Dictionary này sang View thông qua ViewBag
+            ViewBag.UserNames = userNames;
+
+            // --- KẾT THÚC PHẦN THÊM VÀO ---
+
             // Truyền danh sách các danh mục đang hoạt động sang View
             return View(activeCategories);
         }
@@ -66,24 +97,113 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // GET: Admin/Categories/Deleted
         public async Task<ActionResult> DeletedIndex()
         {
-            // Lấy tất cả các danh mục ĐÃ bị xóa mềm
-            // Lọc thủ công bằng .Where(c => c.IsDeleted)
             var deletedCategories = await db.Categories
                                             .Where(c => c.IsDeleted)
-                                            .OrderByDescending(c => c.DeletedAt) // Sắp xếp theo thời gian xóa
+                                            .OrderByDescending(c => c.DeletedAt)
                                             .ToListAsync();
 
-            // Truyền danh sách các danh mục đã xóa sang View (có thể dùng View khác hoặc cùng View Index)
-            // Để đơn giản, chúng ta sẽ tạo View DeletedIndex.cshtml riêng
+            var userIds = deletedCategories.Select(c => c.CreatedByUserId)
+                                           .Where(id => id != null)
+                                           .ToList();
+
+            var updatedByUserIds = deletedCategories.Select(c => c.UpdatedByUserId)
+                                                    .Where(id => id != null)
+                                                    .ToList();
+
+            userIds.AddRange(updatedByUserIds);
+            userIds = userIds.Distinct().ToList();
+
+            var userNames = new Dictionary<string, string>();
+
+            if (userIds.Any())
+            {
+                // **THAY ĐỔI TỪ UserName SANG FullName TẠI ĐÂY**
+                var users = await db.Users
+                                    .Where(u => userIds.Contains(u.Id))
+                                    .ToListAsync();
+
+                foreach (var user in users)
+                {
+                    // Ưu tiên FullName, nếu FullName null/empty thì dùng UserName
+                    userNames[user.Id] = !string.IsNullOrEmpty(user.FullName) ? user.FullName : user.UserName;
+                }
+            }
+
+            ViewBag.UserNames = userNames;
+
             return View(deletedCategories);
         }
 
+        // GET: Admin/Categories/GetLessonsPartial (hoặc Admin/Lessons/GetLessonsPartial)
+        public ActionResult GetLessonsPartial(int categoryId, bool showDeleted = false)
+        {
+            // Truy vấn danh sách bài học
+            // Eager load CreatedByUser và UpdatedByUser
+            var lessons = db.Lessons
+                                  .Include(l => l.CreatedByUser)
+                                  .Include(l => l.UpdatedByUser) // Rất quan trọng để lấy thông tin người cập nhật
+                                  .Where(l => l.CategoryId == categoryId)
+                                  .AsQueryable();
+
+            // Lọc theo trạng thái xóa mềm
+            if (!showDeleted)
+            {
+                lessons = lessons.Where(l => !l.IsDeleted);
+            }
+            else
+            {
+                lessons = lessons.Where(l => l.IsDeleted);
+            }
+
+            // Ánh xạ từ Lesson entity sang LessonViewModel
+            var lessonViewModels = lessons.ToList().Select(l => new LessonViewModel
+            {
+                Id = l.Id,
+                Title = l.Title,
+                Description = l.Description,
+                IsDeleted = l.IsDeleted,
+                IsFree = l.IsFreeTrial,
+
+                CreatedDate = l.CreatedDate,
+                CreatedByUserFullName = l.CreatedByUser?.FullName, // Lấy FullName từ navigation property
+
+                UpdatedDate = l.UpdatedDate,
+                UpdatedByUserFullName = l.UpdatedByUser?.FullName, // Lấy FullName từ navigation property
+                                                                   // (Người này cũng sẽ là người xóa nếu IsDeleted = true)
+
+                DeletedAt = l.DeletedAt
+                // Không cần ánh xạ DeletedByUserFullName nữa
+            }).OrderBy(l => l.CreatedDate).ToList();
+
+            // Truyền CategoryId và ShowDeletedLessons vào Partial View thông qua ViewData
+            ViewData["CategoryId"] = categoryId;
+            ViewData["ShowDeletedLessons"] = showDeleted;
+
+            return PartialView("_LessonsListPartial", lessonViewModels);
+        }
 
         // --- ACTION: XEM CHI TIẾT DANH MỤC (Details) ---
         // GET: Admin/Categories/Details/5
-        public async Task<ActionResult> Details(int? id)
+        public async Task<ActionResult> Details(int? id) // Bỏ showDeleted ở đây vì nó được xử lý trong GetLessonsPartial
         {
             // Kiểm tra ID có được cung cấp không
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            // 1. Lấy Category chính và Eager Load CreatedByUser và UpdatedByUser
+            // Điều này sẽ tải FullName và các thông tin khác của người dùng trực tiếp
+            var category = await db.Categories
+                                   .Include(c => c.CreatedByUser)
+                                   .Include(c => c.UpdatedByUser)
+                                   .SingleOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+            {
+                return HttpNotFound();
+            }
+            // Lấy thông tin người dùng hiện tại để kiểm tra quyền chỉnh sửa
             var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
             if (user_now == null)
             {
@@ -91,51 +211,60 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
             var userRoles = await _userManager.GetRolesAsync(user_now.Id);
             ViewBag.CanEdit = User.IsInRole("Administrator") || user_now.CanManageCategories;
-            if (id == null)
+
+            // 2. Lấy Roles cho người tạo và người cập nhật của Category
+            // Chúng ta cần UserManager để lấy roles vì chúng không phải là navigation property trực tiếp từ Category
+            string createdByUserRole = "N/A";
+            if (!string.IsNullOrEmpty(category.CreatedByUserId))
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest); // Trả về lỗi 400 Bad Request
+                var roles = await _userManager.GetRolesAsync(category.CreatedByUserId);
+                createdByUserRole = roles.FirstOrDefault() ?? "N/A";
             }
 
-            // --- SỬ DỤNG PHÉP CHIẾU (.Select()) ĐỂ NẠP DANH MỤC VÀ BÀI HỌC ĐÃ LỌC ---
-            // Truy vấn và chiếu (project) dữ liệu trực tiếp vào ViewModel.
-            // Điều này hiệu quả hơn so với việc nạp tất cả rồi lọc trong bộ nhớ.
-            var viewModel = await db.Categories
-                .Where(c => c.Id == id) // Lọc danh mục theo ID trước
-                .Select(c => new CategoryDetailsWithLessonsViewModel // Chiếu dữ liệu sang ViewModel
-                {
-                    // Ánh xạ các thuộc tính của Danh mục
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Price = c.Price,
-                    IsDeleted = c.IsDeleted,
-                    DeletedAt = c.DeletedAt,
-
-                    // Ánh xạ Audit Fields (nếu cần)
-                    CreatedByUserId = c.CreatedByUserId,
-                    CreatedByUserRole = c.CreatedByUserRole,
-                    CreatedDate = c.CreatedDate,
-                    UpdatedByUserId = c.UpdatedByUserId,
-                    UpdatedByUserRole = c.UpdatedByUserRole,
-                    UpdatedDate = c.UpdatedDate,
-
-                    // Chiếu (project) và lọc danh sách Bài học TẠI ĐÂY
-                    // .ToList() là cần thiết để thực thi truy vấn cho Lessons và đưa kết quả vào bộ nhớ
-                    Lessons = c.Lessons.Where(l => !l.IsDeleted).ToList() // <-- Lọc bài học chưa xóa mềm
-                })
-                .SingleOrDefaultAsync(); // Thực thi truy vấn và lấy một kết quả hoặc null
-
-            // --- KẾT THÚC PHÉP CHIẾU ---
-
-
-            // Kiểm tra có tìm thấy danh mục và ánh xạ ViewModel thành công không
-            if (viewModel == null)
+            string updatedByUserRole = "N/A";
+            if (!string.IsNullOrEmpty(category.UpdatedByUserId))
             {
-                return HttpNotFound(); // Trả về lỗi 404 nếu không tìm thấy danh mục với ID đó
+                var roles = await _userManager.GetRolesAsync(category.UpdatedByUserId);
+                updatedByUserRole = roles.FirstOrDefault() ?? "N/A";
             }
 
-            // Truyền ViewModel đã có dữ liệu (bao gồm danh sách Bài học đã lọc) sang View Details
-            return View(viewModel); // View sẽ sử dụng CategoryDetailsWithLessonsViewModel
+            // 3. Tạo và populate ViewModel
+            var viewModel = new CategoryDetailsWithLessonsViewModel
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                Price = category.Price,
+                IsDeleted = category.IsDeleted,
+                DeletedAt = category.DeletedAt,
+
+                CreatedByUserId = category.CreatedByUserId,
+                CreatedDate = category.CreatedDate,
+                // Lấy FullName từ navigation property
+                CreatedByUserFullName = category.CreatedByUser?.FullName ?? category.CreatedByUser?.UserName ?? "N/A",
+                // Gán Role đã lấy từ UserManager
+                CreatedByUserRole = createdByUserRole,
+
+                UpdatedByUserId = category.UpdatedByUserId,
+                UpdatedDate = category.UpdatedDate,
+                // Lấy FullName từ navigation property
+                UpdatedByUserFullName = category.UpdatedByUser?.FullName ?? category.UpdatedByUser?.UserName ?? "N/A",
+                // Gán Role đã lấy từ UserManager
+                UpdatedByUserRole = updatedByUserRole,
+
+                // Không cần tải Lessons ở đây nữa, vì chúng ta đã dùng AJAX trong GetLessonsPartial.
+                // Để đảm bảo ViewModel không bị null khi truy cập Lessons, bạn có thể khởi tạo một List rỗng.
+                Lessons = new List<LessonViewModel>() // Khởi tạo rỗng vì sẽ tải qua AJAX
+                                                      // ShowDeletedLessons sẽ được quyết định trong JavaScript của View chính (CategoryDetails.cshtml)
+                                                      // hoặc dựa vào trạng thái IsDeleted của Category ban đầu
+                                                      // showDeleted = category.IsDeleted; // Điều này sẽ được xử lý trong JavaScript của View
+            };
+
+            // Gán biến initialShowDeletedLessons cho View để JS có thể đọc
+            // Đây là cách tốt nhất để truyền trạng thái ban đầu cho JS
+            ViewBag.InitialShowDeletedLessons = category.IsDeleted;
+
+            return View(viewModel);
         }
 
 
@@ -363,150 +492,131 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
         // --- ACTION: XÓA MỀM DANH MỤC (SoftDelete) ---
         // POST: Admin/Categories/SoftDelete/5
-        [HttpPost, ActionName("SoftDelete")] // Đặt tên Action là SoftDelete, nhưng URL sẽ dùng tên này
+        [HttpPost, ActionName("SoftDelete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SoftDeleteConfirmed(int id) // Nhận ID của danh mục cần xóa mềm
+        public async Task<ActionResult> SoftDeleteConfirmed(int id)
         {
-            // Tìm danh mục cần xóa mềm
             var category = await db.Categories.FindAsync(id);
 
-            // Kiểm tra có tìm thấy danh mục và nó chưa bị xóa mềm không
-            if (category != null && !category.IsDeleted)
+            if (category == null)
             {
-                // Đánh dấu bản ghi là đã xóa.
-                // Logic override SaveChanges sẽ xử lý việc set IsDeleted = true và DeletedAt = DateTime.Now.
-                db.Categories.Remove(category); // Dùng .Remove() để kích hoạt override SaveChanges
-
-                // Lưu thay đổi vào cơ sở dữ liệu bất đồng bộ
-                await db.SaveChangesAsync();
+                return HttpNotFound(); // Không tìm thấy danh mục
             }
 
-            // Chuyển hướng về trang danh sách sau khi xóa mềm
-            return RedirectToAction("Index");
+            // Kiểm tra xem danh mục đã bị xóa mềm chưa để tránh xóa mềm lại
+            if (category.IsDeleted)
+            {
+                // Có thể chuyển hướng hoặc trả về lỗi nếu danh mục đã xóa mềm
+                return RedirectToAction("Index");
+            }
+
+            // --- THỰC HIỆN XÓA MỀM TRỰC TIẾP TRONG CONTROLLER ---
+            category.IsDeleted = true;
+            category.DeletedAt = DateTime.Now;
+
+            // Lấy thông tin người dùng hiện tại để điền vào audit fields
+            string currentUserId = User.Identity.GetUserId();
+            var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+
+            // Bạn có thể cần lấy FullName/UserName từ currentUser nếu muốn lưu vào UpdatedByUserFullName
+            // var currentUser = await userManager.FindByIdAsync(currentUserId); 
+
+            string currentUserRole = (await userManager.GetRolesAsync(currentUserId)).FirstOrDefault();
+
+            category.UpdatedByUserId = currentUserId;
+            // category.UpdatedByUserFullName = currentUser?.FullName ?? currentUser?.UserName; // Nếu bạn có trường này
+            category.UpdatedByUserRole = currentUserRole ?? "Unknown";
+            category.UpdatedDate = DateTime.Now; // Ghi nhận thời gian xóa mềm là thời gian cập nhật cuối
+
+            // Đánh dấu entity là Modified để Entity Framework biết cần tạo lệnh UPDATE
+            db.Entry(category).State = EntityState.Modified;
+
+            await db.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
+
+            return RedirectToAction("Index"); // Chuyển hướng về trang danh sách chính
         }
 
 
         // --- ACTION: KHÔI PHỤC DANH MỤC (Restore) ---
         // POST: Admin/Categories/Restore/5
-        [HttpPost, ActionName("Restore")] // Đặt tên Action là Restore
+        [HttpPost, ActionName("Restore")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> RestoreConfirmed(int id) // Nhận ID của danh mục cần khôi phục
+        public async Task<ActionResult> RestoreConfirmed(int id)
         {
-            // Tìm danh mục cần khôi phục
-            // Cần tìm cả các bản ghi đã xóa mềm, nên không dùng .Where(!IsDeleted)
             var category = await db.Categories.FindAsync(id);
 
-            // Kiểm tra có tìm thấy danh mục và nó ĐANG bị xóa mềm không
-            if (category != null && category.IsDeleted)
+            if (category == null)
             {
-                // --- THỰC HIỆN KHÔI PHỤC (Đảo ngược trạng thái xóa mềm) ---
-                category.IsDeleted = false; // Đặt lại trạng thái xóa mềm
-                category.DeletedAt = null; // Xóa thông tin thời gian xóa mềm
-
-                // Cập nhật thông tin người cập nhật/thời gian cập nhật (tùy chọn)
-                string currentUserId = User.Identity.GetUserId();
-                var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-                var currentUserRoles = await userManager.GetRolesAsync(currentUserId);
-                string currentUserRole = currentUserRoles.FirstOrDefault();
-
-                category.UpdatedByUserId = currentUserId;
-                category.UpdatedByUserRole = currentUserRole ?? "Unknown";
-                category.UpdatedDate = DateTime.Now;
-
-                // Đánh dấu trạng thái của bản ghi là Modified
-                db.Entry(category).State = EntityState.Modified;
-
-                // Lưu thay đổi vào cơ sở dữ liệu bất đồng bộ
-                await db.SaveChangesAsync();
+                return HttpNotFound(); // Không tìm thấy danh mục
             }
 
-            // Chuyển hướng về trang danh sách các danh mục đã xóa sau khi khôi phục
-            return RedirectToAction("DeletedIndex");
+            // Chỉ khôi phục nếu danh mục ĐANG bị xóa mềm
+            if (!category.IsDeleted)
+            {
+                // Nếu không bị xóa mềm, có thể chuyển hướng hoặc hiển thị lỗi
+                return RedirectToAction("Index");
+            }
+
+            // --- THỰC HIỆN KHÔI PHỤC TRỰC TIẾP TRONG CONTROLLER ---
+            category.IsDeleted = false; // Đặt lại trạng thái xóa mềm
+            category.DeletedAt = null;  // Xóa thông tin thời gian xóa mềm
+
+            // Cập nhật thông tin người khôi phục vào audit fields
+            string currentUserId = User.Identity.GetUserId();
+            var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            // var currentUser = await userManager.FindByIdAsync(currentUserId); 
+            string currentUserRole = (await userManager.GetRolesAsync(currentUserId)).FirstOrDefault();
+
+            category.UpdatedByUserId = currentUserId;
+            // category.UpdatedByUserFullName = currentUser?.FullName ?? currentUser?.UserName; // Nếu bạn có trường này
+            category.UpdatedByUserRole = currentUserRole ?? "Unknown";
+            category.UpdatedDate = DateTime.Now; // Ghi nhận thời gian khôi phục là thời gian cập nhật cuối
+
+            // Đánh dấu entity là Modified
+            db.Entry(category).State = EntityState.Modified;
+
+            await db.SaveChangesAsync(); // Lưu thay đổi
+
+            return RedirectToAction("DeletedIndex"); // Chuyển hướng về trang danh sách các danh mục đã xóa
         }
 
 
         // --- ACTION: XÓA HOÀN TOÀN DANH MỤC (HardDelete) ---
         // POST: Admin/Categories/HardDelete/5
         // LƯU Ý: Action này sẽ XÓA VĨNH VIỄN bản ghi khỏi DB.
-        // Hãy cẩn thận khi sử dụng, chỉ nên áp dụng cho các bản ghi đã xóa mềm.
-        // Cần cơ chế để BỎ QUA logic Soft Delete trong SaveChanges cho bản ghi này.
-        [HttpPost, ActionName("HardDelete")] // Đặt tên Action là HardDelete
+        // Nên cẩn thận khi sử dụng, và thường chỉ nên áp dụng cho các bản ghi đã xóa mềm.
+        [HttpPost, ActionName("HardDelete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> HardDeleteConfirmed(int id) // Nhận ID của danh mục cần xóa hoàn toàn
+        public async Task<ActionResult> HardDeleteConfirmed(int id)
         {
-            // Tìm danh mục cần xóa hoàn toàn
-            // Cần tìm cả các bản ghi đã xóa mềm
+            // Tìm danh mục cần xóa hoàn toàn.
+            // Bạn có thể cần .AsNoTracking() nếu bản ghi đang được DbContext theo dõi từ trước,
+            // nhưng FindAsync() sẽ trả về bản ghi đang được theo dõi nếu có.
             var category = await db.Categories.FindAsync(id);
 
-            // Kiểm tra có tìm thấy danh mục và nó ĐANG bị xóa mềm không
-            // Chỉ cho phép xóa hoàn toàn các bản ghi ĐÃ bị xóa mềm
-            if (category != null && category.IsDeleted)
+            if (category == null)
             {
-                // --- THỰC HIỆN XÓA VĨNH VIỄN ---
-                // Cách đơn giản nhất để bypass Soft Delete override là đánh dấu trạng thái Deleted TRỰC TIẾP VÀ GỌI BASE SaveChanges
-                // Tuy nhiên, việc gọi base.SaveChanges() trực tiếp từ controller không lý tưởng
-                // Cách thông thường là dùng db.Set<T>().Remove() và cấu hình trong OnModelCreating hoặc SaveChanges để nhận biết
-                // Với cách override SaveChanges hiện tại của bạn, bạn cần một cách để nói rằng "lần này thì xóa thật".
-                // Một cách (hơi hacky) là tạm thời tắt/bỏ qua override cho lần gọi SaveChanges này,
-                // hoặc thêm một điều kiện kiểm tra trong override SaveChanges.
-                // Cách đơn giản nhất với setup hiện tại là đánh dấu trạng thái EntityState.Deleted và sau đó gọi SaveChanges
-                // Nhưng override SaveChanges sẽ bắt lấy trạng thái Deleted và chuyển nó thành Modified!
-                // Để XÓA THẬT với setup này, bạn cần tìm cách BYPASS HOÀN TOÀN override SaveChanges hoặc sửa override SaveChanges.
-                // CÁCH ĐƠN GIẢN NHẤT (nhưng hơi không rõ ràng với override hiện tại) là dùng db.Remove():
-                db.Categories.Remove(category); // Mark as Deleted
-
-                // Cần đảm bảo rằng lệnh SaveChanges() tiếp theo sẽ THỰC SỰ XÓA bản ghi này,
-                // chứ không phải bị intercept bởi override SaveChanges() và biến thành Soft Delete.
-                // Với override SaveChanges() hiện tại của bạn, lệnh db.Categories.Remove(category)
-                // sẽ dẫn đến việc bản ghi bị Soft Delete chứ không phải Hard Delete!
-
-                // Để thực hiện Hard Delete với override SaveChanges hiện tại, bạn có 2 lựa chọn chính:
-                // 1. Tạm thời tắt/bỏ qua override cho lệnh SaveChanges này (cách phức tạp, không nên).
-                // 2. Sửa lại override SaveChanges để nó nhận biết trường hợp cần Hard Delete (ví dụ: kiểm tra một cờ, hoặc kiểm tra một kiểu entity đặc biệt).
-                // 3. Cách phổ biến khác: Truy vấn lại bản ghi KHÔNG TRACKING, gán Id, đánh dấu trạng thái là Deleted và gọi base SaveChanges.
-
-                // Cách 3: Hard Delete an entity by re-attaching it as Deleted (bypasses the override SaveChanges)
-                var hardDeleteCategory = new Category { Id = id }; // Tạo một đối tượng mới chỉ với ID
-                db.Entry(hardDeleteCategory).State = EntityState.Deleted; // Đánh dấu trạng thái là Deleted
-
-                // Bây giờ gọi SaveChanges. Entity Framework sẽ thấy một entity có ID này đang ở trạng thái Deleted
-                // và thực hiện lệnh DELETE trong database. LƯU Ý: Cách này BỎ QUA override SaveChanges() của bạn!
-                // Nếu bạn muốn override SaveChanges() xử lý cả Hard Delete dựa trên một cờ, bạn cần sửa lại override đó.
-
-
-                // --- Chúng ta sẽ sử dụng cách Re-attach và đánh dấu Deleted để Hard Delete ---
-                // Lưu ý: Việc này không kích hoạt override SaveChanges() của bạn cho bản ghi này.
-                // Nếu có các bản ghi khác đang chờ Soft Delete trong cùng một SaveChanges,
-                // bạn cần lưu ý cách xử lý. Tốt nhất là Hard Delete trong một SaveChanges() riêng.
-
-                // Lấy bản ghi gốc từ DB lần nữa, nhưng đảm bảo nó không bị EF tracking
-                var categoryToHardDelete = db.Categories.AsNoTracking().SingleOrDefault(c => c.Id == id);
-                if (categoryToHardDelete != null)
-                {
-                    // Đánh dấu bản ghi này (không bị tracking) là Deleted
-                    db.Entry(categoryToHardDelete).State = EntityState.Deleted;
-                    // Lưu thay đổi. Lệnh này sẽ thực hiện HARD DELETE.
-                    // Việc này BỎ QUA override SaveChanges() của bạn cho bản ghi này.
-                    db.SaveChanges(); // Sử dụng SaveChanges() đồng bộ hoặc SaveChangesAsync() không CancellationToken nếu override của bạn cho phép
-                }
-                else
-                {
-                    // Xử lý trường hợp không tìm thấy bản ghi (rất hiếm nếu đã kiểm tra ở trên)
-                    return HttpNotFound();
-                }
-
-                // Hoặc CÁCH KHÁC (Nếu bạn muốn dùng Remove và sửa override SaveChanges):
-                // Sửa override SaveChanges để nó kiểm tra một cờ nào đó trong DbContext
-                // Hoặc kiểm tra một thuộc tính đặc biệt trên Entity (ví dụ IHardDeletable)
-                // Hoặc truyền một tham số đặc biệt vào SaveChanges (cần thêm chữ ký mới cho SaveChanges)
-
-                // VỚI CÁCH OVERRIDE SAVECHANGES() CỦA BẠN HIỆN TẠI, cách RE-ATTACH là cách đơn giản nhất để HARD DELETE.
-
-
+                return HttpNotFound(); // Không tìm thấy danh mục
             }
 
-            // Chuyển hướng về trang danh sách các danh mục đã xóa sau khi xóa hoàn toàn
-            return RedirectToAction("DeletedIndex");
+            // TÙY CHỌN: Chỉ cho phép xóa cứng các bản ghi đã bị xóa mềm
+            if (!category.IsDeleted)
+            {
+                // Trả về lỗi hoặc chuyển hướng nếu không muốn xóa cứng bản ghi đang hoạt động
+                // Ví dụ: return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Chỉ có thể xóa cứng bản ghi đã bị xóa mềm.");
+                // Hoặc đơn giản là chuyển hướng về Index nếu không hợp lệ
+                return RedirectToAction("Index");
+            }
+
+            // --- THỰC HIỆN XÓA CỨNG (Vĩnh viễn khỏi DB) ---
+            // Gọi .Remove() trực tiếp để Entity Framework tạo lệnh DELETE SQL.
+            // Vì SaveChanges() override của bạn KHÔNG CÒN xử lý EntityState.Deleted
+            // thành Modified nữa, lệnh này sẽ thực sự xóa bản ghi.
+            db.Categories.Remove(category);
+
+            await db.SaveChangesAsync(); // Lưu thay đổi, thực hiện Hard Delete
+
+            return RedirectToAction("DeletedIndex"); // Chuyển hướng về trang danh sách đã xóa
         }
 
 

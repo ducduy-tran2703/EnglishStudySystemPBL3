@@ -14,7 +14,8 @@ namespace EnglishStudySystem.Areas.Admin.ViewModel
         public int Id { get; set; }
 
         // CategoryId cần thiết (người dùng có thể thay đổi danh mục)
-        [Required(ErrorMessage = "ID Danh mục là bắt buộc.")] // Đánh dấu Required ở ViewModel
+        [Required(ErrorMessage = "ID Danh mục là bắt buộc.")]
+        [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
 
         [Required(ErrorMessage = "Tiêu đề bài học là bắt buộc.")]
@@ -26,32 +27,44 @@ namespace EnglishStudySystem.Areas.Admin.ViewModel
         public string Description { get; set; }
 
         [Display(Name = "URL Video")]
-        public string Video_URL { get; set; } // <-- Thay thế Content bằng Video_URL
+        public string Video_URL { get; set; }
+
+        [Display(Name = "Cho phép học thử miễn phí")]
+        public bool IsFreeTrial { get; set; }
+
 
         // --- Thông tin về Danh mục cha (để hiển thị tên trên View) ---
         public string CategoryName { get; set; }
 
 
         // --- Thông tin về Bài kiểm tra liên quan (để hiển thị danh sách) ---
-        public List<Test> Tests { get; set; } // Cần using EnglishStudySystem.Models;
+        public List<Test> Tests { get; set; }
 
 
         // --- Hiển thị Audit Fields (Dựa trên Lesson.cs) ---
-        [Display(Name = "Người tạo")]
+        [Display(Name = "ID người tạo")]
         public string CreatedByUserId { get; set; }
+
+        [Display(Name = "Người tạo")]
+        public string CreatedByUserFullName { get; set; } // Đã thêm lại theo trao đổi trước đó
+
         [Display(Name = "Vai trò người tạo")]
         public string CreatedByUserRole { get; set; }
+
         [Display(Name = "Ngày tạo")]
         public DateTime CreatedDate { get; set; }
 
-        [Display(Name = "Người cập nhật")]
+        [Display(Name = "ID người cập nhật")]
         public string UpdatedByUserId { get; set; }
+
+        [Display(Name = "Người cập nhật")]
+        public string UpdatedByUserFullName { get; set; } // Đã thêm lại theo trao đổi trước đó
+
         [Display(Name = "Vai trò người cập nhật")]
         public string UpdatedByUserRole { get; set; }
+
         [Display(Name = "Ngày cập nhật")]
         public DateTime? UpdatedDate { get; set; }
-
-        // Không bao gồm IsDeleted và DeletedAt vì chúng được quản lý bởi SoftDelete/Restore
 
         // Constructor để khởi tạo danh sách Tests
         public LessonEditViewModel()
