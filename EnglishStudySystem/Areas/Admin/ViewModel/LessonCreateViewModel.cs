@@ -24,6 +24,10 @@ namespace EnglishStudySystem.Areas.Admin.ViewModel
         // Dựa trên Lesson.cs, Video_URL không có [Required]
         public string Video_URL { get; set; } // <-- Thay thế Content bằng Video_URL
 
+        // THÊM THUỘC TÍNH ISFREE VÀO ĐÂY
+        [Display(Name = "Là bài học miễn phí")]
+        public bool IsFree { get; set; } = false; // Mặc định là false (không miễn phí)
+
         // Không bao gồm các thuộc tính Audit (CreatedByUserId, CreatedDate, v.v.)
         // hoặc Soft Delete (IsDeleted, DeletedAt) trong ViewModel này.
     }

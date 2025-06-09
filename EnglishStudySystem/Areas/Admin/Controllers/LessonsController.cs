@@ -44,6 +44,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             if (category == null) return RedirectToAction("Index", "Categories");
 
             var viewModel = new LessonCreateViewModel { CategoryId = categoryId.Value };
+            // Không cần gán IsFree ở đây, vì nó đã có giá trị mặc định là false trong ViewModel
             ViewBag.CategoryName = category.Name;
             return View(viewModel);
         }
@@ -63,7 +64,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     Title = viewModel.Title,
                     Description = viewModel.Description,
                     Video_URL = viewModel.Video_URL,
-                    CategoryId = viewModel.CategoryId
+                    CategoryId = viewModel.CategoryId,
+                    // THÊM THUỘC TÍNH ISFREE VÀO ĐÂY
+                    IsFreeTrial = viewModel.IsFree // Gán giá trị từ ViewModel vào Model Entity
                 };
 
                 string currentUserId = User.Identity.GetUserId();
@@ -140,8 +143,8 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 // Lấy danh sách người dùng đã mua khóa học này
                 var paidUsers = await db.Payments
                     .Where(p => p.CategoryId == categoryId &&
-                               p.Status == "Completed" &&
-                               p.PaymentDate <= DateTime.Now)
+                                 p.Status == "Completed" &&
+                                 p.PaymentDate <= DateTime.Now)
                     .Select(p => p.UserId)
                     .Distinct()
                     .ToListAsync();
@@ -153,7 +156,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     {
                         UserId = userId,
                         IsRead = false,
-                        IsDeleted =false,
+                        IsDeleted = false,
                     });
                 }
 
@@ -342,6 +345,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     originalLesson.Description = viewModel.Description;
                     originalLesson.Video_URL = viewModel.Video_URL;
                     originalLesson.CategoryId = viewModel.CategoryId;
+                    originalLesson.IsFreeTrial = viewModel.IsFreeTrial; // Cập nhật thuộc tính IsFreeTrial
 
                     string currentUserId = User.Identity.GetUserId();
                     if (string.IsNullOrEmpty(currentUserId)) { ModelState.AddModelError("", "Người dùng chưa xác thực."); }
@@ -531,8 +535,8 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // Ví dụ:
         // private Lesson FindDatabaseOnly(int id)
         // {
-        //     // Triển khai logic truy vấn bỏ qua filter
-        //     throw new NotImplementedException("Implement logic to find entity bypassing global filters if needed.");
+        //    // Triển khai logic truy vấn bỏ qua filter
+        //    throw new NotImplementedException("Implement logic to find entity bypassing global filters if needed.");
         // }
     }
 }
