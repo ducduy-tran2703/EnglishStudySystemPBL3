@@ -92,9 +92,10 @@
                                     
 
                                     <div class="d-flex gap-2">
-                                        @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
+
                                         @if (ViewBag.CanEdit)
                                         {
+                                            @Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-info" })
                                             @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-sm btn-warning text-white" })
 
                                             using (Html.BeginForm("SoftDelete", "Categories", new { id = item.Id }, FormMethod.Post, new { @class = "d-inline delete-form", id = "deleteForm_" + item.Id }))
@@ -105,7 +106,7 @@
                                                 </button>
                                             }
                                         }
-                                        </div>
+                                    </div>
 
                                    
                                 </td>
