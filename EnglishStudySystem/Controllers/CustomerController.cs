@@ -268,16 +268,16 @@ namespace EnglishStudySystem.Controllers
             {
                 // Lấy danh sách các lần làm bài kiểm tra của user
                 var testAttempts = _context.UserTestAttempts
-                    .Where(uta => uta.UserId == userId)
-                    .Include(uta => uta.Test) // Load Test
-                    .Include(uta => uta.Test.Lesson) // Load Lesson từ Test (EF6 hỗ trợ đường dẫn)
-                    .Include(uta => uta.UserAnswers.Select(ua => ua.Question.Answers)) // Load sâu vào UserAnswers -> Question -> Answers
-                    .OrderByDescending(uta => uta.AttemptDate)
-                    .ToList();
+            .Where(uta => uta.UserId == userId)
+            .Include(uta => uta.Test) // Load Test
+            .Include(uta => uta.Test.Lesson) // Load Lesson từ Test
+            .OrderByDescending(uta => uta.AttemptDate)
+            .ToList();
 
                 // Tạo view model chứa các thông tin cần hiển thị
                 var viewModel = testAttempts.Select(uta => new TestHistoryViewModel
                 {
+                    Id = uta.Id,
                     TestId = uta.TestId,
                     TestTitle = uta.Test?.Title,
                     LessonName = uta.Test?.Lesson?.Title,
@@ -297,10 +297,20 @@ namespace EnglishStudySystem.Controllers
             string currentUserId = User.Identity.GetUserId();
 
             var payments = _context.Payments
-                             .Where(p => p.UserId == currentUserId)
-                             .Include("Category")
-                             .OrderByDescending(p => p.PaymentDate)
-                             .ToList();
+                                 .Where(p => p.UserId == currentUserId)
+                                 .Include("Category")
+                                 .OrderByDescending(p => p.PaymentDate)
+                                 .ToList();
+
+            // Tạo danh sách các CategoryId đã có thanh toán thành công
+            var completedCategoryIds = payments
+                .Where(p => p.Status == "Completed")
+                .Select(p => p.CategoryId)
+                .Distinct()
+                .ToHashSet();
+
+            // Truyền danh sách này qua ViewBag để sử dụng trong View
+            ViewBag.CompletedCategoryIds = completedCategoryIds;
 
             return View(payments);
         }

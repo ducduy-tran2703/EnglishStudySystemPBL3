@@ -28,6 +28,17 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         // Khai báo DbContext để truy vấn dữ liệu
+        private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext _context;
+        private UserManager<ApplicationUser> _userManager;
+        private RoleManager<IdentityRole> _roleManager;
+
+        public CategoriesController()
+        {
+            _context = new ApplicationDbContext();
+            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_context));
+            _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
+        }
         private ApplicationDbContext db;
         private UserManager<ApplicationUser> _userManager;
         public CategoriesController()
@@ -40,6 +51,14 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // GET: Admin/Categories
         public async Task<ActionResult> Index()
         {
+            
+            var user_now = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user_now == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await _userManager.GetRolesAsync(user_now.Id);
+            ViewBag.CanEdit = User.IsInRole("Administrator")||user_now.CanManageCategories;
             // Lấy tất cả các danh mục CHƯA bị xóa mềm
             // Do không có Global Query Filter, chúng ta phải lọc thủ công bằng .Where(c => !c.IsDeleted)
             var activeCategories = await db.Categories
@@ -173,6 +192,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         // GET: Admin/Categories/Details/5
         public async Task<ActionResult> Details(int? id) // Bỏ showDeleted ở đây vì nó được xử lý trong GetLessonsPartial
         {
+            // Kiểm tra ID có được cung cấp không
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);

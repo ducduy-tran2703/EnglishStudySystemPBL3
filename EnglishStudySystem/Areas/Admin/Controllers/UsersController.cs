@@ -13,6 +13,7 @@ using Microsoft.Owin.Logging;
 using System.Security.Claims;
 using System.Net;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
     // Chỉ cho phép người dùng có vai trò "Administrator" truy cập Controller này
@@ -238,16 +239,28 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     UserName = model.UserName,
                     Email = model.Email,
                     FullName = model.FullName,
-                    IsActive = true,
-
+                    IsActive = true,                  
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
+
                     // Gán quyền Editor
                     await _userManager.AddToRoleAsync(user.Id, "Editor");
+                    //string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                    //if (UserManager.EmailService != null)
+                    //{
+                    //    await UserManager.EmailService.SendAsync(new IdentityMessage
+                    //    {
+                    //        Destination = user.Email,
+                    //        Subject = "Xác nhận Email của bạn",
+                    //        Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                    //    });
+                    //}
                     //_context.SaveChanges();
                     // Gửi email thông báo (nếu cần)
                     // await SendEditorAccountEmail(user.Email, model.UserName, model.Password);

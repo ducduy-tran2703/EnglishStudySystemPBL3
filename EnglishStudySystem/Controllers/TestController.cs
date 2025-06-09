@@ -176,8 +176,9 @@ namespace EnglishStudySystem.Controllers
             {
                 return HttpNotFound();
             }
+            var lesson = db.Lessons.Include(l => l.Category).FirstOrDefault(l => l.Id == attempt.Test.LessonId);
             var test = db.Tests.Include(t => t.Questions).FirstOrDefault(t => t.Id == id);
-            if (!test.Lesson.IsFreeTrial)
+            if (!lesson.IsFreeTrial)
             {
                 // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
                 bool hasPurchased = db.Payments.Any(p =>

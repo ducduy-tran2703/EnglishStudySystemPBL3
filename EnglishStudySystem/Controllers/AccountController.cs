@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using EnglishStudySystem.Models;
+using System.Resources;
 
 namespace EnglishStudySystem.Controllers
 {
@@ -75,13 +76,6 @@ namespace EnglishStudySystem.Controllers
             {
                 return RedirectToAction("HomePage", "Home");
             }
-            var categories = _context.Categories
-                .Where(c => !c.IsDeleted)
-                .OrderByDescending(c => c.CreatedDate)
-                .Take(6)
-                .ToList();
-            ViewBag.ListCategories = categories;
-
             // --- LOGIC XÁC ĐỊNH FINAL RETURNURL ---
             string finalReturnUrl;
 
@@ -150,14 +144,6 @@ namespace EnglishStudySystem.Controllers
         public async Task<ActionResult> Login(LoginViewModel model)
         {
 
-            // Giữ lại việc lấy categories nếu View cần hiển thị chúng khi validation thất bại
-            var categories = _context.Categories
-            .Where(c => !c.IsDeleted)
-            .OrderByDescending(c => c.CreatedDate)
-            .Take(6)
-            .ToList();
-            ViewBag.ListCategories = categories;
-
 
             if (!ModelState.IsValid)
             {
@@ -178,6 +164,31 @@ namespace EnglishStudySystem.Controllers
                     // Để lấy ID ngay đây, bạn có thể lấy từ user object: user.Id
                     if (user != null)
                     {
+                        if (!user.EmailConfirmed)
+                        {
+                            // Nếu email chưa được xác nhận, đăng xuất và thông báo lỗi
+                            string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                            if (UserManager.EmailService != null)
+                            {
+                                await UserManager.EmailService.SendAsync(new IdentityMessage
+                                {
+                                    Destination = user.Email,
+                                    Subject = "Xác nhận Email của bạn",
+                                    Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                                });
+                            }
+                            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                            ModelState.AddModelError("", "Email chưa được xác nhận. Vui lòng kiểm tra hộp thư của bạn.");
+                            return View(model);
+                        }
+                        if (!user.IsActive)
+                        {
+                            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                            ModelState.AddModelError("", "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên thông qua email:Noobita.vn@gmail.");
+                            return View(model);
+                        }
                         Session["ID"] = user.Id; // Lấy ID từ user object
                         Session["FullName"] = user.FullName;
 
@@ -275,14 +286,18 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            var categories = _context.Categories
-     .Where(c => !c.IsDeleted)
-     .OrderByDescending(c => c.CreatedDate)
-     .Take(6)
-     .ToList();
-            ViewBag.ListCategories = categories;
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
+            if (TempData["ConfirmMessage"] != null)
+            {
+                ViewBag.Message = TempData["ConfirmMessage"];
+            }
             return View();
         }
+
 
         //
         // POST: /Account/Register
@@ -291,6 +306,11 @@ namespace EnglishStudySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -304,45 +324,41 @@ namespace EnglishStudySystem.Controllers
                     AccountStatus = UserAccountStatus.Normal,
                     EmailConfirmed = false
                 };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                     await UserManager.AddToRoleAsync(user.Id, "Customer");
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
+
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // Send the email with the confirmation link
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
                     if (UserManager.EmailService != null)
                     {
+                        var expirationTime = DateTime.Now.Add(ApplicationUserManager.PasswordResetTokenLifespan);
+                        string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")}";
                         await UserManager.EmailService.SendAsync(new IdentityMessage
                         {
+
                             Destination = user.Email,
                             Subject = "Xác nhận Email của bạn",
-                            Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>"
+                            Body = "Vui lòng xác nhận tài khoản của bạn bằng cách nhấp vào liên kết này: <a href=\"" + callbackUrl + "\">liên kết xác nhận</a>" + "<br/>" + expirationMessage
                         });
                     }
-                    else
-                    {
-                        // Handle case where EmailService is not configured
-                        ViewBag.ErrorMessage = "Dịch vụ gửi Email chưa được cấu hình. Không thể gửi Email xác nhận.";
-                        // Optionally log the error
-                        // Redirect to an error page or back to registration with an error message
-                        return View("Error"); // Cần có View Error.cshtml
-                    }
-                    
-                    // Redirect to a page informing the user to check their email
-                    return RedirectToAction("RegisterConfirmation", new { email = user.Email });
 
+                    // Gửi thông báo về lại view
+                    ViewBag.Message = "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.";
+                    ModelState.Clear(); // Xóa form
+                    return View();
                 }
+
                 AddErrors(result);
             }
 
-            // If we got this far, something failed, redisplay form
+            // Có lỗi → hiển thị lại form
             return View(model);
         }
+
 
         // GET: /Account/RegisterConfirmation
         [AllowAnonymous]
@@ -359,37 +375,28 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (userId == null || code == null)
             {
-                ViewBag.ErrorMessage = "Liên kết xác nhận không hợp lệ.";
                 return View("Error");
             }
-            // Find the user by ID
-            var user = await UserManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                ViewBag.ErrorMessage = $"Người dùng với ID '{userId}' không tồn tại.";
-                return View("Error"); // Display an error view
-            }
-            // Confirm the email
+
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             if (result.Succeeded)
             {
-                // Email confirmed successfully!
-                // You can redirect to a success page or the login page.
-                 ViewBag.StatusMessage = "Cảm ơn bạn đã xác nhận Email của mình!"; // Message for a confirmation view
-               // return RedirectToAction("ConfirmEmailConfirmation"); // Redirect to a success view
-                 
-                 return RedirectToAction("Login"); // Alternatively, redirect to login page
+                // Đưa thông báo vào TempData để hiển thị lại tại Register view
+                TempData["ConfirmSuccess"] = true;
+                TempData["ConfirmMessage"] = "Tài khoản của bạn đã được xác nhận thành công!";
+                return RedirectToAction("Register");
             }
-            else
-            {
-                // Handle confirmation failure (e.g., invalid token, user not found, token expired)
-                AddErrors(result); // Display specific errors from IdentityResult
-                ViewBag.ErrorMessage = "Lỗi xác nhận Email.";
-                return View("Error"); // Display an error view
-            }
+
+            return View("Error");
         }
+
 
         //
         // GET: /Account/ConfirmEmailConfirmation
@@ -404,12 +411,11 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
-            var categories = _context.Categories
-            .Where(c => !c.IsDeleted)
-            .OrderByDescending(c => c.CreatedDate)
-            .Take(6)
-            .ToList();
-            ViewBag.ListCategories = categories;
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             return View();
         }
 
@@ -420,13 +426,18 @@ namespace EnglishStudySystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null )
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    ViewBag.Message = "Kiểm tra Gmail của bạn để cập nhật mật khẩu mới.";
+                    return View(model);
                 }
 
                 if (!(await UserManager.IsEmailConfirmedAsync(user.Id)))
@@ -446,9 +457,12 @@ namespace EnglishStudySystem.Controllers
                 else
                 {
                     string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                    var callbackUrl = Url.Action("ResetPassword", "Account", new {code = code,email = model.Email }, protocol: Request.Url.Scheme);
+                    var expirationTime = DateTime.Now.Add(ApplicationUserManager.PasswordResetTokenLifespan);
+                    string expirationMessage = $"Mã này sẽ hết hạn vào lúc {expirationTime.ToString("HH:mm:ss dd/MM/yyyy")}";
+                    await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>" + "<br/>" + expirationMessage);
+                    ViewBag.Message = "Kiểm tra Gmail của bạn để cập nhật mật khẩu mới.";
+                    return View(model);
                 }
             }
 
@@ -461,42 +475,95 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             return View();
         }
 
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
-        public ActionResult ResetPassword(string code)
+        public async Task<ActionResult> ResetPassword(string code, string email)
         {
-            return code == null ? View("Error") : View();
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
+            if (code == null || email == null)
+            {
+                ViewBag.ErrorMessage = "Liên kết đặt lại mật khẩu không hợp lệ.";
+                return View("Error");
+            }
+
+            var user = await UserManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Vẫn không tiết lộ rằng người dùng không tồn tại vì lý do bảo mật.
+                ViewBag.ErrorMessage = "Người dùng không tồn tại hoặc liên kết không hợp lệ.";
+                return View("Error");
+            }
+            var isTokenValid = await UserManager.VerifyUserTokenAsync(user.Id, "ResetPassword", code);
+
+            if (!isTokenValid)
+            {
+                ViewBag.ErrorMessage = "Mã đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu một mã mới.";
+                return View("Error");
+            }
+            var model = new ResetPasswordViewModel
+            {
+                Code = code,
+                Email = email
+            };
+            
+
+            // Kiểm tra TempData cho thông báo thành công (sau khi POST thành công)
+            if (TempData["ResetPasswordSuccess"] != null && (bool)TempData["ResetPasswordSuccess"])
+            {
+                ViewBag.ResetPasswordSuccess = true;
+            }
+
+            return View(model);
         }
 
-        //
         // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Người dùng đã đăng nhập -> chuyển hướng
+                return RedirectToAction("HomePage", "Home");
+            }
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
+
             var user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                // Don't reveal that the user does not exist
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                // Không tiết lộ, giả vờ thành công
+                ViewBag.ResetPasswordSuccess = true;
+                return View(model);
             }
+
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                ViewBag.ResetPasswordSuccess = true; // Thông báo thành công
+                return View(model); // KHÔNG Redirect nữa
             }
-            AddErrors(result);
-            return View();
+
+            AddErrors(result); // Nếu lỗi thì hiển thị lại form
+            return View(model);
         }
+
 
         //
         // GET: /Account/ResetPasswordConfirmation
@@ -675,7 +742,22 @@ namespace EnglishStudySystem.Controllers
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error);
+                // Kiểm tra lỗi liên quan đến email
+                if (error.ToLower().Contains("email"))
+                {
+                    ModelState.AddModelError("Email", "Email đã được sử dụng");
+                }
+                // Kiểm tra lỗi liên quan đến tên đăng nhập (dựa trên thông báo "Name ... is already taken.")
+                else if (error.ToLower().Contains("already taken") && error.ToLower().Contains("name"))
+                {
+                    // Thay đổi thông báo lỗi cho tên đăng nhập
+                    ModelState.AddModelError("UserName", "Tên đăng nhập đã tồn tại");
+                }
+                // Xử lý các lỗi khác
+                else
+                {
+                    ModelState.AddModelError("", error); // Giữ nguyên thông báo lỗi gốc cho các lỗi khác
+                }
             }
         }
 

@@ -77,10 +77,12 @@ namespace EnglishStudySystem.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "{0} phải dài ít nhất {2} ký tự.", MinimumLength = 6)]
+        [Required(ErrorMessage = "Mật khẩu không được để trống")]
+        [StringLength(100, ErrorMessage = "{0} phải có ít nhất {2} ký tự.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
+        // Quy tắc: Ít nhất 1 ký tự đặc biệt, ít nhất 1 số, và ít nhất 1 chữ cái viết hoa và 1 chữ cái viết thường
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$", ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
@@ -101,9 +103,11 @@ namespace EnglishStudySystem.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)] // Định dạng hiển thị
         public DateTime? DateOfBirth { get; set; } // Dùng DateTime? để có thể là null nếu không bắt buộc hoặc để kiểm tra input
 
-        [Phone] // Đảm bảo định dạng số điện thoại hợp lệ (không bắt buộc kiểm tra theo regex nếu không yêu cầu)
+        [Required(ErrorMessage = "Số điện thoại không được để trống")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         [Display(Name = "Số điện thoại")]
-        [StringLength(20, ErrorMessage = "Số điện thoại không được vượt quá 20 ký tự.")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Số điện thoại phải có đúng 10 ký tự.")]
+        [RegularExpression("^[0-9]*$", ErrorMessage = "Số điện thoại chỉ được chứa ký tự số.")]
         public string PhoneNumber { get; set; }
 
         public string ReturnUrl { get; set; }
@@ -116,15 +120,17 @@ namespace EnglishStudySystem.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [Required(ErrorMessage = "Mật khẩu không được để trống")]
+        [StringLength(100, ErrorMessage = "{0} phải có ít nhất {2} ký tự.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Mật khẩu")]
+        // Quy tắc: Ít nhất 1 ký tự đặc biệt, ít nhất 1 số, và ít nhất 1 chữ cái viết hoa và 1 chữ cái viết thường
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$", ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Xác nhận mật khẩu")]
+        [Compare("Password", ErrorMessage = "Mật khẩu và mật khẩu xác nhận không khớp.")]
         public string ConfirmPassword { get; set; }
 
         public string Code { get; set; }

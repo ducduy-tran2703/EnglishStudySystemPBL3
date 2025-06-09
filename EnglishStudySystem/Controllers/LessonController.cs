@@ -1,9 +1,11 @@
 ﻿using EnglishStudySystem.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace EnglishStudySystem.Controllers
@@ -11,16 +13,19 @@ namespace EnglishStudySystem.Controllers
     public class LessonController : Controller
     {
         private ApplicationDbContext _db = new ApplicationDbContext();
+
         [HttpGet]
         public ActionResult Details(int id)
         {
-            var currentUserId = User.Identity.GetUserId(); // Lấy ID người dùng hiện tại
-            ViewBag.UserId = currentUserId; // Truyền vào ViewBag
+            var currentUserId = User.Identity.GetUserId();
+            ViewBag.UserId = currentUserId;
+
             var lesson = _db.Lessons
-            .Include(l => l.Category)
-            .Include(l => l.Comments.Select(c => c.User))
-            .Include(l => l.Comments.Select(c => c.Replies)) // Thêm dòng này
-            .FirstOrDefault(l => l.Id == id);
+                .Include(l => l.Category)
+                .Include(l => l.Comments.Select(c => c.User))
+                .Include(l => l.Comments.Select(c => c.Replies))
+                .FirstOrDefault(l => l.Id == id);
+
             if (lesson != null)
             {
                 // Lấy thông tin người tạo
@@ -34,25 +39,36 @@ namespace EnglishStudySystem.Controllers
                     ViewBag.UpdaterName = updater?.FullName ?? "Không xác định";
                 }
             }
+
             var userId = User.Identity.GetUserId();
             if (lesson == null)
             {
                 return HttpNotFound();
             }
-            if (lesson.IsFreeTrial==false)
+
+            if (lesson.IsFreeTrial == false)
             {
                 // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
                 bool hasPurchased = _db.Payments.Any(p =>
-                p.UserId == userId &&
+                    p.UserId == userId &&
                     p.CategoryId == lesson.CategoryId &&
                     p.Status == "Completed" &&
                     p.PaymentDate <= DateTime.Now);
 
-                if (!hasPurchased)
+                bool CanView;
+                if (User.IsInRole("Administrator") || User.IsInRole("Editor"))
+                    CanView = true;
+                else
+                    CanView = false;
+
+                ViewBag.CanView = CanView;
+
+                if (!hasPurchased && !CanView)
                 {
                     return RedirectToAction("AccessDenied", "Error", new { message = "Bạn cần mua khóa học để xem bài học này" });
                 }
             }
+
             if (User.Identity.IsAuthenticated)
             {
                 var existingHistory = _db.LessonHistories
@@ -60,7 +76,6 @@ namespace EnglishStudySystem.Controllers
 
                 if (existingHistory == null)
                 {
-                    // Nếu chưa có trong lịch sử thì thêm mới
                     _db.LessonHistories.Add(new LessonHistory
                     {
                         LessonId = id,
@@ -70,7 +85,6 @@ namespace EnglishStudySystem.Controllers
                 }
                 else
                 {
-                    // Nếu đã có thì cập nhật thời gian xem
                     existingHistory.ViewDate = DateTime.Now;
                 }
 
@@ -78,7 +92,6 @@ namespace EnglishStudySystem.Controllers
             }
 
             var isSaved = false;
-
             if (!string.IsNullOrEmpty(userId))
             {
                 isSaved = _db.SavedLessons.Any(s => s.LessonId == id && s.UserId == userId);
@@ -90,11 +103,38 @@ namespace EnglishStudySystem.Controllers
                 .Take(5)
                 .ToList();
 
-               ViewBag.Comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
+            var comments = lesson.Comments.Where(c => !c.IsDeleted).OrderByDescending(c => c.CreatedDate).ToList();
+
+            // Tạo dictionary chứa thông tin role của từng user
+            var userIds = comments.Select(c => c.UserId).Distinct().ToList();
+            var userRoles = new Dictionary<string, string>();
+            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_db));
+
+            foreach (var uId in userIds)
+            {
+                var roles = userManager.GetRoles(uId);
+
+                if (roles.Contains("Administrator"))
+                {
+                    userRoles[uId] = "Administrator";
+                }
+                else if (roles.Contains("Editor"))
+                {
+                    userRoles[uId] = "Editor";
+                }
+                else
+                {
+                    userRoles[uId] = "Student";
+                }
+            }
+
+            ViewBag.UserRoles = userRoles;
+            ViewBag.Comments = comments;
+
             var lessonTests = _db.Tests
-    .Where(t => t.LessonId == id && !t.IsDeleted)
-    .OrderBy(t => t.CreatedDate)
-    .ToList();
+                .Where(t => t.LessonId == id && !t.IsDeleted)
+                .OrderBy(t => t.CreatedDate)
+                .ToList();
 
             ViewBag.LessonTests = lessonTests;
             ViewBag.IsSaved = isSaved;
@@ -102,6 +142,7 @@ namespace EnglishStudySystem.Controllers
 
             return View(lesson);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -162,8 +203,8 @@ namespace EnglishStudySystem.Controllers
                     RelatedEntityType = "CommentReply",
                     TargetController = "Lesson",
                     TargetAction = "Details",
-                    PrimaryRelatedEntityId = parentComment.LessonId, // ID bài học
-                    SecondaryRelatedEntityId = parentComment.Id // ID comment gốc (để scroll tới)
+                    PrimaryRelatedEntityId = parentComment.LessonId,
+                    SecondaryRelatedEntityId = parentComment.Id
                 };
 
                 _db.Notifications.Add(notification);
@@ -172,7 +213,7 @@ namespace EnglishStudySystem.Controllers
                 // Tạo UserNotification liên kết
                 var userNotification = new UserNotification
                 {
-                    UserId = parentComment.UserId, // Người nhận là tác giả comment gốc
+                    UserId = parentComment.UserId,
                     NotificationId = notification.Id,
                     IsRead = false,
                     IsDeleted = false
@@ -230,7 +271,6 @@ namespace EnglishStudySystem.Controllers
 
                 if (savedLesson == null)
                 {
-                    // Thêm vào danh sách đã lưu
                     _db.SavedLessons.Add(new SavedLesson
                     {
                         LessonId = lessonId,
@@ -240,7 +280,6 @@ namespace EnglishStudySystem.Controllers
                 }
                 else
                 {
-                    // Xóa khỏi danh sách đã lưu
                     _db.SavedLessons.Remove(savedLesson);
                 }
 

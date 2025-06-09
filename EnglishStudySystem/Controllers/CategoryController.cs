@@ -23,6 +23,10 @@ namespace EnglishStudySystem.Controllers
         // In CategoryController.cs (no changes needed, your existing code is fine)
         public ActionResult Details(int id)
         {
+            if (User.IsInRole("Administrator") || User.IsInRole("Editor"))           
+                ViewBag.CanView = true;         
+            else
+                ViewBag.CanView = false;
             var category = _context.Categories
                 .FirstOrDefault(c => c.Id == id && !c.IsDeleted);
 

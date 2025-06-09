@@ -15,6 +15,7 @@
     <!-- Thêm jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="border: 3px solid #28a745; border-radius: 5px;">
@@ -66,47 +67,48 @@
                         @Html.Action("NotificationBell", "Notification")
                     </div>
 
-                <!-- User Profile Dropdown -->
-                <div class="dropdown" data-bs-toggle="tooltip" title="Người dùng">
-                    <a class="nav-link" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle fs-4"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")">Thông tin cá nhân</a></li>
-                        <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")">Đổi mật khẩu</a></li>
-                        <li><a class="dropdown-item" href="@Url.Action("PaymentHistory", "Customer")">Lịch sử giao dịch</a></li>
-                        <li>
-                            @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
-                            {
-                                @Html.AntiForgeryToken()
-                                <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">
-                                    Đăng xuất
-                                </a>
-                            }
-                        </li>
-                    </ul>
+                    <!-- User Profile Dropdown -->
+                    <div class="dropdown" data-bs-toggle="tooltip" title="Người dùng">
+                        <a class="nav-link" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle fs-4"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="@Url.Action("DetailUser", "Customer")">Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Manage")">Đổi mật khẩu</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("PaymentHistory", "Customer")">Lịch sử giao dịch</a></li>
+                            <li>
+                                @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">
+                                        Đăng xuất
+                                    </a>
+                                }
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
-</header>
-    <body>
-        @RenderBody()
+        </nav>
+    </header>
 
-        <!-- Load các script ở cuối body -->
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        @RenderSection("scripts", required: false)
-        @RenderSection("Styles", required: false)
-        <script>
-            // Activate tooltips
-            $(document).ready(function () {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                });
+
+    @RenderBody()
+
+    <!-- Load các script ở cuối body -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("scripts", required: false)
+    @RenderSection("Styles", required: false)
+    <script>
+        // Activate tooltips
+        $(document).ready(function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>

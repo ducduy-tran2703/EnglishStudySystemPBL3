@@ -7,3 +7,16 @@
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
 
+@* **THÊM CÁC DÒNG SAU VÀO ĐÂY** *@
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Lỗi:</strong> @ViewBag.ErrorMessage
+    </div>
+}
+@* **KẾT THÚC BỔ SUNG** *@
+
+<p>
+    Vui lòng thử lại hoặc liên hệ quản trị viên nếu sự cố vẫn tiếp diễn.
+</p>
+

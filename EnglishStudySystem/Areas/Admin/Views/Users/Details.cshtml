@@ -69,10 +69,18 @@
                             @(Model.IsActive ? "Đã kích hoạt" : "Chưa kích hoạt / Bị khóa")
                         </span>
                     </div>
-                    <div class="col-lg-6 mb-3">
-                        <strong class="text-muted d-block mb-1"><i class="fas fa-shield-alt me-2"></i>Trạng thái tài khoản:</strong>
-                        <span class="badge bg-light text-dark border p-2 rounded-pill">@Model.AccountStatus.ToString()</span>
-                    </div>
+                    @if (Model.Roles.Contains("Editor") || Model.Roles.Contains("Admin"))
+                    {
+                        <div class="col-lg-6 mb-3">
+                            <strong class="text-muted d-block mb-1"><i class="fas fa-shield-alt me-2"></i>Trạng thái tài khoản:</strong>
+                            <span class="badge @(Model.CanManageCategories ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
+                                @(Model.CanManageCategories || Model.Roles.Contains("Admin") ? "Được phép quản lý danh mục" : "Bị khóa quản lý doanh mục")
+                            </span>
+                            <span class="badge @(Model.CanManageUsers ? "badge-success-light" : "badge-secondary-light") p-2 rounded-pill">
+                                @(Model.CanManageUsers || Model.Roles.Contains("Admin") ? "Được phép quản lý người dùng" : "Bị khóa quản lý người dùng")
+                            </span>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -136,10 +144,10 @@
                                 <thead class="thead-light">
                                     <tr>
                                         <th style="width: 30%;">Tên khóa học</th>
-                                        <th style="width: 30%;">Mô tả</th>
+                                        <th style="width: 40%;">Mô tả</th>
                                         <th style="width: 15%;" class="text-end">Giá</th>
                                         <th style="width: 15%;" class="text-center">Ngày tạo</th>
-                                        <th style="width: 10%;" class="text-center">Trạng thái</th>
+                                       
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -151,8 +159,7 @@
                                             </td>
                                             <td><small class="text-muted">@(category.Description != null && category.Description.Length > 70 ? category.Description.Substring(0, 70) + "..." : category.Description)</small></td>
                                             <td class="text-end font-weight-bold">@category.Price$</td>
-                                            <td class="text-center"><small>@category.CreatedDate.ToString("dd/MM/yyyy")</small></td>
-                                            
+                                            <td class="text-center"><small>@category.CreatedDate.ToString("dd/MM/yyyy")</small></td>                              
                                         </tr>
                                     }
                                 </tbody>
