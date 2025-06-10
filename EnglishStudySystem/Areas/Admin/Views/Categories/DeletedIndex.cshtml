@@ -29,7 +29,7 @@
                     </thead>
                     <tbody>
                         @{
-                            // Lấy dictionary chứa tên người dùng từ ViewBag
+                            
                             var userNames = ViewBag.UserNames as Dictionary<string, string>;
                             if (userNames == null) // Đảm bảo không null
                             {
@@ -305,8 +305,6 @@
         .modal.show .modal-dialog {
             transform: translateY(0);
         }
-
-        /* Custom modal styling */
         .modal-content {
             border-radius: 15px;
             overflow: hidden;
@@ -326,20 +324,19 @@
             background-color: #f8f9fa;
         }
 
-        /* Button hover effects */
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             transition: all 0.2s ease;
         }
 
-        /* Backdrop blur effect */
+
         .modal-backdrop.show {
             backdrop-filter: blur(3px);
             background-color: rgba(0,0,0,0.6);
         }
 
-        /* Special styling for hard delete modal */
         #hardDeleteConfirmModal .modal-content {
             border: 2px solid #e74c3c;
         }
@@ -350,7 +347,6 @@
             color: #c0392b;
         }
 
-        /* Pulse animation for dangerous action */
         .btn-danger:hover {
             animation: pulse-danger 1s infinite;
         }
@@ -376,7 +372,6 @@
         $(document).ready(function () {
             let currentFormId = null;
 
-            // Xử lý click nút khôi phục
             $('.restore-btn').click(function () {
                 currentFormId = $(this).data('form-id');
                 const categoryName = $(this).data('category-name');
@@ -385,7 +380,6 @@
                 $('#restoreConfirmModal').modal('show');
             });
 
-            // Xử lý click nút xóa vĩnh viễn
             $('.hard-delete-btn').click(function () {
                 currentFormId = $(this).data('form-id');
                 const categoryName = $(this).data('category-name');
@@ -394,21 +388,18 @@
                 $('#hardDeleteConfirmModal').modal('show');
             });
 
-            // Xử lý xác nhận khôi phục
             $('#confirmRestoreBtn').click(function () {
                 if (currentFormId) {
                     $('#' + currentFormId).submit();
                 }
             });
 
-            // Xử lý xác nhận xóa vĩnh viễn
             $('#confirmHardDeleteBtn').click(function () {
                 if (currentFormId) {
                     $('#' + currentFormId).submit();
                 }
             });
 
-            // Reset khi đóng modal
             $('.modal').on('hidden.bs.modal', function () {
                 currentFormId = null;
             });

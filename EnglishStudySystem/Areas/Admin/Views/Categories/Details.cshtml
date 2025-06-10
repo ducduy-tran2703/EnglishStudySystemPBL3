@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "Chi tiết Danh mục";
-    // Xác định trạng thái ban đầu: nếu danh mục bị xóa thì hiển thị bài học đã xóa
     var initialShowDeletedLessons = Model.IsDeleted;
 }
 
@@ -161,8 +160,6 @@
             // Hàm để tải Partial View
             function loadLessonsPartial(showDeleted) {
                 var categoryId = @Model.Id;
-                // Đảm bảo URL này gọi đến Action "GetLessonsPartial" trong "CategoriesController"
-                // và nằm trong Area "Admin"
                 var url = '@Url.Action("GetLessonsPartial", "Categories", new { area = "Admin" })';
 
                 $.ajax({
@@ -181,7 +178,6 @@
                 });
             }
 
-            // Hàm cập nhật tiêu đề danh sách bài học
             function updateLessonListHeader(showDeleted) {
                 if (showDeleted) {
                     $('#lessonListHeader').text('Danh sách Bài học đã xóa');
@@ -189,17 +185,14 @@
                     $('#lessonListHeader').text('Danh sách Bài học');
                 }
             }
-
-            // Hàm cập nhật các nút hành động trên header của danh sách bài học
             function updateLessonListActions(showDeleted) {
                 var actionsHtml = '';
                 var categoryId = @Model.Id;
-                var isCategoryDeleted = @Model.IsDeleted.ToString().ToLower(); // Chuyển đổi C# bool sang JS bool
+                var isCategoryDeleted = @Model.IsDeleted.ToString().ToLower();
 
                 if (showDeleted) {
                     actionsHtml += '<button type="button" class="btn btn-primary btn-sm me-2" id="btnShowActiveLessons"><i class="fas fa-list me-1"></i> Danh sách Bài học</button>';
                 } else {
-                    // Chỉ hiển thị nút "Thêm mới Bài học" nếu danh mục không bị xóa
                     if (!isCategoryDeleted) {
                         actionsHtml += '<a href="@Url.Action("Create", "Lessons", new { area = "Admin", categoryId = Model.Id })" class="btn btn-success btn-sm me-2"><i class="fas fa-plus me-1"></i> Thêm mới Bài học</a>';
                     }
@@ -216,15 +209,8 @@
                 });
             }
 
-            // Tải danh sách bài học ban đầu khi trang load
-            // Nếu danh mục bị xóa, mặc định hiển thị bài học đã xóa
-            // Giá trị của initialShowDeletedLessons được lấy từ Model.IsDeleted ở phía Razor.
             loadLessonsPartial(@initialShowDeletedLessons.ToString().ToLower());
 
-            // --------------------------------------------------------------------------------------
-            // ĐOẠN JAVASCRIPT XỬ LÝ CÁC NÚT HÀNH ĐỘNG CỦA LESSON
-            // Nó sẽ lắng nghe sự kiện trên toàn bộ document, đảm bảo hoạt động với các phần tử mới tải
-            // --------------------------------------------------------------------------------------
 
             $(document).on('click', '.btn-lesson-action-ajax', function (e) {
                 e.preventDefault(); // Ngăn chặn hành vi mặc định của form/link
@@ -233,9 +219,9 @@
                 var lessonId = button.data('id');
                 var actionUrl = button.data('action-url');
                 var confirmMessage = button.data('confirm-message');
-                var successTitle = button.data('success-title') || 'Thành công!'; // Tiêu đề mặc định
-                var errorTitle = button.data('error-title') || 'Thất bại!'; // Tiêu đề mặc định
-                var antiForgeryToken = $('input[name="__RequestVerificationToken"]').val(); // Lấy token từ trang chính
+                var successTitle = button.data('success-title') || 'Thành công!'; 
+                var errorTitle = button.data('error-title') || 'Thất bại!'; 
+                var antiForgeryToken = $('input[name="__RequestVerificationToken"]').val(); 
 
                 Swal.fire({
                     title: 'Bạn có chắc chắn?',
@@ -262,7 +248,6 @@
                                         response.message,
                                         'success'
                                     );
-                                    // Sau khi thao tác thành công, tải lại Partial View với trạng thái hiện tại
                                     var currentShowDeleted = $('#lessonListHeader').text().includes('đã xóa');
                                     loadLessonsPartial(currentShowDeleted);
                                 } else {
@@ -285,10 +270,7 @@
                     }
                 });
             });
-
-            // --------------------------------------------------------------------------------------
-            // KẾT THÚC ĐOẠN JAVASCRIPT ĐƯỢC THÊM VÀO
-            // --------------------------------------------------------------------------------------
+\
 
         });
     </script>

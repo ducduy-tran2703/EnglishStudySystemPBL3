@@ -47,17 +47,14 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                                            .OrderBy(c => c.Name) 
                                            .ToListAsync(); 
 
-            // --- BẮT ĐẦU PHẦN THÊM VÀO ĐỂ LẤY TÊN ĐẦY ĐỦ CỦA NGƯỜI TẠO ---
 
             var createdByUserIds = activeCategories.Select(c => c.CreatedByUserId)
                                                    .Where(id => id != null) 
                                                    .Distinct()
                                                    .ToList();
 
-            // Khởi tạo Dictionary để lưu trữ FullName của người dùng
             var userNames = new Dictionary<string, string>();
 
-            // Nếu có User ID, truy vấn FullName của họ từ bảng Users
             if (createdByUserIds.Any())
             {
                 var users = await db.Users
@@ -230,7 +227,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
         public ActionResult Create()
         {
-            // Action này chỉ đơn giản hiển thị form tạo mới
             return View();
         }
 
@@ -253,8 +249,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
                 var currentUserRoles = await userManager.GetRolesAsync(currentUserId);
                 string currentUserRole = currentUserRoles.FirstOrDefault();
-
-                // Gán giá trị vào Entity Model (LÚC NÀY category.CreatedByUserId đã được gán giá trị từ currentUserId)
                 category.CreatedByUserId = currentUserId; // <-- Gán giá trị vào Entity Model
                 category.CreatedByUserRole = currentUserRole ?? "Unknown";
                 category.CreatedDate = DateTime.Now;
@@ -402,17 +396,15 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             if (category == null)
             {
-                return HttpNotFound(); // Không tìm thấy danh mục
+                return HttpNotFound(); 
             }
 
-            // Kiểm tra xem danh mục đã bị xóa mềm chưa để tránh xóa mềm lại
             if (category.IsDeleted)
             {
-                // Có thể chuyển hướng hoặc trả về lỗi nếu danh mục đã xóa mềm
+
                 return RedirectToAction("Index");
             }
 
-            // --- THỰC HIỆN XÓA MỀM TRỰC TIẾP TRONG CONTROLLER ---
             category.IsDeleted = true;
             category.DeletedAt = DateTime.Now;
 
@@ -423,16 +415,15 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             string currentUserRole = (await userManager.GetRolesAsync(currentUserId)).FirstOrDefault();
 
             category.UpdatedByUserId = currentUserId;
-            // category.UpdatedByUserFullName = currentUser?.FullName ?? currentUser?.UserName; // Nếu bạn có trường này
-            category.UpdatedByUserRole = currentUserRole ?? "Unknown";
-            category.UpdatedDate = DateTime.Now; // Ghi nhận thời gian xóa mềm là thời gian cập nhật cuối
 
-            // Đánh dấu entity là Modified để Entity Framework biết cần tạo lệnh UPDATE
+            category.UpdatedByUserRole = currentUserRole ?? "Unknown";
+            category.UpdatedDate = DateTime.Now; 
+
             db.Entry(category).State = EntityState.Modified;
 
-            await db.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
+            await db.SaveChangesAsync(); 
 
-            return RedirectToAction("Index"); // Chuyển hướng về trang danh sách chính
+            return RedirectToAction("Index"); 
         }
         [HttpPost, ActionName("Restore")]
         [ValidateAntiForgeryToken]
@@ -442,17 +433,14 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             if (category == null)
             {
-                return HttpNotFound(); // Không tìm thấy danh mục
+                return HttpNotFound(); 
             }
 
-            // Chỉ khôi phục nếu danh mục ĐANG bị xóa mềm
             if (!category.IsDeleted)
             {
-                // Nếu không bị xóa mềm, có thể chuyển hướng hoặc hiển thị lỗi
                 return RedirectToAction("Index");
             }
 
-            // --- THỰC HIỆN KHÔI PHỤC TRỰC TIẾP TRONG CONTROLLER ---
             category.IsDeleted = false; 
             category.DeletedAt = null;  
 
@@ -463,14 +451,14 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             category.UpdatedByUserId = currentUserId;
             category.UpdatedByUserRole = currentUserRole ?? "Unknown";
-            category.UpdatedDate = DateTime.Now; // Ghi nhận thời gian khôi phục là thời gian cập nhật cuối
+            category.UpdatedDate = DateTime.Now; 
 
             // Đánh dấu entity là Modified
             db.Entry(category).State = EntityState.Modified;
 
             await db.SaveChangesAsync(); // Lưu thay đổi
 
-            return RedirectToAction("DeletedIndex"); // Chuyển hướng về trang danh sách các danh mục đã xóa
+            return RedirectToAction("DeletedIndex");
         }
 
         [HttpPost, ActionName("HardDelete")]
@@ -482,10 +470,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             if (category == null)
             {
-                return HttpNotFound(); // Không tìm thấy danh mục
+                return HttpNotFound(); 
             }
 
-            // TÙY CHỌN: Chỉ cho phép xóa cứng các bản ghi đã bị xóa mềm
             if (!category.IsDeleted)
             {
 
@@ -494,13 +481,12 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
             db.Categories.Remove(category);
 
-            await db.SaveChangesAsync(); // Lưu thay đổi, thực hiện Hard Delete
+            await db.SaveChangesAsync(); 
 
-            return RedirectToAction("DeletedIndex"); // Chuyển hướng về trang danh sách đã xóa
+            return RedirectToAction("DeletedIndex"); 
         }
 
 
-        // Phương thức Dispose để giải phóng tài nguyên DbContext
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -510,7 +496,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             base.Dispose(disposing);
         }
 
-        // Helper để lấy IAuthenticationManager (cần cho đăng xuất nếu có)
+
         private IAuthenticationManager AuthenticationManager
         {
             get

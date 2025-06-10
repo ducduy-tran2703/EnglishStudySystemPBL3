@@ -25,11 +25,7 @@ namespace EnglishStudySystem.Controllers
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult HomePage(string sortOrder)
         {
-            //if(User.IsInRole("Administrator") || User.IsInRole("Editor"))
-            //{
-            //    return RedirectToAction("Index", "Home", new { area = "Admin" });
-            //}
-            // Truy vấn ban đầu (lọc deleted)
+            
             var categoriesQuery = _context.Categories
                 .Where(c => !c.IsDeleted);
 
@@ -91,16 +87,12 @@ namespace EnglishStudySystem.Controllers
                 .OrderByDescending(c => c.CreatedDate)
                 .Take(6)
                 .ToList();
-
-            // Lấy danh sách userIds từ các categories
             var userIds = categories.Select(c => c.CreatedByUserId).Distinct().ToList();
 
-            // Truy vấn bảng Users để lấy thông tin người dùng
             var users = _context.Users
                 .Where(u => userIds.Contains(u.Id))
                 .ToDictionary(u => u.Id, u => u.FullName);
 
-            // Truyền dữ liệu qua ViewBag
             ViewBag.UserNames = users;
             ViewBag.ListCategories = ViewBagcategories;
             ViewBag.Keyword = keyword;

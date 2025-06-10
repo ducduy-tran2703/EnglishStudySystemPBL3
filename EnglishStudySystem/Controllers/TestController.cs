@@ -73,14 +73,12 @@ namespace EnglishStudySystem.Controllers
         [Authorize]
         public ActionResult TakeTest(int attemptId)
         {
-            // Lấy UserId trước khi thực hiện truy vấn
             string userId = User.Identity.GetUserId();
 
-            // Lấy thông tin attempt
             var attempt = db.UserTestAttempts
                           .Include(a => a.Test)
                           .Include(a => a.Test.Questions.Select(q => q.Answers))
-                          .FirstOrDefault(a => a.Id == attemptId && a.UserId == userId); // Sử dụng biến userId đã lấy trước
+                          .FirstOrDefault(a => a.Id == attemptId && a.UserId == userId); 
 
             if (attempt == null || attempt.IsCompleted)
             {
@@ -113,7 +111,6 @@ namespace EnglishStudySystem.Controllers
             int score = 0;
             int totalQuestions = attempt.Test.Questions.Count;
 
-            // Lưu từng câu trả lời và tính điểm
             foreach (var question in attempt.Test.Questions)
             {
                 string answerKey = "answer_" + question.Id;
@@ -141,15 +138,14 @@ namespace EnglishStudySystem.Controllers
                     {
                         UserTestAttemptId = attempt.Id,
                         QuestionId = question.Id,
-                        SelectedAnswerId = null, // Không chọn đáp án nào
-                        IsCorrect = false // Không đúng vì không trả lời
+                        SelectedAnswerId = null, 
+                        IsCorrect = false 
                     };
                 }
 
                 db.UserAnswers.Add(userAnswer);
             }
 
-            // Cập nhật trạng thái attempt
             attempt.EndTime = DateTime.Now;
             attempt.IsCompleted = true;
             attempt.Score = (int)Math.Round((double)score / totalQuestions * 100);
@@ -160,8 +156,6 @@ namespace EnglishStudySystem.Controllers
             return RedirectToAction("Details", new { id = attempt.Id });
         }
 
-
-        // GET: Test/Details/5 (Xem chi tiết bài kiểm tra)
         [Authorize]
         public ActionResult Details(int id)
         {
@@ -180,7 +174,6 @@ namespace EnglishStudySystem.Controllers
             var test = db.Tests.Include(t => t.Questions).FirstOrDefault(t => t.Id == id);
             if (!lesson.IsFreeTrial)
             {
-                // Kiểm tra xem người dùng đã mua khóa học chứa bài học này chưa
                 bool hasPurchased = db.Payments.Any(p =>
                 p.UserId == userId &&
                     p.CategoryId == lesson.CategoryId &&

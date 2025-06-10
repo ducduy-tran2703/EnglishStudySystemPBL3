@@ -2,7 +2,6 @@
 @model DashboardViewModel
 @{
     ViewBag.Title = "Thống Kê Hệ Thống";
-    //Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml"; // Đảm bảo layout của bạn được kích hoạt
 }
 
 <div class="container-fluid px-4">
@@ -323,8 +322,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     */
     body {
-        font-family: 'Nunito', sans-serif; /* Áp dụng font cho toàn trang */
-        background-color: #f8f9fc; /* Màu nền trang nhạt */
+        font-family: 'Nunito', sans-serif;
+        background-color: #f8f9fc; 
         color: #5a5c69;
     }
 
@@ -340,14 +339,14 @@
 
     /* Card Styles */
     .card {
-        border: none; /* Bỏ border mặc định của card */
-        border-radius: .5rem; /* Bo góc mềm mại hơn */
+        border: none;
+        border-radius: .5rem; 
         margin-bottom: 1.5rem;
-        transition: all 0.3s ease-in-out; /* Hiệu ứng chuyển động mượt mà */
+        transition: all 0.3s ease-in-out;
     }
 
     .info-card:hover {
-        transform: translateY(-5px); /* Hiệu ứng nhấc lên khi hover */
+        transform: translateY(-5px); 
         box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
     }
 
@@ -355,12 +354,12 @@
         background-color: #fff;
         border-bottom: 1px solid #e3e6f0;
         padding: .75rem 1.25rem;
-        font-weight: 600; /* Đậm hơn cho tiêu đề card */
+        font-weight: 600; 
     }
 
     .card-category-title {
-        font-size: .75rem; /* Điều chỉnh kích thước */
-        letter-spacing: .05em; /* Tăng khoảng cách chữ */
+        font-size: .75rem;
+        letter-spacing: .05em; 
     }
 
     .card-icon i {
@@ -369,7 +368,7 @@
     }
 
     .info-card:hover .card-icon i {
-        color: inherit; /* Màu của icon sẽ theo màu của text-primary, text-success,... */
+        color: inherit; 
     }
 
     .border-left-primary .card-icon i {
@@ -393,9 +392,9 @@
     }
 
     .stats-item .stat-value {
-        font-size: 1.75rem; /* Giữ nguyên hoặc điều chỉnh */
+        font-size: 1.75rem; 
         font-weight: 700;
-        color: #3A3B45; /* Đậm hơn một chút */
+        color: #3A3B45; 
     }
 
     .stats-item-detail .detail-title {

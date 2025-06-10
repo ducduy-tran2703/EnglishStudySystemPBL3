@@ -301,11 +301,10 @@ namespace EnglishStudySystem.Controllers
             var userId = User.Identity.GetUserId();
             using (var _context = new ApplicationDbContext())
             {
-                // Lấy danh sách các lần làm bài kiểm tra của user
                 var testAttempts = _context.UserTestAttempts
             .Where(uta => uta.UserId == userId)
-            .Include(uta => uta.Test) // Load Test
-            .Include(uta => uta.Test.Lesson) // Load Lesson từ Test
+            .Include(uta => uta.Test) 
+            .Include(uta => uta.Test.Lesson)
             .OrderByDescending(uta => uta.AttemptDate)
             .ToList();
 
@@ -341,14 +340,13 @@ namespace EnglishStudySystem.Controllers
                                  .OrderByDescending(p => p.PaymentDate)
                                  .ToList();
 
-            // Tạo danh sách các CategoryId đã có thanh toán thành công
+
             var completedCategoryIds = payments
                 .Where(p => p.Status == "Completed")
                 .Select(p => p.CategoryId)
                 .Distinct()
                 .ToHashSet();
 
-            // Truyền danh sách này qua ViewBag để sử dụng trong View
             ViewBag.CompletedCategoryIds = completedCategoryIds;
 
             return View(payments);

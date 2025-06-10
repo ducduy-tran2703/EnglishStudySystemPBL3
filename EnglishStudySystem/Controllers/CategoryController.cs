@@ -20,7 +20,7 @@ namespace EnglishStudySystem.Controllers
         {
             _context = context;
         }
-        // In CategoryController.cs (no changes needed, your existing code is fine)
+
         public ActionResult Details(int id)
         {
             if (User.IsInRole("Administrator") || User.IsInRole("Editor"))           
@@ -35,7 +35,6 @@ namespace EnglishStudySystem.Controllers
                 return HttpNotFound();
             }
 
-            // Sắp xếp bài học: ưu tiên IsFreeTrial = true, sau đó theo CreatedDate
             var lessons = _context.Lessons
                 .Where(l => l.CategoryId == id && !l.IsDeleted)
                 .OrderBy(l => l.CreatedDate)
@@ -57,7 +56,6 @@ namespace EnglishStudySystem.Controllers
                 })
                 .ToList();
 
-            // Kiểm tra người dùng đã mua CHÍNH XÁC category này chưa
             bool daMua = false;
             if (User.Identity.IsAuthenticated)
             {

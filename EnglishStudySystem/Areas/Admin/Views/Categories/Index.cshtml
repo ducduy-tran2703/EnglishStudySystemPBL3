@@ -39,7 +39,6 @@
                     </thead>
                     <tbody>
                         @{
-                            // Lấy dictionary chứa tên người dùng từ ViewBag
                             var userNames = ViewBag.UserNames as Dictionary<string, string>;
                             if (userNames == null) // Đảm bảo không null
                             {
@@ -55,7 +54,6 @@
                                     <div class="small text-muted">
                                         Tạo bởi:
                                         @{
-                                            // Lấy tên người tạo từ CreatedByUserId
                                             var creatorName = !string.IsNullOrEmpty(item.CreatedByUserId) && userNames.ContainsKey(item.CreatedByUserId)
                                                                 ? userNames[item.CreatedByUserId]
                                                                 : "System"; // Mặc định là "System" nếu không tìm thấy

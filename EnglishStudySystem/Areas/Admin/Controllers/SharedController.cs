@@ -44,7 +44,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
                 stats.TotalCourses = _db.Categories.Count(); 
 
-                // Tính tổng lợi nhuận từ các thanh toán đã hoàn thành
                 stats.TotalRevenue = _db.Payments
                                        .Where(p => p.Status == "Completed")
                                        .Sum(p => (decimal?)p.Amount) ?? 0m; 

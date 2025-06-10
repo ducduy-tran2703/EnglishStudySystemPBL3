@@ -93,8 +93,6 @@ namespace EnglishStudySystem.Controllers
             }
             else
             {
-                // 2. Nếu không có returnUrl hợp lệ, thử sử dụng Request.UrlReferrer làm dự phòng
-                // Sử dụng PathAndQuery để chỉ lấy đường dẫn và chuỗi truy vấn (thường tốt hơn full URL)
                 string referrerUrl = Request.UrlReferrer?.PathAndQuery;
 
                 if (!string.IsNullOrEmpty(referrerUrl) && Url.IsLocalUrl(referrerUrl))
@@ -104,13 +102,11 @@ namespace EnglishStudySystem.Controllers
                 }
                 else
                 {
-                    // 3. Nếu cả hai đều không có hoặc không hợp lệ, thiết lập URL mặc định là trang chủ
+
                     finalReturnUrl = Url.Action("HomePage", "Home"); // URL đến trang chủ
                 }
             }
 
-            // --- THỰC HIỆN KIỂM TRA: Nếu URL đã xác định là trang Login hoặc Register, chuyển hướng về trang chủ ---
-            // Lấy URL chuẩn của Action Login và Register (chỉ lấy PathAndQuery)
             string loginUrlPath = Url.Action("Login", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
             string registerUrlPath = Url.Action("Register", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), ""); // Get PathAndQuery
             string forgotUrlPath = Url.Action("ForgotPassword", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
@@ -119,7 +115,6 @@ namespace EnglishStudySystem.Controllers
             string ResetPassword_Path = Url.Action("ResetPassword", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
             string ResetPasswordConfirmation_Path = Url.Action("ResetPasswordConfirmation", "Account", null, Request.Url.Scheme).Replace(Request.Url.GetLeftPart(UriPartial.Authority), "");
 
-            // So sánh finalReturnUrl với loginUrlPath và registerUrlPath (không phân biệt chữ hoa chữ thường)
             if (!string.IsNullOrEmpty(finalReturnUrl) && // Đảm bảo finalReturnUrl không null/empty
                 (finalReturnUrl.Equals(loginUrlPath, StringComparison.OrdinalIgnoreCase) ||
                  finalReturnUrl.Equals(registerUrlPath, StringComparison.OrdinalIgnoreCase) || 
@@ -132,10 +127,7 @@ namespace EnglishStudySystem.Controllers
                 // Nếu URL đích là trang Login hoặc Register, FORCE chuyển hướng về trang chủ
                 finalReturnUrl = Url.Action("HomePage", "Home");
             }
-            // --- KẾT THÚC LOGIC KIỂM TRA ---
 
-            // Chuẩn bị ViewModel cho View Login
-            // Truyền finalReturnUrl đã xử lý vào ViewModel để View có thể đưa vào hidden field
             var model = new LoginViewModel(); // Khởi tạo ViewModel
             model.ReturnUrl = finalReturnUrl; // Gán finalReturnUrl vào thuộc tính ReturnUrl của ViewModel
 
@@ -162,8 +154,6 @@ namespace EnglishStudySystem.Controllers
             }
             if (!ModelState.IsValid)
             {
-                // Nếu model state không hợp lệ, hiển thị lại View
-                // ViewModel model đã chứa ReturnUrl từ hidden field trong form POST
                 return View(model);
             }
 
@@ -175,8 +165,7 @@ namespace EnglishStudySystem.Controllers
                 case SignInStatus.Success:
                     // Lấy thông tin User và lưu vào Session (giữ nguyên logic của bạn)
                     ApplicationUser user = await UserManager.FindByNameAsync(model.UserName);
-                    // Lưu ý: User.Identity.GetUserId() chỉ có giá trị sau khi đăng nhập hoàn tất trong Request tiếp theo.
-                    // Để lấy ID ngay đây, bạn có thể lấy từ user object: user.Id
+                   
                     if (user != null)
                     {
                         if (!user.EmailConfirmed)
@@ -216,21 +205,15 @@ namespace EnglishStudySystem.Controllers
                         // KIỂM TRA VAI TRÒ để quyết định chuyển hướng
                         if (roles.Contains("Administrator") || roles.Contains("Editor"))
                         {
-                            // Nếu là Admin hoặc Editor, chuyển hướng đến Trang chủ Admin Dashboard
-                            // Sử dụng RedirectToAction với area = "Admin"
                             return RedirectToAction("Index", "Home", new { area = "Admin" });
                         }
                         else
                         {
-                            // Nếu là người dùng thường, sử dụng logic ReturnUrl như đã làm
-                            // RedirectToLocal sẽ xử lý việc chuyển về trang trước đó hoặc trang chủ mặc định
                             return RedirectToLocal(model.ReturnUrl);
                         }
                     }
                     else
                     {
-                        // Trường hợp rất hiếm: Đăng nhập thành công nhưng không tìm thấy user object
-                        // Xử lý lỗi hoặc đăng xuất lại
                         AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); // Đảm bảo đăng xuất lại
                         ModelState.AddModelError("", "Đăng nhập thành công nhưng có lỗi khi tải thông tin người dùng.");
                         // Giữ lại model.ReturnUrl khi hiển thị lại View lỗi
@@ -242,16 +225,12 @@ namespace EnglishStudySystem.Controllers
                     return View("Lockout");
 
                 case SignInStatus.RequiresVerification:
-                    // Nếu cần xác thực 2 bước, chuyển hướng đến SendCode
-                    // Truyền model.ReturnUrl để sau khi xác thực 2 bước xong sẽ quay lại đúng trang đích
                     return RedirectToAction("SendCode", new { Provider = "Email", ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
 
                 case SignInStatus.Failure:
                 default:
                     // Đăng nhập thất bại
                     ModelState.AddModelError("", "Invalid login attempt.");
-                    // Hiển thị lại View Login
-                    // ViewModel model đã chứa ReturnUrl từ form POST
                     return View(model);
             }
         }
@@ -260,7 +239,6 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
-            // Require that the user has already logged in via username/password or external login
             if (!await SignInManager.HasBeenVerifiedAsync())
             {
                 return View("Error");
@@ -279,11 +257,6 @@ namespace EnglishStudySystem.Controllers
             {
                 return View(model);
             }
-
-            // The following code protects for brute force attacks against the two factor codes. 
-            // If a user enters incorrect codes for a specified amount of time then the user account 
-            // will be locked out for a specified amount of time. 
-            // You can configure the account lockout settings in IdentityConfig
             var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
@@ -381,8 +354,6 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult RegisterConfirmation(string email)
         {
-            // Simple view to tell the user to check their email
-            // Pass the email to the view if you want to display it
             ViewBag.Email = email;
             return View();
         }
@@ -394,7 +365,6 @@ namespace EnglishStudySystem.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                // Người dùng đã đăng nhập -> chuyển hướng
                 return RedirectToAction("HomePage", "Home");
             }
             if (userId == null || code == null)
@@ -405,7 +375,6 @@ namespace EnglishStudySystem.Controllers
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             if (result.Succeeded)
             {
-                // Đưa thông báo vào TempData để hiển thị lại tại Register view
                 TempData["ConfirmSuccess"] = true;
                 TempData["ConfirmMessage"] = "Tài khoản của bạn đã được xác nhận thành công!";
                 return RedirectToAction("Register");
@@ -420,7 +389,6 @@ namespace EnglishStudySystem.Controllers
         [AllowAnonymous]
         public ActionResult ConfirmEmailConfirmation()
         {
-            // Simple view to display a success message after email is confirmed
             return View();
         }
         //
@@ -436,8 +404,6 @@ namespace EnglishStudySystem.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -464,7 +430,6 @@ namespace EnglishStudySystem.Controllers
                 }
 
                 // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                // Send an email with this link
                 if (UserManager.EmailService == null)
                 {
                     // Xử lý khi EmailService chưa được cấu hình
@@ -483,7 +448,6 @@ namespace EnglishStudySystem.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
@@ -507,7 +471,6 @@ namespace EnglishStudySystem.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                // Người dùng đã đăng nhập -> chuyển hướng
                 return RedirectToAction("HomePage", "Home");
             }
             if (code == null || email == null)
@@ -519,7 +482,6 @@ namespace EnglishStudySystem.Controllers
             var user = await UserManager.FindByEmailAsync(email);
             if (user == null)
             {
-                // Vẫn không tiết lộ rằng người dùng không tồn tại vì lý do bảo mật.
                 ViewBag.ErrorMessage = "Người dùng không tồn tại hoặc liên kết không hợp lệ.";
                 return View("Error");
             }
@@ -535,9 +497,7 @@ namespace EnglishStudySystem.Controllers
                 Code = code,
                 Email = email
             };
-            
-
-            // Kiểm tra TempData cho thông báo thành công (sau khi POST thành công)
+         
             if (TempData["ResetPasswordSuccess"] != null && (bool)TempData["ResetPasswordSuccess"])
             {
                 ViewBag.ResetPasswordSuccess = true;
@@ -554,7 +514,6 @@ namespace EnglishStudySystem.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                // Người dùng đã đăng nhập -> chuyển hướng
                 return RedirectToAction("HomePage", "Home");
             }
             if (!ModelState.IsValid)
@@ -565,7 +524,6 @@ namespace EnglishStudySystem.Controllers
             var user = await UserManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                // Không tiết lộ, giả vờ thành công
                 ViewBag.ResetPasswordSuccess = true;
                 return View(model);
             }
@@ -573,31 +531,26 @@ namespace EnglishStudySystem.Controllers
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
-                ViewBag.ResetPasswordSuccess = true; // Thông báo thành công
-                return View(model); // KHÔNG Redirect nữa
+                ViewBag.ResetPasswordSuccess = true; 
+                return View(model); 
             }
 
-            AddErrors(result); // Nếu lỗi thì hiển thị lại form
+            AddErrors(result); 
             return View(model);
         }
 
-
-        //
-        // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
         }
 
-        //
-        // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public ActionResult ExternalLogin(string provider, string returnUrl)
         {
-            // Request a redirect to the external login provider
+           
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
@@ -659,7 +612,6 @@ namespace EnglishStudySystem.Controllers
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
                 case SignInStatus.Failure:
                 default:
-                    // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
                     return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
@@ -773,7 +725,7 @@ namespace EnglishStudySystem.Controllers
                 // Xử lý các lỗi khác
                 else
                 {
-                    ModelState.AddModelError("", error); // Giữ nguyên thông báo lỗi gốc cho các lỗi khác
+                    ModelState.AddModelError("", error);
                 }
             }
         }
