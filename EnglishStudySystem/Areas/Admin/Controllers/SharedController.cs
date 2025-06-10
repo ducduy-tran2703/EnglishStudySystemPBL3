@@ -42,15 +42,12 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     System.Diagnostics.Debug.WriteLine("WARNING (SharedController): Role 'Editor' not found by name for QuickStats.");
                 }
 
-                // Đếm Khóa học (điều chỉnh nếu tên bảng/model khác)
-                // Giả sử Categories là Khóa học, hoặc bạn có bảng Courses riêng
-                stats.TotalCourses = _db.Categories.Count(); // Hoặc _db.Courses.Count();
+                stats.TotalCourses = _db.Categories.Count(); 
 
                 // Tính tổng lợi nhuận từ các thanh toán đã hoàn thành
                 stats.TotalRevenue = _db.Payments
                                        .Where(p => p.Status == "Completed")
-                                       .Sum(p => (decimal?)p.Amount) ?? 0m; // Nếu Amount có thể null, ?? 0m
-                                                                            // Nếu Amount không thể null, chỉ cần .Sum(p => p.Amount)
+                                       .Sum(p => (decimal?)p.Amount) ?? 0m; 
 
             }
             catch (System.Exception ex)

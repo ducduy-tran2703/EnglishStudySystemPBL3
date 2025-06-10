@@ -34,12 +34,9 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"CRITICAL: Error fetching Role IDs: {ex.Message} \nStackTrace: {ex.StackTrace}");
-                // Nếu không lấy được Role ID, các thống kê liên quan sẽ không chính xác.
-                // Bạn có thể muốn ghi log nghiêm trọng hơn hoặc hiển thị lỗi cho admin.
             }
 
 
-            // Thống kê người dùng
             try
             {
                 // Đếm Customer
@@ -199,11 +196,11 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                         .Select(u => new EditorStatItemViewModel
                         {
                             EditorName = u.UserName,
-                            TotalCategoriesCreated = _db.Categories.Count(c => c.CreatedByUserId == u.Id), // Giả sử Category có CreatedByUserId
+                            TotalCategoriesCreated = _db.Categories.Count(c => c.CreatedByUserId == u.Id), 
                             TotalRevenue = _db.Payments
                                 .Where(p => p.Status == "Completed"
                                          && p.Category != null
-                                         && p.Category.CreatedByUserId == u.Id) // Liên kết qua Category.CreatedByUserId
+                                         && p.Category.CreatedByUserId == u.Id) 
                                 .Sum(p => (decimal?)p.Amount) ?? 0m
                         })
                         .ToList();

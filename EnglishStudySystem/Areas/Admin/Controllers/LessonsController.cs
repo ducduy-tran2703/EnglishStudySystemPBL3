@@ -1,26 +1,23 @@
-﻿// EnglishStudySystem/Areas/Admin/Controllers/LessonsController.cs
-
-using System;
-using System.Data.Entity; // Cần cho DbContext, EntityState, Include, SingleOrDefaultAsync
-using System.Linq; // Cần cho LINQ, Where, Select, ToList
-using System.Net; // Cần cho HttpStatusCodeResult
-using System.Threading.Tasks; // Cần cho async/await
-using System.Web.Mvc; // Cần cho Controller, ActionResult, HttpNotFound, v.v.
-using EnglishStudySystem.Models; // Cần cho ApplicationDbContext, Lesson, Category, Test, etc.
-using EnglishStudySystem.Areas.Admin.ViewModel; // Cần cho các ViewModels mới <-- ĐẢM BẢO USING NÀY
-using Microsoft.AspNet.Identity; // Cần cho User.Identity.GetUserId
-using Microsoft.AspNet.Identity.Owin; // Cần cho UserManager
-using System.Collections.Generic; // Cần cho List
-using System.Data.Entity.Validation; // Cần cho DbEntityValidationException
+﻿using System;
+using System.Data.Entity; 
+using System.Linq; 
+using System.Net; 
+using System.Threading.Tasks; 
+using System.Web.Mvc; 
+using EnglishStudySystem.Models; 
+using EnglishStudySystem.Areas.Admin.ViewModel; 
+using Microsoft.AspNet.Identity; 
+using Microsoft.AspNet.Identity.Owin; 
+using System.Collections.Generic; 
+using System.Data.Entity.Validation; 
 using System.Diagnostics;
 using System.Web;
 using EnglishStudySystem;
-using Microsoft.AspNet.Identity.EntityFramework; // Cần cho Debug.WriteLine
+using Microsoft.AspNet.Identity.EntityFramework; 
 
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
-    // Chỉ cho phép Admin và Editor truy cập Controller này
-    [Authorize(Roles = "Administrator, Editor")] // Đảm bảo Role là "Administrator" nếu đó là tên role Admin
+    [Authorize(Roles = "Administrator, Editor")] 
     public class LessonsController : Controller
     {
         private ApplicationDbContext db;
@@ -28,15 +25,10 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
         public LessonsController()
         {
-            db = new ApplicationDbContext(); // Khởi tạo DbContext
-            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db)); // Lấy UserManager từ OWIN Context
+            db = new ApplicationDbContext(); 
+            _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db)); 
         }
 
-        // --- Actions cho Quản lý Bài học ---
-
-
-
-        // GET: Admin/Lessons/Create?categoryId=5
         public ActionResult Create(int? categoryId)
         {
             if (categoryId == null) return RedirectToAction("Index", "Categories");
@@ -182,10 +174,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            // Lấy Bài học theo ID và NẠP (INCLUDE) các Entity liên quan bằng cú pháp EF6 chuẩn
-            // - Category để hiển thị tên danh mục
-            // - Tests để hiển thị danh sách bài kiểm tra (sẽ nạp TẤT CẢ Tests)
-            // - CreatedByUser và UpdatedByUser (để lấy FullName)
             var lesson = await db.Lessons
                                  .Include(l => l.Category)
                                  .Include(l => l.Tests) // Tải tất cả Tests liên quan
@@ -198,8 +186,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return HttpNotFound();
             }
 
-            // --- Lấy Roles cho người tạo và người cập nhật ---
-            // Chúng ta cần UserManager để lấy roles vì chúng không phải là navigation property trực tiếp
             string createdByUserRole = "N/A";
             if (!string.IsNullOrEmpty(lesson.CreatedByUserId))
             {
@@ -223,33 +209,24 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 Video_URL = lesson.Video_URL,
                 IsFree = lesson.IsFreeTrial,
                 CategoryId = lesson.CategoryId,
-                CategoryName = lesson.Category?.Name, // Lấy tên danh mục từ navigation property
+                CategoryName = lesson.Category?.Name, 
 
                 // Thông tin Người tạo
                 CreatedByUserId = lesson.CreatedByUserId,
-                CreatedByUserFullName = lesson.CreatedByUser?.FullName ?? lesson.CreatedByUser?.UserName ?? "N/A", // Lấy FullName từ navigation property
+                CreatedByUserFullName = lesson.CreatedByUser?.FullName ?? lesson.CreatedByUser?.UserName ?? "N/A", 
                 CreatedByUserRole = createdByUserRole, // Gán vai trò đã lấy
                 CreatedDate = lesson.CreatedDate,
 
                 // Thông tin Người cập nhật (cũng là người xóa)
                 UpdatedByUserId = lesson.UpdatedByUserId,
-                UpdatedByUserFullName = lesson.UpdatedByUser?.FullName ?? lesson.UpdatedByUser?.UserName ?? "N/A", // Lấy FullName từ navigation property
+                UpdatedByUserFullName = lesson.UpdatedByUser?.FullName ?? lesson.UpdatedByUser?.UserName ?? "N/A", 
                 UpdatedByUserRole = updatedByUserRole, // Gán vai trò đã lấy
                 UpdatedDate = lesson.UpdatedDate,
 
                 // Thông tin Xóa mềm
                 IsDeleted = lesson.IsDeleted,
                 DeletedAt = lesson.DeletedAt,
-                // Không ánh xạ DeletedByUserFullName vào ViewModel nữa vì nó không tồn tại trong ViewModel
-                // Nếu cần hiển thị người xóa, bạn sẽ sử dụng UpdatedByUserFullName trong View khi IsDeleted = true
-                // VÀO VIEW (Details.cshtml) BẠN SẼ LÀM:
-                // @if (Model.IsDeleted) {
-                //    <dt>Người xóa</dt>
-                //    <dd>@Model.UpdatedByUserFullName</dd>
-                // }
-
-
-                // Danh sách Tests
+                
                 Tests = lesson.Tests.ToList() // Ánh xạ trực tiếp danh sách Tests đã được Include
             };
 
@@ -266,8 +243,8 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
 
             var lesson = await db.Lessons
-                                 .Include(l => l.Category) // Vẫn include Category để lấy CategoryName
-                                 .Include(l => l.Tests)    // Vẫn include Tests nếu bạn muốn hiển thị
+                                 .Include(l => l.Category) 
+                                 .Include(l => l.Tests)    
                                  .Include(l => l.CreatedByUser)
                                  .Include(l => l.UpdatedByUser)
                                  .SingleOrDefaultAsync(l => l.Id == id);
@@ -291,9 +268,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 updatedByUserRole = roles.FirstOrDefault() ?? "N/A";
             }
 
-            // ***** ĐOẠN CODE LIÊN QUAN ĐẾN CATEGORIESLIST ĐÃ BỊ LOẠI BỎ *****
-            // var categories = await db.Categories.Where(c => !c.IsDeleted).ToListAsync();
-            // ViewBag.CategoryId = new SelectList(categories, "Id", "Name", lesson.CategoryId);
 
 
             // Ánh xạ từ Lesson entity sang LessonEditViewModel
@@ -375,8 +349,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                             ModelState.AddModelError(validationError.PropertyName, validationError.ErrorMessage);
                         }
                     }
-                    // Nếu lỗi, cần chuẩn bị lại dữ liệu cho View (CategoryName, Tests, Audit)
-                    // Nạp lại Tests và CategoryName cho ViewModel
                     var lessonWithTestsOnFail = await db.Lessons.Include(l => l.Tests.Where(t => !t.IsDeleted)).SingleOrDefaultAsync(l => l.Id == viewModel.Id);
                     viewModel.Tests = lessonWithTestsOnFail?.Tests.ToList() ?? new List<Test>();
                     ViewBag.CategoryName = category?.Name;
@@ -395,7 +367,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             }
 
             // Nếu ModelState ban đầu không hợp lệ
-            // Nạp lại Tests và CategoryName cho ViewModel
             var lessonWithTestsOnFailInitial = await db.Lessons.Include(l => l.Tests.Where(t => !t.IsDeleted)).SingleOrDefaultAsync(l => l.Id == viewModel.Id);
             viewModel.Tests = lessonWithTestsOnFailInitial?.Tests.ToList() ?? new List<Test>();
             ViewBag.CategoryName = category?.Name;
@@ -404,7 +375,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
 
 
         // --- ACTION: XÓA MỀM BÀI HỌC (SoftDelete) ---
-        // POST: Admin/Lessons/SoftDelete/5
         [HttpPost, ActionName("SoftDelete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SoftDeleteConfirmed(int id)
@@ -448,7 +418,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         }
 
         // --- ACTION: KHÔI PHỤC BÀI HỌC (Restore) ---
-        // POST: Admin/Lessons/Restore/5
         [HttpPost, ActionName("Restore")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RestoreConfirmed(int id)
@@ -490,7 +459,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
         }
 
         // --- ACTION: XÓA HOÀN TOÀN BÀI HỌC (HardDelete) ---
-        // POST: Admin/Lessons/HardDelete/5
         [HttpPost, ActionName("HardDelete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> HardDeleteConfirmed(int id)
@@ -502,7 +470,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Bài học không tồn tại." });
             }
 
-            // TÙY CHỌN: Chỉ cho phép xóa cứng các bản ghi đã bị xóa mềm (như bạn đã code)
             if (!lesson.IsDeleted)
             {
                 return Json(new { success = false, message = "Chỉ có thể xóa cứng bài học đã bị xóa mềm." });
@@ -528,15 +495,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             base.Dispose(disposing);
         }
 
-        // --- Phương thức để tìm entity kể cả đã xóa mềm (nếu cần) ---
-        // Nếu SingleOrDefaultAsync(l => l.Id == id) hoạt động đúng với Global Filter của bạn,
-        // bạn không cần phương thức FindDatabaseOnly này nữa.
-        // Nếu Global Filter chặn, bạn cần triển khai logic bỏ qua filter ở đây.
-        // Ví dụ:
-        // private Lesson FindDatabaseOnly(int id)
-        // {
-        //    // Triển khai logic truy vấn bỏ qua filter
-        //    throw new NotImplementedException("Implement logic to find entity bypassing global filters if needed.");
         // }
     }
 }

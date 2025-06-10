@@ -1,16 +1,16 @@
 ﻿using EnglishStudySystem;
 using EnglishStudySystem.Models;
 using EnglishStudySystem.ViewModel;
-using Microsoft.AspNet.Identity; // Cho .NET Framework Identity
+using Microsoft.AspNet.Identity;
 using System;
-using System.Data.Entity; // Cho .NET Framework EF6
+using System.Data.Entity; 
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Mvc; // Cho .NET Framework MVC
+using System.Web.Mvc; 
 
 namespace EnglishStudySystem.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Administrator, Editor")] // Chỉ cho phép Admin và Editor truy cập
+    [Authorize(Roles = "Administrator, Editor")] 
     public class TestController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -20,14 +20,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
             _dbContext = new ApplicationDbContext();
         }
 
-        // Constructor nếu bạn dùng Dependency Injection (phổ biến trong .NET Core)
-        // public TestController(ApplicationDbContext dbContext)
-        // {
-        //     _dbContext = dbContext;
-        // }
-
-        // GET: Admin/Test/Index?lessonId={lessonId}
-        // Hiển thị danh sách bài kiểm tra của một bài học cụ thể
         public async Task<ActionResult> Index(int lessonId)
         {
             var lesson = await _dbContext.Lessons.FindAsync(lessonId);
@@ -144,7 +136,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                     Title = model.Title,
                     Description = model.Description,
                     LessonId = model.LessonId,
-                    QuestionCount = model.Questions.Count, // Tự động xác định từ số lượng câu hỏi
+                    QuestionCount = model.Questions.Count, 
                     Duration = model.Duration,
                     CreatedDate = DateTime.Now
                 };
@@ -343,8 +335,6 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 existingTest.QuestionCount = model.Questions.Count; // Tự động xác định từ số lượng câu hỏi
                 existingTest.Duration = model.Duration;
 
-                // Xử lý Questions và Answers
-                // 1. Xóa các câu hỏi và đáp án không còn tồn tại
                 var questionIdsToKeep = model.Questions.Where(q => q.Id > 0).Select(q => q.Id).ToList();
                 var questionsToRemove = existingTest.Questions.Where(q => !questionIdsToKeep.Contains(q.Id)).ToList();
                 _dbContext.Questions.RemoveRange(questionsToRemove);
@@ -354,7 +344,7 @@ namespace EnglishStudySystem.Areas.Admin.Controllers
                 foreach (var qVm in model.Questions)
                 {
                     Question question;
-                    if (qVm.Id > 0) // Cập nhật câu hỏi hiện có
+                    if (qVm.Id > 0) 
                     {
                         question = existingTest.Questions.FirstOrDefault(q => q.Id == qVm.Id);
                         if (question != null)
