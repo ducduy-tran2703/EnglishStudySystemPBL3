@@ -34,7 +34,7 @@
                             <span class="badge bg-warning bg-opacity-10 text-warning py-2 px-3 ms-2">
                                 @if (category.Price.HasValue && category.Price > 0)
                                 {
-                                    // Thay đổi CultureInfo để định dạng tiền tệ theo USD
+                                    
                                     <text>@string.Format(new System.Globalization.CultureInfo("en-US"), "{0:C0}", category.Price.Value)</text>
                                 }
                                 else
@@ -119,28 +119,24 @@
             box-shadow: 0 10px 20px rgba(40, 167, 69, 0.1) !important;
         }
 
-    /* Custom màu vàng cho badge giá tiền */
     .badge.bg-warning {
         color: #ffc107 !important;
         background-color: rgba(255, 193, 7, 0.1) !important;
         border: 1px solid rgba(255, 193, 7, 0.2);
     }
 
-    /* Custom màu cho badge bài học */
     .badge.bg-primary {
         color: #007bff !important;
         background-color: rgba(0, 123, 255, 0.1) !important;
         border: 1px solid rgba(0, 123, 255, 0.2);
     }
 
-    /* Custom màu cho badge bài kiểm tra */
     .badge.bg-info {
         color: #17a2b8 !important;
         background-color: rgba(23, 162, 184, 0.1) !important;
         border: 1px solid rgba(23, 162, 184, 0.2);
     }
 
-    /* Đảm bảo tất cả card có cùng chiều cao và layout nhất quán */
     .card {
         min-height: 280px; /* Chiều cao tối thiểu cho card */
     }
@@ -151,7 +147,6 @@
         font-size: 12px;
     }
 
-    /* Cố định chiều cao cho title để badge nằm ngang hàng */
     .card-title-fixed {
         min-height: 48px; /* Đủ chỗ cho 2 dòng title */
         line-height: 1.2;
@@ -175,14 +170,13 @@
         }
 
     .larger-text {
-        font-size: 1em; /* Đã điều chỉnh lại để chữ "Tổng hợp" to hơn theo yêu cầu trước */
+        font-size: 1em;
     }
 
         .larger-text i {
-            font-size: 0.6em; /* Điều chỉnh icon để không bị to theo text (0.667 = 1/1.5) */
+            font-size: 0.6em;
         }
 
-    /* Xóa khoảng cách giữa Tổng hợp và các badge bên dưới */
     .mb-3 > div + div {
         margin-top: 0 !important;
     }

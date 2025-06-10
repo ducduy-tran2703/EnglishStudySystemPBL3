@@ -70,14 +70,12 @@ else
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Cập nhật class ngay lập tức để phản ánh trạng thái đã đọc
+
                             $link.closest('li').removeClass('unread-notification').addClass('read-notification');
                         }
-                        // Chuyển hướng dù thành công hay thất bại
                         window.location.href = url;
                     },
                     error: function() {
-                        // Vẫn chuyển hướng nếu có lỗi
                         window.location.href = url;
                     }
                 });

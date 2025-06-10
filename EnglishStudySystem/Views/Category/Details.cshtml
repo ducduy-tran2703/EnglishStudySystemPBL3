@@ -59,7 +59,6 @@
             {
                 <div class="list-group list-group-flush">
                     @{
-                        // Sắp xếp lessons: bài miễn phí lên trên, các bài khác theo thứ tự ban đầu
                         var sortedLessons = lessons.OrderByDescending(l => l.IsFreeTrial).ThenBy(l => l.CreatedDate).ToList();
                     }
                     @foreach (var lesson in sortedLessons)
@@ -161,7 +160,6 @@
             color: #000;
         }
 
-    /* Đảm bảo tất cả các nút có cùng độ rộng tối thiểu */
     .btn-sm {
         min-width: 120px;
     }

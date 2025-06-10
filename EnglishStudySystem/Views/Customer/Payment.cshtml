@@ -155,7 +155,7 @@ $('#btnCheckPayment').click(function() {
 
     // Thêm tham số amount vào request
     $.get('@Url.Action("CheckPaymentMomo", "Payment")', {
-        amount: @Model.Price, // Truyền amount từ model
+        amount: @Model.Price, 
         categoryId: categoryId
     }, function(response) {
         if (response && typeof response.success !== 'undefined') {
